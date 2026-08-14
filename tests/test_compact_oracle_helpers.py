@@ -1,9 +1,33 @@
+from __future__ import annotations
+
+import importlib.util
+import sys
+from pathlib import Path
+from types import ModuleType
+from typing import Any, cast
+
 from jbspan.schemas import TextSpan
-from scripts.run_phase1_llama_cpp_compact_oracle import (
-    _candidate_specs_for_text,
-    _partition_word_spans,
-    _word_spans,
-)
+
+
+def _load_runner_module() -> ModuleType:
+    path = (
+        Path(__file__).resolve().parents[1]
+        / "scripts"
+        / "run_phase1_llama_cpp_compact_oracle.py"
+    )
+    spec = importlib.util.spec_from_file_location("phase1_compact_oracle_runner", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("could not load compact-oracle runner module")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+_RUNNER = _load_runner_module()
+_word_spans = cast(Any, _RUNNER._word_spans)
+_partition_word_spans = cast(Any, _RUNNER._partition_word_spans)
+_candidate_specs_for_text = cast(Any, _RUNNER._candidate_specs_for_text)
 
 
 def test_partition_word_spans_is_contiguous_and_complete() -> None:
