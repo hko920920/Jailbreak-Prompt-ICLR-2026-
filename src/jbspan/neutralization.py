@@ -7,7 +7,8 @@ from jbspan.schemas import TextSpan
 
 
 class Neutralizer(Protocol):
-    name: str
+    @property
+    def name(self) -> str: ...
 
     def apply(self, text: str, spans: tuple[TextSpan, ...]) -> str: ...
 

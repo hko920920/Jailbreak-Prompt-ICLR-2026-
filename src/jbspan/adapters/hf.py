@@ -24,8 +24,11 @@ class HuggingFaceCausalLMAdapter:
 
     def __post_init__(self) -> None:
         try:
-            import torch
-            from transformers import AutoModelForCausalLM, AutoTokenizer
+            import torch  # type: ignore[import-not-found]
+            from transformers import (  # type: ignore[import-not-found]
+                AutoModelForCausalLM,
+                AutoTokenizer,
+            )
         except ImportError as exc:  # pragma: no cover - optional dependency
             raise RuntimeError("install jbspan with the 'hf' extra") from exc
 
@@ -43,7 +46,7 @@ class HuggingFaceCausalLMAdapter:
         self._model.eval()
 
     def generate(self, prompt: str, *, seed: int) -> str:  # pragma: no cover - GPU path
-        import torch
+        import torch  # type: ignore[import-not-found]
 
         torch.manual_seed(seed)
         messages = [{"role": "user", "content": prompt}]
@@ -63,4 +66,4 @@ class HuggingFaceCausalLMAdapter:
         with torch.inference_mode():
             output = self._model.generate(**batch, **generation_kwargs)
         generated = output[0, batch["input_ids"].shape[1] :]
-        return self._tokenizer.decode(generated, skip_special_tokens=True)
+        return str(self._tokenizer.decode(generated, skip_special_tokens=True))

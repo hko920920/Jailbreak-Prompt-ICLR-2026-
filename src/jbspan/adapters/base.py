@@ -6,18 +6,21 @@ from jbspan.schemas import BehaviorScores, PromptPair
 
 
 class TargetModel(Protocol):
-    name: str
+    @property
+    def name(self) -> str: ...
 
     def generate(self, prompt: str, *, seed: int) -> str: ...
 
 
 class ResponseJudge(Protocol):
-    name: str
+    @property
+    def name(self) -> str: ...
 
     def score(self, pair: PromptPair, prompt: str, response: str) -> BehaviorScores: ...
 
 
 class IntentJudge(Protocol):
-    name: str
+    @property
+    def name(self) -> str: ...
 
     def score(self, pair: PromptPair, edited_prompt: str) -> float: ...
