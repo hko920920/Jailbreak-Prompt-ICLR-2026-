@@ -1,7 +1,8 @@
 {
   "experiment_id": "phase1-micro-pilot-v1",
   "paper_validity": false,
-  "data_path": "data/processed/phase1_micro_pilot.jsonl",
+  "data_path": "data/processed/phase1_micro_pilot_20.local.jsonl",
+  "selection_manifest": "data/manifests/phase1_micro_pilot_20.source_selection.json",
   "output_dir": "artifacts/phase1-micro-pilot-v1",
   "cache_dir": "cache/phase1-micro-pilot-v1",
   "max_examples": 20,
