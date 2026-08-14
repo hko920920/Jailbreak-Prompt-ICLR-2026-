@@ -1,9 +1,36 @@
 from __future__ import annotations
 
+import importlib.util
+import sys
+from pathlib import Path
+from types import ModuleType
+from typing import Any, Callable
+
 import pytest
 
 from jbspan.schemas import PromptPair
-from scripts.run_phase1_llama_cpp_neutralization_diagnostic import _build_variants
+
+
+def _load_runner_module() -> ModuleType:
+    path = (
+        Path(__file__).resolve().parents[1]
+        / "scripts"
+        / "run_phase1_llama_cpp_neutralization_diagnostic.py"
+    )
+    spec = importlib.util.spec_from_file_location("neutralization_diagnostic_runner", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("unable to load neutralization diagnostic runner")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+_runner = _load_runner_module()
+_build_variants: Callable[
+    [PromptPair, tuple[int, ...]],
+    tuple[dict[str, str], dict[str, Any]],
+] = _runner._build_variants
 
 
 def _pair() -> PromptPair:
