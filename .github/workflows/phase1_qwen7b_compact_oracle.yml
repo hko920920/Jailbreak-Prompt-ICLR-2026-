@@ -2,19 +2,6 @@ name: phase1-qwen7b-compact-oracle
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - agent/phase1-core-experiment-prep
-    paths:
-      - .github/workflows/phase1_qwen7b_compact_oracle.yml
-      - scripts/run_phase1_llama_cpp_compact_oracle.py
-      - scripts/assemble_phase1_jbb_micro_pilot.py
-      - src/jbspan/schemas.py
-      - tests/test_goal_alignment.py
-      - tests/test_compact_oracle_helpers.py
-      - data/manifests/phase1_qwen7b_compact_oracle_cases.json
-      - data/manifests/phase1_qwen7b_neutralization_ai_assisted_labels.json
-      - security/phase1_compact_oracle_recipient_cert.pem
 
 permissions:
   contents: read
