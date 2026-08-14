@@ -1,0 +1,162 @@
+name: phase1-qwen7b-private-audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/phase1-core-experiment-prep
+    paths:
+      - .github/workflows/phase1_qwen7b_private_audit.yml
+      - scripts/run_phase1_llama_cpp_private_audit.py
+      - scripts/assemble_phase1_jbb_micro_pilot.py
+      - data/manifests/phase1_qwen7b_heuristic_candidates.json
+      - security/phase1_audit_recipient_cert.pem
+
+permissions:
+  contents: read
+
+jobs:
+  qwen7b-private-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    env:
+      MODEL_REF: Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M
+      DATA_PATH: data/processed/phase1_micro_pilot_20.local.jsonl
+      CANDIDATE_PATH: data/manifests/phase1_qwen7b_heuristic_candidates.json
+      PRIVATE_OUTPUT: ${{ runner.temp }}/phase1_qwen7b_private_audit.jsonl
+      SAFE_OUTPUT: artifacts/phase1-qwen7b-private-audit/safe_summary.json
+      ENCRYPTED_OUTPUT: artifacts/phase1-qwen7b-private-audit/private_audit.cms
+      RECIPIENT_CERT: security/phase1_audit_recipient_cert.pem
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev]'
+
+      - name: Validate private audit runner
+        run: |
+          ruff check scripts/run_phase1_llama_cpp_private_audit.py
+          mypy src/jbspan scripts/run_phase1_llama_cpp_private_audit.py
+
+      - name: Assemble pinned 20-example input
+        run: |
+          python scripts/assemble_phase1_jbb_micro_pilot.py \
+            --output "$DATA_PATH" \
+            --manifest data/manifests/phase1_micro_pilot_20.selection.private-audit.json
+
+      - name: Install official llama.cpp runtime
+        run: |
+          curl -LsSf https://llama.app/install.sh | \
+            SKIP_CUDA=1 SKIP_ROCM=1 SKIP_VULKAN=1 sh
+          ~/.llama-app/llama --version
+
+      - name: Start Qwen2.5-7B-Instruct Q4 server
+        run: |
+          export HF_HOME="$RUNNER_TEMP/huggingface"
+          mkdir -p "$HF_HOME" "$RUNNER_TEMP/llama-server"
+          nohup ~/.llama-app/llama serve \
+            -hf "$MODEL_REF" \
+            --host 127.0.0.1 \
+            --port 8080 \
+            -c 4608 \
+            -t 4 \
+            >"$RUNNER_TEMP/llama-server/server.log" 2>&1 &
+          echo "$!" >"$RUNNER_TEMP/llama-server/pid"
+
+          ready=0
+          for _ in $(seq 1 180); do
+            if ! kill -0 "$(cat "$RUNNER_TEMP/llama-server/pid")" 2>/dev/null; then
+              echo "llama server exited before readiness"
+              tail -n 100 "$RUNNER_TEMP/llama-server/server.log"
+              exit 1
+            fi
+            status="$(curl -sS -o /dev/null -w '%{http_code}' \
+              http://127.0.0.1:8080/health || true)"
+            if [ "$status" = "200" ]; then
+              ready=1
+              break
+            fi
+            sleep 10
+          done
+
+          if [ "$ready" != "1" ]; then
+            echo "llama server did not become ready"
+            tail -n 100 "$RUNNER_TEMP/llama-server/server.log"
+            exit 1
+          fi
+
+      - name: Capture 11 longer-decode candidate pairs privately
+        run: |
+          timeout 55m python scripts/run_phase1_llama_cpp_private_audit.py \
+            --data "$DATA_PATH" \
+            --candidates "$CANDIDATE_PATH" \
+            --private-output "$PRIVATE_OUTPUT" \
+            --safe-output "$SAFE_OUTPUT" \
+            --model "$MODEL_REF" \
+            --max-tokens 160 \
+            --temperature 0.0
+
+      - name: Encrypt private audit bundle and remove plaintext
+        run: |
+          mkdir -p "$(dirname "$ENCRYPTED_OUTPUT")"
+          archive="$RUNNER_TEMP/phase1_qwen7b_private_audit.tar.gz"
+          tar -C "$(dirname "$PRIVATE_OUTPUT")" -czf "$archive" \
+            "$(basename "$PRIVATE_OUTPUT")"
+          openssl cms -encrypt -binary -aes256 \
+            -in "$archive" \
+            -out "$ENCRYPTED_OUTPUT" \
+            -outform DER \
+            "$RECIPIENT_CERT"
+          openssl dgst -sha256 "$ENCRYPTED_OUTPUT"
+          shred -u "$PRIVATE_OUTPUT" "$archive"
+          test ! -e "$PRIVATE_OUTPUT"
+
+      - name: Publish safe aggregate summary
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          path = Path(os.environ["SAFE_OUTPUT"])
+          payload = json.loads(path.read_text(encoding="utf-8"))
+          summary = {key: value for key, value in payload.items() if key != "records"}
+          print(json.dumps(summary, indent=2, sort_keys=True))
+          with Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a", encoding="utf-8") as handle:
+              handle.write("# Phase 1 Qwen2.5-7B private audit capture\n\n")
+              handle.write(f"- candidates captured: **{payload['example_count']}**\n")
+              handle.write(
+                  "- longer-decode heuristic candidates: "
+                  f"**{payload['longer_decode_heuristic_candidate_count']}**\n"
+              )
+              handle.write(
+                  f"- jailbreak length-finished: **{payload['jailbreak_length_finished_count']}**\n"
+              )
+              handle.write("- plaintext prompts/responses uploaded: **false**\n")
+              handle.write("- encrypted CMS bundle uploaded: **true**\n")
+              handle.write("\nThis capture is not paper-valid until explicit audit labels are frozen.\n")
+          PY
+
+      - name: Upload encrypted private bundle and safe summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase1-qwen7b-encrypted-private-audit
+          path: |
+            ${{ env.ENCRYPTED_OUTPUT }}
+            ${{ env.SAFE_OUTPUT }}
+          if-no-files-found: error
+          retention-days: 3
+
+      - name: Stop local model server
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/llama-server/pid" ]; then
+            kill "$(cat "$RUNNER_TEMP/llama-server/pid")" 2>/dev/null || true
+          fi
