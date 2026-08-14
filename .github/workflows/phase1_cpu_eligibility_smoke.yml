@@ -38,7 +38,7 @@ jobs:
       - name: Validate eligibility runner
         run: |
           ruff check scripts/run_phase1_llama_cpp_eligibility.py
-          mypy scripts/run_phase1_llama_cpp_eligibility.py
+          mypy src/jbspan scripts/run_phase1_llama_cpp_eligibility.py
 
       - name: Assemble pinned 20-example input
         run: |
