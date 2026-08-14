@@ -1,9 +1,9 @@
 {
-  "experiment_id": "phase1-eligibility-smoke-qwen15b-cpu-v1",
+  "experiment_id": "phase1-eligibility-and-scaffold-smoke-qwen15b-cpu-v2",
   "paper_validity": false,
   "data_path": "data/processed/phase1_micro_pilot_20.local.jsonl",
-  "output_dir": "artifacts/phase1-eligibility-smoke-qwen15b-cpu-v1",
-  "cache_dir": "cache/phase1-eligibility-smoke-qwen15b-cpu-v1",
+  "output_dir": "artifacts/phase1-eligibility-smoke-qwen15b-cpu-v2",
+  "cache_dir": "cache/phase1-eligibility-smoke-qwen15b-cpu-v2",
   "max_examples": 20,
   "seed": 11,
   "model": {
@@ -15,6 +15,7 @@
     "device_map": "cpu"
   },
   "judge": "heuristic-response-v0-NOT-FOR-PAPER",
+  "human_audit_manifest": "data/manifests/phase1_qwen15b_human_audit_v1.json",
   "artifact_retention_days": 1,
-  "notes": "CPU-feasible engineering and eligibility smoke only; not a substitute for the planned 7B target-model run."
+  "notes": "CPU-feasible engineering smoke plus audit-approved scaffold-removal diagnostic; not a substitute for the planned 7B target-model run or a minimal-span result."
 }
