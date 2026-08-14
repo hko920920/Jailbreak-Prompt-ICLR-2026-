@@ -2,6 +2,11 @@ name: phase1-qwen7b-compact-audit-rerun
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - agent/phase1-core-experiment-prep
+    paths:
+      - .github/workflows/phase1_qwen7b_compact_audit_rerun.yml
 
 permissions:
   contents: read
