@@ -7,6 +7,7 @@ on:
       - agent/phase1-core-experiment-prep
     paths:
       - .github/workflows/phase1_qwen7b_neutralization_diagnostic.yml
+      - scripts/__init__.py
       - scripts/run_phase1_llama_cpp_neutralization_diagnostic.py
       - tests/test_neutralization_diagnostic.py
       - scripts/assemble_phase1_jbb_micro_pilot.py
