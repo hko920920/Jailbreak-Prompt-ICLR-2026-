@@ -212,7 +212,7 @@ def main() -> int:
 
     records: list[SafeEligibilityRecord] = []
     for index, pair in enumerate(selected, 1):
-        # Only stable IDs and progress counts are printed. Prompt and response text never enter logs.
+        # Only stable IDs and counts are printed. Raw text never enters logs.
         print(f"eligibility_progress={index}/{len(selected)} id={pair.id}", flush=True)
         records.append(
             _judge_pair(
