@@ -23,7 +23,7 @@ jobs:
       MODEL_REF: Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M
       DATA_PATH: data/processed/phase1_micro_pilot_20.local.jsonl
       CANDIDATE_PATH: data/manifests/phase1_qwen7b_heuristic_candidates.json
-      PRIVATE_OUTPUT: ${{ runner.temp }}/phase1_qwen7b_private_audit.jsonl
+      PRIVATE_OUTPUT: /tmp/phase1_qwen7b_private_audit.jsonl
       SAFE_OUTPUT: artifacts/phase1-qwen7b-private-audit/safe_summary.json
       ENCRYPTED_OUTPUT: artifacts/phase1-qwen7b-private-audit/private_audit.cms
       RECIPIENT_CERT: security/phase1_audit_recipient_cert.pem
