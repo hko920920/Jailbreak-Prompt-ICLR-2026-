@@ -39,7 +39,8 @@ def test_partition_word_spans_is_contiguous_and_complete() -> None:
     assert len(chunks) == 3
     assert chunks[0][1] == 0
     assert chunks[-1][2] == len(words)
-    assert all(left[2] == right[1] for left, right in zip(chunks, chunks[1:], strict=True))
+    adjacent_pairs = zip(chunks, chunks[1:])
+    assert all(left[2] == right[1] for left, right in adjacent_pairs)
 
 
 def test_candidate_grid_is_unique_sorted_and_fraction_bounded() -> None:
