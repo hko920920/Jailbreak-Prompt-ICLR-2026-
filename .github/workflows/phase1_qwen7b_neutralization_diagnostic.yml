@@ -1,0 +1,169 @@
+name: phase1-qwen7b-neutralization-diagnostic
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/phase1-core-experiment-prep
+    paths:
+      - .github/workflows/phase1_qwen7b_neutralization_diagnostic.yml
+      - scripts/run_phase1_llama_cpp_neutralization_diagnostic.py
+      - tests/test_neutralization_diagnostic.py
+      - scripts/assemble_phase1_jbb_micro_pilot.py
+      - data/manifests/phase1_qwen7b_neutralization_candidates.json
+      - data/manifests/phase1_qwen7b_ai_assisted_audit_labels.json
+      - security/phase1_audit_recipient_cert.pem
+      - src/jbspan/neutralization.py
+      - src/jbspan/schemas.py
+
+permissions:
+  contents: read
+
+jobs:
+  qwen7b-neutralization:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      MODEL_REF: Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M
+      DATA_PATH: data/processed/phase1_micro_pilot_20.local.jsonl
+      CANDIDATE_PATH: data/manifests/phase1_qwen7b_neutralization_candidates.json
+      AUDIT_LABELS: data/manifests/phase1_qwen7b_ai_assisted_audit_labels.json
+      SAFE_OUTPUT: artifacts/phase1-qwen7b-neutralization/safe_summary.json
+      ENCRYPTED_OUTPUT: artifacts/phase1-qwen7b-neutralization/private_diagnostic.cms
+      RECIPIENT_CERT: security/phase1_audit_recipient_cert.pem
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install and validate project
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev]'
+          ruff check scripts/run_phase1_llama_cpp_neutralization_diagnostic.py \
+            tests/test_neutralization_diagnostic.py
+          mypy src/jbspan scripts/run_phase1_llama_cpp_neutralization_diagnostic.py
+          pytest tests/test_neutralization_diagnostic.py
+
+      - name: Assemble pinned 20-example input
+        run: |
+          python scripts/assemble_phase1_jbb_micro_pilot.py \
+            --output "$DATA_PATH" \
+            --manifest data/manifests/phase1_micro_pilot_20.selection.neutralization.json
+
+      - name: Install official llama.cpp runtime
+        run: |
+          curl -LsSf https://llama.app/install.sh | \
+            SKIP_CUDA=1 SKIP_ROCM=1 SKIP_VULKAN=1 sh
+          ~/.llama-app/llama --version
+
+      - name: Start Qwen2.5-7B-Instruct Q4 server
+        run: |
+          export HF_HOME="$RUNNER_TEMP/huggingface"
+          mkdir -p "$HF_HOME" "$RUNNER_TEMP/llama-server"
+          nohup ~/.llama-app/llama serve \
+            -hf "$MODEL_REF" \
+            --host 127.0.0.1 \
+            --port 8080 \
+            -c 4608 \
+            -t 4 \
+            >"$RUNNER_TEMP/llama-server/server.log" 2>&1 &
+          echo "$!" >"$RUNNER_TEMP/llama-server/pid"
+
+          ready=0
+          for _ in $(seq 1 180); do
+            if ! kill -0 "$(cat "$RUNNER_TEMP/llama-server/pid")" 2>/dev/null; then
+              echo "llama server exited before readiness"
+              tail -n 100 "$RUNNER_TEMP/llama-server/server.log"
+              exit 1
+            fi
+            status="$(curl -sS -o /dev/null -w '%{http_code}' \
+              http://127.0.0.1:8080/health || true)"
+            if [ "$status" = "200" ]; then
+              ready=1
+              break
+            fi
+            sleep 10
+          done
+
+          if [ "$ready" != "1" ]; then
+            echo "llama server did not become ready"
+            tail -n 100 "$RUNNER_TEMP/llama-server/server.log"
+            exit 1
+          fi
+
+      - name: Run six-case controlled neutralization diagnostic
+        run: |
+          private_output="$RUNNER_TEMP/phase1_qwen7b_neutralization.private.jsonl"
+          echo "PRIVATE_OUTPUT=$private_output" >> "$GITHUB_ENV"
+          timeout 70m python scripts/run_phase1_llama_cpp_neutralization_diagnostic.py \
+            --data "$DATA_PATH" \
+            --candidates "$CANDIDATE_PATH" \
+            --audit-labels "$AUDIT_LABELS" \
+            --private-output "$private_output" \
+            --safe-output "$SAFE_OUTPUT" \
+            --model "$MODEL_REF" \
+            --max-tokens 192 \
+            --temperature 0.0
+
+      - name: Encrypt private diagnostic and remove plaintext
+        run: |
+          mkdir -p "$(dirname "$ENCRYPTED_OUTPUT")"
+          archive="$RUNNER_TEMP/phase1_qwen7b_neutralization.tar.gz"
+          tar -C "$(dirname "$PRIVATE_OUTPUT")" -czf "$archive" \
+            "$(basename "$PRIVATE_OUTPUT")"
+          openssl cms -encrypt -binary -aes256 \
+            -in "$archive" \
+            -out "$ENCRYPTED_OUTPUT" \
+            -outform DER \
+            "$RECIPIENT_CERT"
+          openssl dgst -sha256 "$ENCRYPTED_OUTPUT"
+          shred -u "$PRIVATE_OUTPUT" "$archive"
+          test ! -e "$PRIVATE_OUTPUT"
+
+      - name: Publish safe aggregate summary
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          path = Path(os.environ["SAFE_OUTPUT"])
+          payload = json.loads(path.read_text(encoding="utf-8"))
+          summary = {key: value for key, value in payload.items() if key != "records"}
+          print(json.dumps(summary, indent=2, sort_keys=True))
+          with Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a", encoding="utf-8") as handle:
+              handle.write("# Qwen2.5-7B controlled neutralization diagnostic\n\n")
+              handle.write(f"- cases: **{payload['example_count']}**\n")
+              handle.write(
+                  "- heuristic refusal counts: "
+                  f"`{payload['variant_heuristic_refusal_counts']}`\n"
+              )
+              handle.write(
+                  "- length-finished counts: "
+                  f"`{payload['variant_length_finished_counts']}`\n"
+              )
+              handle.write("- plaintext prompts/responses uploaded: **false**\n")
+              handle.write("- encrypted private diagnostic uploaded: **true**\n")
+              handle.write("\nResults remain development-only pending explicit audit.\n")
+          PY
+
+      - name: Upload encrypted private diagnostic and safe summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase1-qwen7b-encrypted-neutralization-diagnostic
+          path: |
+            ${{ env.ENCRYPTED_OUTPUT }}
+            ${{ env.SAFE_OUTPUT }}
+          if-no-files-found: error
+          retention-days: 3
+
+      - name: Stop local model server
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/llama-server/pid" ]; then
+            kill "$(cat "$RUNNER_TEMP/llama-server/pid")" 2>/dev/null || true
+          fi
