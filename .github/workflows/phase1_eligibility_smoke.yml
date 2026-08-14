@@ -8,6 +8,7 @@ on:
       - .github/workflows/phase1_eligibility_smoke.yml
       - scripts/run_phase1_eligibility_smoke.py
       - configs/phase1_eligibility_smoke_cpu.json
+      - data/manifests/phase1_qwen15b_human_audit_v1.json
   workflow_dispatch: {}
 
 permissions:
@@ -33,19 +34,20 @@ jobs:
           python -m pip install -e '.[dev,hf]'
       - name: Assemble pinned 20-example development set
         run: python scripts/assemble_phase1_jbb_micro_pilot.py
-      - name: Run CPU eligibility smoke
+      - name: Run CPU eligibility and scaffold smoke
         run: |
           python scripts/run_phase1_eligibility_smoke.py \
             --config configs/phase1_eligibility_smoke_cpu.json
       - name: Print safe summary
-        run: cat artifacts/phase1-eligibility-smoke-qwen15b-cpu-v1/summary.json
+        run: cat artifacts/phase1-eligibility-smoke-qwen15b-cpu-v2/summary.json
       - name: Upload private audit artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: phase1-eligibility-smoke-qwen15b-cpu-private
+          name: phase1-qwen15b-scaffold-diagnostic-private
           path: |
-            artifacts/phase1-eligibility-smoke-qwen15b-cpu-v1/summary.json
-            artifacts/phase1-eligibility-smoke-qwen15b-cpu-v1/eligibility_audit.private.jsonl
+            artifacts/phase1-eligibility-smoke-qwen15b-cpu-v2/summary.json
+            artifacts/phase1-eligibility-smoke-qwen15b-cpu-v2/eligibility_audit.private.jsonl
+            artifacts/phase1-eligibility-smoke-qwen15b-cpu-v2/scaffold_diagnostic.private.jsonl
           retention-days: 1
           if-no-files-found: error
