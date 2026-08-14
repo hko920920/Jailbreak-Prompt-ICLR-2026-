@@ -1,0 +1,1 @@
+{"id":"replace-with-stable-id","behavior":"abstract behavior label","original_prompt":"[LOCAL DATA ONLY: original request refused by the target model]","jailbreak_prompt":"[LOCAL DATA ONLY: paired successful jailbreak prompt]","attack_family":"replace-with-family","metadata":{"source":"replace-with-source","license":"replace-with-license","split":"development"}}
