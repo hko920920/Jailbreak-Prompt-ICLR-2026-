@@ -46,7 +46,7 @@ class HuggingFaceCausalLMAdapter:
         self._model.eval()
 
     def generate(self, prompt: str, *, seed: int) -> str:  # pragma: no cover - GPU path
-        import torch  # type: ignore[import-not-found]
+        import torch
 
         torch.manual_seed(seed)
         messages = [{"role": "user", "content": prompt}]
