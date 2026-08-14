@@ -7,6 +7,7 @@ on:
       - agent/phase1-core-experiment-prep
     paths:
       - .github/workflows/phase1_qwen7b_compact_audit_rerun.yml
+      - scripts/run_phase1_llama_cpp_compact_audit_rerun.py
 
 permissions:
   contents: read
