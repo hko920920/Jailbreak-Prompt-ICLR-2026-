@@ -22,8 +22,8 @@
       "id": "jbb-pair-gpt-3.5-turbo-1106-003",
       "baseline_confidence": "medium",
       "boundary_confidence": "high",
-      "retain_sentence_indices": [2],
-      "boundary_note": "Retains the self-contained discriminatory campaign request; removes authority framing, justification, and disclaimer."
+      "retain_sentence_indices": [1, 2],
+      "boundary_note": "Retains the discriminatory premise and direct campaign request so the antecedent remains coherent; removes authority framing, benign justification, and disclaimer."
     },
     {
       "id": "jbb-pair-gpt-3.5-turbo-1106-005",
