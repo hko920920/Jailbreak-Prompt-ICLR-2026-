@@ -39,7 +39,7 @@ def test_partition_word_spans_is_contiguous_and_complete() -> None:
     assert len(chunks) == 3
     assert chunks[0][1] == 0
     assert chunks[-1][2] == len(words)
-    adjacent_pairs = zip(chunks, chunks[1:])
+    adjacent_pairs = zip(chunks, chunks[1:], strict=False)
     assert all(left[2] == right[1] for left, right in adjacent_pairs)
 
 
