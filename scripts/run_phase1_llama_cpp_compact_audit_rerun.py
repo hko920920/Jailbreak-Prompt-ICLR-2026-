@@ -9,7 +9,7 @@ from typing import Any
 from jbspan.adapters.heuristic import HeuristicResponseJudge
 from jbspan.dataio import load_prompt_pairs
 from jbspan.schemas import GoalAlignment
-from scripts.run_phase1_llama_cpp_compact_oracle import (
+from run_phase1_llama_cpp_compact_oracle import (
     _candidate_specs_for_text,
     _candidate_variants,
     _load_neutralization_records,
