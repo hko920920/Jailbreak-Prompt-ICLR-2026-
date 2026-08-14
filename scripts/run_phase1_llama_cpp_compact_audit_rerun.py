@@ -6,9 +6,6 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
-from jbspan.adapters.heuristic import HeuristicResponseJudge
-from jbspan.dataio import load_prompt_pairs
-from jbspan.schemas import GoalAlignment
 from run_phase1_llama_cpp_compact_oracle import (
     _candidate_specs_for_text,
     _candidate_variants,
@@ -22,6 +19,10 @@ from run_phase1_llama_cpp_compact_oracle import (
     _sentence_spans,
     _write_private_jsonl,
 )
+
+from jbspan.adapters.heuristic import HeuristicResponseJudge
+from jbspan.dataio import load_prompt_pairs
+from jbspan.schemas import GoalAlignment
 
 
 def _load_json(path: Path) -> dict[str, Any]:
