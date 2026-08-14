@@ -8,7 +8,7 @@ on:
       - .github/workflows/phase1_eligibility_smoke.yml
       - scripts/run_phase1_eligibility_smoke.py
       - configs/phase1_eligibility_smoke_cpu.json
-  workflow_dispatch:
+  workflow_dispatch: {}
 
 permissions:
   contents: read
@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
-      HF_HOME: ${{ runner.temp }}/huggingface
+      HF_HOME: /tmp/huggingface
       TOKENIZERS_PARALLELISM: "false"
       TRANSFORMERS_NO_ADVISORY_WARNINGS: "1"
     steps:
