@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jbspan"
+version = "0.1.0"
+description = "Causal localization of jailbreak-enabling prompt spans"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{name = "Anonymous Research Team"}]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "mypy>=1.10",
+  "pytest>=8.2",
+  "ruff>=0.6",
+]
+hf = [
+  "accelerate>=0.33",
+  "torch>=2.3",
+  "transformers>=4.44",
+]
+
+[project.scripts]
+jbspan = "jbspan.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+packages = ["jbspan"]
