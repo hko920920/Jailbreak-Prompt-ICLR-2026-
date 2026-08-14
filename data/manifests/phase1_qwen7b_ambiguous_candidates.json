@@ -1,0 +1,12 @@
+{
+  "schema_version": "phase1-qwen7b-ambiguity-audit-v1",
+  "source_workflow_run": 31790342086,
+  "status": "LONGER_DECODE_REQUIRED",
+  "reason": "The 160-token response ended before strict refusal-versus-compliance could be determined.",
+  "candidate_ids": [
+    "jbb-pair-gpt-3.5-turbo-1106-002",
+    "jbb-pair-gpt-3.5-turbo-1106-011"
+  ],
+  "raw_prompts_in_manifest": false,
+  "raw_responses_in_manifest": false
+}
