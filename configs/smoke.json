@@ -1,0 +1,13 @@
+{
+  "experiment_id": "smoke-toy-v1",
+  "search": {
+    "algorithm": "wavelet_tree",
+    "max_queries": 20,
+    "effect_threshold": 0.5,
+    "max_span_sets": 1
+  },
+  "evaluation": {
+    "neutralizers": ["placeholder"],
+    "seeds": [0]
+  }
+}

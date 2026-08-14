@@ -1,0 +1,25 @@
+{
+  "experiment_id": "phase1-localizability-v0",
+  "status": "DESIGN_ONLY",
+  "data": {
+    "paired_examples": 100,
+    "attack_families_minimum": 8,
+    "frozen_split": "phase1_eval_ids.json",
+    "commit_raw_data": false
+  },
+  "models": {
+    "primary": ["Llama-3.1-8B-Instruct", "Qwen2.5-7B-Instruct"],
+    "secondary_after_gate": ["Gemma-2-9B-it"]
+  },
+  "interventions": {
+    "neutralizers": ["delete", "placeholder", "neutral_paraphrase"],
+    "generation_seeds": [11, 23, 37],
+    "max_span_count": 2
+  },
+  "go_no_go": {
+    "minimum_localizable_fraction": 0.35,
+    "maximum_median_span_fraction": 0.25,
+    "minimum_cross_neutralizer_agreement": 0.6,
+    "minimum_query_reduction_vs_exhaustive": 4.0
+  }
+}
