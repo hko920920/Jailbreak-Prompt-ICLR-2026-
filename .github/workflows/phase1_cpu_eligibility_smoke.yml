@@ -19,10 +19,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 75
     env:
-      MODEL_REF: Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M
+      MODEL_REF: "Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M"
       DATA_PATH: data/processed/phase1_micro_pilot_20.local.jsonl
       SAFE_OUTPUT: artifacts/phase1-qwen25-7b-cpu-smoke/eligibility_summary.json
-      HF_HOME: ${{ runner.temp }}/huggingface
     steps:
       - uses: actions/checkout@v4
 
@@ -55,7 +54,8 @@ jobs:
 
       - name: Start Qwen2.5-7B-Instruct Q4 server
         run: |
-          mkdir -p "$RUNNER_TEMP/llama-server"
+          export HF_HOME="$RUNNER_TEMP/huggingface"
+          mkdir -p "$HF_HOME" "$RUNNER_TEMP/llama-server"
           nohup ~/.llama-app/llama serve \
             -hf "$MODEL_REF" \
             --host 127.0.0.1 \
