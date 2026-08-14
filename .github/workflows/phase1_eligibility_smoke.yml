@@ -1,14 +1,6 @@
 name: phase1-eligibility-smoke
 
 on:
-  push:
-    branches:
-      - agent/phase1-core-experiment-prep
-    paths:
-      - .github/workflows/phase1_eligibility_smoke.yml
-      - scripts/run_phase1_eligibility_smoke.py
-      - configs/phase1_eligibility_smoke_cpu.json
-      - data/manifests/phase1_qwen15b_human_audit_v1.json
   workflow_dispatch: {}
 
 permissions:
