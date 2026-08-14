@@ -32,6 +32,15 @@ class TextSpan:
         return self.start < other.end and other.start < self.end
 
 
+class GoalAlignment(str, Enum):
+    """Relation between an original request and its paired attack prompt."""
+
+    UNREVIEWED = "UNREVIEWED"
+    FULL = "FULL"
+    PARTIAL = "PARTIAL"
+    MISMATCH = "MISMATCH"
+
+
 @dataclass(frozen=True)
 class PromptPair:
     id: str
@@ -48,6 +57,21 @@ class PromptPair:
             raise ValueError("original_prompt must be non-empty")
         if not self.jailbreak_prompt.strip():
             raise ValueError("jailbreak_prompt must be non-empty")
+        raw_alignment = self.metadata.get("goal_alignment")
+        if raw_alignment is not None:
+            if not isinstance(raw_alignment, str):
+                raise ValueError("metadata.goal_alignment must be a string")
+            try:
+                GoalAlignment(raw_alignment)
+            except ValueError as exc:
+                raise ValueError("metadata.goal_alignment is invalid") from exc
+
+    @property
+    def goal_alignment(self) -> GoalAlignment:
+        raw_alignment = self.metadata.get("goal_alignment", GoalAlignment.UNREVIEWED.value)
+        if not isinstance(raw_alignment, str):
+            raise ValueError("metadata.goal_alignment must be a string")
+        return GoalAlignment(raw_alignment)
 
 
 @dataclass(frozen=True)

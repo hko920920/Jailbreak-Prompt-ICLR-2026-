@@ -1,0 +1,166 @@
+name: phase1-qwen7b-compact-oracle
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/phase1-core-experiment-prep
+    paths:
+      - .github/workflows/phase1_qwen7b_compact_oracle.yml
+      - scripts/run_phase1_llama_cpp_compact_oracle.py
+      - scripts/assemble_phase1_jbb_micro_pilot.py
+      - src/jbspan/schemas.py
+      - data/manifests/phase1_qwen7b_compact_oracle_cases.json
+      - data/manifests/phase1_qwen7b_neutralization_ai_assisted_labels.json
+      - security/phase1_compact_oracle_recipient_cert.pem
+
+permissions:
+  contents: read
+
+jobs:
+  qwen7b-compact-oracle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      MODEL_REF: Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M
+      DATA_PATH: data/processed/phase1_micro_pilot_20.local.jsonl
+      CASE_PATH: data/manifests/phase1_qwen7b_compact_oracle_cases.json
+      LABEL_PATH: data/manifests/phase1_qwen7b_neutralization_ai_assisted_labels.json
+      SAFE_OUTPUT: artifacts/phase1-qwen7b-compact-oracle/safe_summary.json
+      ENCRYPTED_OUTPUT: artifacts/phase1-qwen7b-compact-oracle/private_oracle.cms
+      RECIPIENT_CERT: security/phase1_compact_oracle_recipient_cert.pem
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install and validate project
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev]'
+          ruff check scripts/run_phase1_llama_cpp_compact_oracle.py src/jbspan/schemas.py
+          mypy src/jbspan scripts/run_phase1_llama_cpp_compact_oracle.py
+          pytest tests/test_goal_alignment.py tests/test_compact_oracle_helpers.py
+
+      - name: Assemble pinned input
+        run: |
+          python scripts/assemble_phase1_jbb_micro_pilot.py \
+            --output "$DATA_PATH" \
+            --manifest data/manifests/phase1_micro_pilot_20.selection.compact-oracle.json
+
+      - name: Install official llama.cpp runtime
+        run: |
+          curl -LsSf https://llama.app/install.sh | \
+            SKIP_CUDA=1 SKIP_ROCM=1 SKIP_VULKAN=1 sh
+          ~/.llama-app/llama --version
+
+      - name: Start Qwen2.5-7B-Instruct Q4 server
+        run: |
+          export HF_HOME="$RUNNER_TEMP/huggingface"
+          mkdir -p "$HF_HOME" "$RUNNER_TEMP/llama-server"
+          nohup ~/.llama-app/llama serve \
+            -hf "$MODEL_REF" \
+            --host 127.0.0.1 \
+            --port 8080 \
+            -c 4608 \
+            -t 4 \
+            >"$RUNNER_TEMP/llama-server/server.log" 2>&1 &
+          echo "$!" >"$RUNNER_TEMP/llama-server/pid"
+
+          ready=0
+          for _ in $(seq 1 180); do
+            if ! kill -0 "$(cat "$RUNNER_TEMP/llama-server/pid")" 2>/dev/null; then
+              echo "llama server exited before readiness"
+              tail -n 100 "$RUNNER_TEMP/llama-server/server.log"
+              exit 1
+            fi
+            status="$(curl -sS -o /dev/null -w '%{http_code}' \
+              http://127.0.0.1:8080/health || true)"
+            if [ "$status" = "200" ]; then
+              ready=1
+              break
+            fi
+            sleep 10
+          done
+
+          if [ "$ready" != "1" ]; then
+            echo "llama server did not become ready"
+            tail -n 100 "$RUNNER_TEMP/llama-server/server.log"
+            exit 1
+          fi
+
+      - name: Capture compact oracle grid privately
+        run: |
+          private_output="$RUNNER_TEMP/phase1_qwen7b_compact_oracle.jsonl"
+          echo "PRIVATE_OUTPUT=$private_output" >> "$GITHUB_ENV"
+          timeout 150m python scripts/run_phase1_llama_cpp_compact_oracle.py \
+            --data "$DATA_PATH" \
+            --cases "$CASE_PATH" \
+            --neutralization-labels "$LABEL_PATH" \
+            --private-output "$private_output" \
+            --safe-output "$SAFE_OUTPUT" \
+            --model "$MODEL_REF" \
+            --chunk-count 6 \
+            --maximum-candidate-fraction 0.35 \
+            --max-tokens 128 \
+            --temperature 0.0
+
+      - name: Encrypt private oracle bundle and remove plaintext
+        run: |
+          mkdir -p "$(dirname "$ENCRYPTED_OUTPUT")"
+          archive="$RUNNER_TEMP/phase1_qwen7b_compact_oracle.tar.gz"
+          tar -C "$(dirname "$PRIVATE_OUTPUT")" -czf "$archive" \
+            "$(basename "$PRIVATE_OUTPUT")"
+          openssl cms -encrypt -binary -aes256 \
+            -in "$archive" \
+            -out "$ENCRYPTED_OUTPUT" \
+            -outform DER \
+            "$RECIPIENT_CERT"
+          openssl dgst -sha256 "$ENCRYPTED_OUTPUT"
+          shred -u "$PRIVATE_OUTPUT" "$archive"
+          test ! -e "$PRIVATE_OUTPUT"
+
+      - name: Publish safe aggregate summary
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          payload = json.loads(Path(os.environ["SAFE_OUTPUT"]).read_text(encoding="utf-8"))
+          public = {key: value for key, value in payload.items() if key != "cases"}
+          print(json.dumps(public, indent=2, sort_keys=True))
+          with Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a", encoding="utf-8") as handle:
+              handle.write("# Phase 1 Qwen2.5-7B compact oracle capture\n\n")
+              handle.write(f"- cases: **{payload['case_count']}**\n")
+              handle.write(f"- grid candidates: **{payload['candidate_count']}**\n")
+              handle.write(f"- generations: **{payload['generation_count']}**\n")
+              handle.write(f"- chunk count: **{payload['chunk_count']}**\n")
+              handle.write(
+                  "- maximum candidate fraction: "
+                  f"**{payload['maximum_candidate_fraction']}**\n"
+              )
+              handle.write("- plaintext prompts/responses uploaded: **false**\n")
+              handle.write("- encrypted oracle bundle uploaded: **true**\n")
+              handle.write("\nThis capture requires explicit audit before interpretation.\n")
+          PY
+
+      - name: Upload encrypted oracle and safe summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase1-qwen7b-encrypted-compact-oracle
+          path: |
+            ${{ env.ENCRYPTED_OUTPUT }}
+            ${{ env.SAFE_OUTPUT }}
+          if-no-files-found: error
+          retention-days: 3
+
+      - name: Stop local model server
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/llama-server/pid" ]; then
+            kill "$(cat "$RUNNER_TEMP/llama-server/pid")" 2>/dev/null || true
+          fi
