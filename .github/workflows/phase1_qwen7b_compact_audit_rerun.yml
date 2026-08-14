@@ -38,8 +38,8 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e '.[dev]'
           ruff check scripts/run_phase1_llama_cpp_compact_audit_rerun.py
-          MYPYPATH=scripts mypy src/jbspan \
-            scripts/run_phase1_llama_cpp_compact_oracle.py \
+          mypy src/jbspan scripts/run_phase1_llama_cpp_compact_oracle.py
+          mypy --ignore-missing-imports \
             scripts/run_phase1_llama_cpp_compact_audit_rerun.py
 
       - name: Assemble pinned input
