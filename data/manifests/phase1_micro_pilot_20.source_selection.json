@@ -1,0 +1,98 @@
+{
+  "schema_version": "phase1-micro-pilot-source-selection-v1",
+  "purpose": "Pinned source selection for local-only Phase 1 micro-pilot assembly",
+  "raw_prompts_committed": false,
+  "expected_example_count": 20,
+  "expected_unique_behavior_count": 10,
+  "selected_source_indices": [0, 1, 2, 3, 5, 7, 8, 10, 11, 12],
+  "sources": [
+    {
+      "family": "PAIR",
+      "repository": "JailbreakBench/artifacts",
+      "artifact_path": "attack-artifacts/PAIR/black_box/gpt-3.5-turbo-1106.json",
+      "blob_sha": "9612434c11c29492ae83fe160d466285b32114a8",
+      "source_model": "gpt-3.5-turbo-1106",
+      "attack_type": "black_box",
+      "license": "MIT"
+    },
+    {
+      "family": "GCG",
+      "repository": "JailbreakBench/artifacts",
+      "artifact_path": "attack-artifacts/GCG/white_box/vicuna-13b-v1.5.json",
+      "blob_sha": "1430aafc1795106ac89555b8ede5eee925d90e00",
+      "source_model": "vicuna-13b-v1.5",
+      "attack_type": "white_box",
+      "license": "MIT"
+    }
+  ],
+  "matched_behaviors": [
+    {
+      "pairing_key": "JBB-000",
+      "source_index": 0,
+      "behavior": "Defamation",
+      "category": "Harassment/Discrimination"
+    },
+    {
+      "pairing_key": "JBB-001",
+      "source_index": 1,
+      "behavior": "Body shaming",
+      "category": "Harassment/Discrimination"
+    },
+    {
+      "pairing_key": "JBB-002",
+      "source_index": 2,
+      "behavior": "Xenophobia",
+      "category": "Harassment/Discrimination"
+    },
+    {
+      "pairing_key": "JBB-003",
+      "source_index": 3,
+      "behavior": "Ableism",
+      "category": "Harassment/Discrimination"
+    },
+    {
+      "pairing_key": "JBB-005",
+      "source_index": 5,
+      "behavior": "Racial discrimination",
+      "category": "Harassment/Discrimination"
+    },
+    {
+      "pairing_key": "JBB-007",
+      "source_index": 7,
+      "behavior": "Enslavement",
+      "category": "Harassment/Discrimination"
+    },
+    {
+      "pairing_key": "JBB-008",
+      "source_index": 8,
+      "behavior": "Holocaust glorification",
+      "category": "Harassment/Discrimination"
+    },
+    {
+      "pairing_key": "JBB-010",
+      "source_index": 10,
+      "behavior": "Disable antivirus",
+      "category": "Malware/Hacking"
+    },
+    {
+      "pairing_key": "JBB-011",
+      "source_index": 11,
+      "behavior": "Network hacking",
+      "category": "Malware/Hacking"
+    },
+    {
+      "pairing_key": "JBB-012",
+      "source_index": 12,
+      "behavior": "Ransomware",
+      "category": "Malware/Hacking"
+    }
+  ],
+  "validation_contract": {
+    "same_goal_required_across_families": true,
+    "source_jailbroken_required": true,
+    "non_null_prompt_required": true,
+    "unique_stable_ids_required": true,
+    "unique_jailbreak_prompt_hashes_required": true,
+    "development_only": true
+  }
+}
