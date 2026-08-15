@@ -1,0 +1,32 @@
+{
+  "administrator_zip_sha256": "fb7add27982923fc3581505318f38660d05a7da628aa8de03003dd054fa5f397",
+  "auditor_zip_sha256": "58026f14be81d9970cfecc23468ae04d175821ba151bf3dd7a193806fee7eb92",
+  "blinding_leak_check": "PASS",
+  "builder_sha256": "db88a91d307abdd0c6cd309481c5c5468a24ea5329201fe818208cd0989990a8",
+  "case_count": 3,
+  "files": {
+    "administrator/README.md": "08f8273306e9e7afdaa5244c313d9c9f5c38c98f1fba0389d6bf9133f53cd9eb",
+    "administrator/audit_mapping.json": "a96bcfaa3303ec4d36324c2a8722e1ff5778075041ba5122034f518ad1164732",
+    "auditor/01_response_audit.html": "f431f41f5e2e58a9498dfc7f9ea3830d50d8f2da0ac83e78642741d36e5c7e74",
+    "auditor/02_prompt_validity_audit.html": "0f5cd121292b8a86d444d9a8711f77770b26046162e34967406c46f02b28ecad",
+    "auditor/README.md": "2ddc79b08e001262cf833402617bb112f218198bb7ba18605693c18a0661c9df",
+    "auditor/prompt_validity_annotations.csv": "bbe5054a12ce2ddbc3533033bc87be7f2210534663b9ad17501bdada62682c78",
+    "auditor/response_annotations.csv": "f09c6e28580cef640616e134c264756d14df54e5d395e368bf0debf67b4cdbe9"
+  },
+  "paper_validity": false,
+  "private_jsonl_sha256": "4e481f6ea7847cdedf6e4d63eee1f28086cf842194630888dad766fb9b1ceca8",
+  "prompt_validity_item_count": 28,
+  "raw_content_in_auditor_package": true,
+  "requires_two_independent_humans": true,
+  "response_item_count": 34,
+  "reviewer_1_zip_sha256": "58026f14be81d9970cfecc23468ae04d175821ba151bf3dd7a193806fee7eb92",
+  "reviewer_2_zip_sha256": "58026f14be81d9970cfecc23468ae04d175821ba151bf3dd7a193806fee7eb92",
+  "schema_version": "phase1-step8-blinded-audit-v1",
+  "seed_sha256": "7b35752c64317a00c249f059492c1b73f35b954cec68afce6cd2adc374770523",
+  "source_artifact_digest": "sha256:6b00789d61583829c031d31a124f00dae458bcf7cc43268b5f7d796e21560904",
+  "source_artifact_id": 9244423962,
+  "source_safe_summary_repeated_capture_byte_identical": true,
+  "source_safe_summary_sha256": "5d3c100b0c101ecc07ece5197eca2c0930d71a87cca2b9cb8c658b11f48ca648",
+  "source_workflow_head": "31949c33b5631af710c37edb9ce75a7e90dfa272",
+  "source_workflow_run": 31873837613
+}
