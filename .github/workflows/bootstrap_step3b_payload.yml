@@ -40,6 +40,7 @@ jobs:
           import yaml
           yaml.safe_load(Path('.github/workflows/gate1_step3b_freeze.yml').read_text())
           PY
+          ruff check --fix .
           ruff check .
           mypy src/jbspan
           pytest
