@@ -1,0 +1,53 @@
+name: bootstrap-gate1-step3-v3
+
+on:
+  push:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - .github/workflows/bootstrap_gate1_step3_v3.yml
+
+permissions:
+  contents: write
+
+jobs:
+  unpack:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/gate1-contract
+          fetch-depth: 0
+
+      - name: Recover and unpack frozen Step 3 payload
+        run: |
+          python - <<'PY'
+          import base64
+          import io
+          import lzma
+          import tarfile
+          from pathlib import Path
+
+          source = Path('.github/workflows/bootstrap_gate1_step3.yml').read_text()
+          marker = "<<'PAYLOAD'\n"
+          start = source.index(marker) + len(marker)
+          end = source.index('\nPAYLOAD', start)
+          payload = ''.join(source[start:end].split())
+          archive = lzma.decompress(base64.b64decode(payload))
+          with tarfile.open(fileobj=io.BytesIO(archive), mode='r:') as handle:
+              handle.extractall('.')
+          PY
+          rm -f .github/workflows/bootstrap_gate1_step3.yml
+          rm -f .github/workflows/bootstrap_gate1_step3_v3.yml
+
+      - name: Commit Step 3 implementation
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "Implement Gate 1 Step 3 runtime and smoke"
+          git push origin HEAD:agent/gate1-contract
