@@ -26,6 +26,11 @@ jobs:
           python-version: "3.11"
           cache: pip
 
+      - name: Install validation dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev,step3]'
+
       - name: Apply strict typing fix before model execution
         run: |
           python scripts/apply_step3b_calibration_type_fix.py
@@ -34,8 +39,6 @@ jobs:
 
       - name: Validate corrected calibration code
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install -e '.[dev,step3]'
           ruff check .
           mypy src/jbspan
           pytest
