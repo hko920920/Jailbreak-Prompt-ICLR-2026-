@@ -21,6 +21,30 @@ jobs:
       - run: ruff check .
       - run: mypy src/jbspan
       - run: pytest
+      - name: Validate frozen Automated Gate 1 contract
+        if: matrix.python-version == '3.11'
+        run: python scripts/validate_gate1_contract.py
+      - name: Report safe Gate 1 contract identity
+        if: matrix.python-version == '3.11'
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          manifest = json.loads(
+              Path("artifacts/gate1-contract/contract_manifest.json").read_text()
+          )
+          print(
+              "::notice title=Automated Gate 1 contract::"
+              f"status={manifest['status']}; "
+              f"payloads={manifest['selected_payload_target']}; "
+              f"primitives={manifest['primary_primitive_count']}; "
+              f"families={manifest['primary_family_count']}; "
+              f"neutralizers={manifest['primary_neutralizer_count']}; "
+              f"projected_attacks={manifest['projected_gate1_attack_count']}; "
+              f"contract_sha256={manifest['contract_sha256']}"
+          )
+          PY
       - name: Assemble pinned Phase 1 micro-pilot
         if: matrix.python-version == '3.11'
         run: python scripts/assemble_phase1_jbb_micro_pilot.py
