@@ -100,12 +100,12 @@ class HuggingFaceCausalLMAdapter:
     def __post_init__(self) -> None:
         try:
             self._torch = importlib.import_module("torch")
-            transformers = importlib.import_module("transformers")
+            transformers: Any = importlib.import_module("transformers")
         except ImportError as exc:  # pragma: no cover - optional dependency
             raise RuntimeError("install jbspan with the 'hf' extra") from exc
 
-        tokenizer_loader: Any = getattr(transformers, "AutoTokenizer").from_pretrained
-        model_loader: Any = getattr(transformers, "AutoModelForCausalLM").from_pretrained
+        tokenizer_loader: Any = transformers.AutoTokenizer.from_pretrained
+        model_loader: Any = transformers.AutoModelForCausalLM.from_pretrained
         self.name = self.model_id
         self._tokenizer = tokenizer_loader(
             self.model_id,
