@@ -116,16 +116,17 @@ jobs:
               handle.write('- raw payloads/prompts uploaded: **false**\n')
           PY
 
-      - name: Persist safe frozen outputs
+      - name: Verify or persist safe frozen outputs
         if: github.ref == 'refs/heads/agent/gate1-contract'
         run: |
-          rm -rf data/gate1/materialized
-          mkdir -p data/gate1/materialized
-          cp "$SAFE_OUTPUT"/* data/gate1/materialized/
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/gate1/materialized
-          if ! git diff --cached --quiet; then
+          if [ -f data/gate1/materialized/materialization_manifest.json ]; then
+            diff --recursive --unified data/gate1/materialized "$SAFE_OUTPUT"
+          else
+            mkdir -p data/gate1/materialized
+            cp "$SAFE_OUTPUT"/* data/gate1/materialized/
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data/gate1/materialized
             git commit -m "Freeze Gate 1 Step 2 safe materialization [skip ci]"
             git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
