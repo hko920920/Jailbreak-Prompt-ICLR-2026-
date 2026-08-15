@@ -1,0 +1,17 @@
+{
+  "calibration_payload_count": 10,
+  "candidate_count": 7,
+  "evaluation_payload_count": 40,
+  "paper_validity": false,
+  "raw_wrapper_text_committed": false,
+  "safe_file_sha256": {
+    "candidate_registry.safe.json": "654c3b4497f44b3ff5a6ead1f014b5d5d329cd570952869ddb6de63ff367f533",
+    "source_identity.json": "9065be515f31aaa3470058cd9af9fec298978ba0611f45b45ce8d230fe185c91",
+    "split_manifest.safe.json": "9df70e7c4f8e6187d5fcee86f31dca43330c1196d8b2fb8c53369ccb9432abef"
+  },
+  "schema_version": "gate1-step3b-freeze-manifest-v1",
+  "source_file_sha256": "b4c07b11c9e92ecd332807e8ba32d8fe028b59f4c3499f72670d44105626ef07",
+  "status": "GATE1_STEP3B_SOURCE_AND_SPLIT_FROZEN",
+  "target_model_outputs_observed": false,
+  "v1_result_preserved": true
+}

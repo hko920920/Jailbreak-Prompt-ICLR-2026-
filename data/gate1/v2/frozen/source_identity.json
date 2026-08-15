@@ -1,0 +1,9 @@
+{
+  "git_blob_sha": "220a255d39c1cad769e2414448fbad514e2823dd",
+  "path": "experiments/experiment_116_bandi_synthesis/config/benchmark_reference_programs.csv",
+  "repository": "mdoumbouya/h4rm3l",
+  "revision": "e6f58a1a1e56c1a95b26b06aa4fe393ee2240dbd",
+  "schema_version": "gate1-step3b-source-identity-v1",
+  "source_file_sha256": "b4c07b11c9e92ecd332807e8ba32d8fe028b59f4c3499f72670d44105626ef07",
+  "source_file_size_bytes": 30800
+}
