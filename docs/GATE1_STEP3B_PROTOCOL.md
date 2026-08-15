@@ -71,3 +71,7 @@ The full 250-record sweep, exact intervention oracle, adaptive search, and wavel
 ## Claim boundary
 
 Step 3B may establish that externally grounded, exact-payload-preserving attack programs produce target-confirmed eligible examples. It cannot establish causal localization, compactness, minimality, or Gate 1 passage.
+
+## Implementation freeze
+
+The contract, static source parser, split logic, tests, and source-freeze workflow were materialized before any v2 target output. Bootstrap validation completed with strict `ruff`, `mypy`, and **45 tests** passing; the only automatic edits were removal of three unused imports before the frozen source commit.
