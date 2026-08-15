@@ -1,0 +1,119 @@
+name: phase1-qwen7b-ambiguity-audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/phase1-core-experiment-prep
+    paths:
+      - .github/workflows/phase1_qwen7b_ambiguity_audit.yml
+      - data/manifests/phase1_qwen7b_ambiguous_candidates.json
+
+permissions:
+  contents: read
+
+jobs:
+  qwen7b-ambiguity-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      MODEL_REF: Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M
+      DATA_PATH: data/processed/phase1_micro_pilot_20.local.jsonl
+      CANDIDATE_PATH: data/manifests/phase1_qwen7b_ambiguous_candidates.json
+      PRIVATE_OUTPUT: /tmp/phase1_qwen7b_ambiguity_audit.jsonl
+      SAFE_OUTPUT: artifacts/phase1-qwen7b-ambiguity-audit/safe_summary.json
+      ENCRYPTED_OUTPUT: artifacts/phase1-qwen7b-ambiguity-audit/private_audit.cms
+      RECIPIENT_CERT: security/phase1_audit_recipient_cert.pem
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install and validate project
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev]'
+          ruff check scripts/run_phase1_llama_cpp_private_audit.py
+          mypy src/jbspan scripts/run_phase1_llama_cpp_private_audit.py
+
+      - name: Assemble pinned input
+        run: |
+          python scripts/assemble_phase1_jbb_micro_pilot.py \
+            --output "$DATA_PATH" \
+            --manifest data/manifests/phase1_micro_pilot_20.selection.ambiguity.json
+
+      - name: Install and start Qwen2.5-7B-Instruct Q4
+        run: |
+          curl -LsSf https://llama.app/install.sh | \
+            SKIP_CUDA=1 SKIP_ROCM=1 SKIP_VULKAN=1 sh
+          export HF_HOME="$RUNNER_TEMP/huggingface"
+          mkdir -p "$HF_HOME" "$RUNNER_TEMP/llama-server"
+          nohup ~/.llama-app/llama serve \
+            -hf "$MODEL_REF" \
+            --host 127.0.0.1 \
+            --port 8080 \
+            -c 4608 \
+            -t 4 \
+            >"$RUNNER_TEMP/llama-server/server.log" 2>&1 &
+          echo "$!" >"$RUNNER_TEMP/llama-server/pid"
+
+          ready=0
+          for _ in $(seq 1 180); do
+            if ! kill -0 "$(cat "$RUNNER_TEMP/llama-server/pid")" 2>/dev/null; then
+              tail -n 100 "$RUNNER_TEMP/llama-server/server.log"
+              exit 1
+            fi
+            status="$(curl -sS -o /dev/null -w '%{http_code}' \
+              http://127.0.0.1:8080/health || true)"
+            if [ "$status" = "200" ]; then
+              ready=1
+              break
+            fi
+            sleep 10
+          done
+          test "$ready" = "1"
+
+      - name: Capture two 320-token responses privately
+        run: |
+          timeout 40m python scripts/run_phase1_llama_cpp_private_audit.py \
+            --data "$DATA_PATH" \
+            --candidates "$CANDIDATE_PATH" \
+            --private-output "$PRIVATE_OUTPUT" \
+            --safe-output "$SAFE_OUTPUT" \
+            --model "$MODEL_REF" \
+            --max-tokens 320 \
+            --temperature 0.0
+
+      - name: Encrypt and remove plaintext
+        run: |
+          mkdir -p "$(dirname "$ENCRYPTED_OUTPUT")"
+          archive="$RUNNER_TEMP/phase1_qwen7b_ambiguity_audit.tar.gz"
+          tar -C "$(dirname "$PRIVATE_OUTPUT")" -czf "$archive" \
+            "$(basename "$PRIVATE_OUTPUT")"
+          openssl cms -encrypt -binary -aes256 \
+            -in "$archive" \
+            -out "$ENCRYPTED_OUTPUT" \
+            -outform DER \
+            "$RECIPIENT_CERT"
+          shred -u "$PRIVATE_OUTPUT" "$archive"
+          test ! -e "$PRIVATE_OUTPUT"
+
+      - name: Upload encrypted ambiguity audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase1-qwen7b-encrypted-ambiguity-audit
+          path: |
+            ${{ env.ENCRYPTED_OUTPUT }}
+            ${{ env.SAFE_OUTPUT }}
+          if-no-files-found: error
+          retention-days: 3
+
+      - name: Stop local model server
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/llama-server/pid" ]; then
+            kill "$(cat "$RUNNER_TEMP/llama-server/pid")" 2>/dev/null || true
+          fi

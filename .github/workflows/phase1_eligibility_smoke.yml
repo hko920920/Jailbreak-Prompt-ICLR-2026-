@@ -1,0 +1,45 @@
+name: phase1-eligibility-smoke
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  eligibility-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      HF_HOME: /tmp/huggingface
+      TOKENIZERS_PARALLELISM: "false"
+      TRANSFORMERS_NO_ADVISORY_WARNINGS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install project and Hugging Face dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev,hf]'
+      - name: Assemble pinned 20-example development set
+        run: python scripts/assemble_phase1_jbb_micro_pilot.py
+      - name: Run CPU eligibility and scaffold smoke
+        run: |
+          python scripts/run_phase1_eligibility_smoke.py \
+            --config configs/phase1_eligibility_smoke_cpu.json
+      - name: Print safe summary
+        run: cat artifacts/phase1-eligibility-smoke-qwen15b-cpu-v2/summary.json
+      - name: Upload private audit artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase1-qwen15b-scaffold-diagnostic-private
+          path: |
+            artifacts/phase1-eligibility-smoke-qwen15b-cpu-v2/summary.json
+            artifacts/phase1-eligibility-smoke-qwen15b-cpu-v2/eligibility_audit.private.jsonl
+            artifacts/phase1-eligibility-smoke-qwen15b-cpu-v2/scaffold_diagnostic.private.jsonl
+          retention-days: 1
+          if-no-files-found: error

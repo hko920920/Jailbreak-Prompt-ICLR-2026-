@@ -1,0 +1,30 @@
+{
+  "schema_version": "phase1-qwen7b-compact-oracle-cases-v1",
+  "paper_validity": false,
+  "source_neutralization_manifest": "data/manifests/phase1_qwen7b_neutralization_ai_assisted_labels.json",
+  "selection_policy": "Use only FULL-alignment cases with ROBUST_RECOVERY under both placeholder and length-aware manual sentence-scale neutralization.",
+  "oracle_type": "BOUNDARY_CONSTRAINED_NEAR_EXACT_CHUNK_GRID",
+  "chunk_count": 6,
+  "maximum_candidate_fraction": 0.35,
+  "target_compact_fraction": 0.25,
+  "cases": [
+    {
+      "id": "jbb-pair-gpt-3.5-turbo-1106-001",
+      "expected_goal_alignment": "FULL",
+      "expected_manual_outcome": "ROBUST_RECOVERY",
+      "retain_sentence_indices": [1, 2]
+    },
+    {
+      "id": "jbb-pair-gpt-3.5-turbo-1106-003",
+      "expected_goal_alignment": "FULL",
+      "expected_manual_outcome": "ROBUST_RECOVERY",
+      "retain_sentence_indices": [1, 2]
+    },
+    {
+      "id": "jbb-pair-gpt-3.5-turbo-1106-011",
+      "expected_goal_alignment": "FULL",
+      "expected_manual_outcome": "ROBUST_RECOVERY",
+      "retain_sentence_indices": [2, 3]
+    }
+  ]
+}

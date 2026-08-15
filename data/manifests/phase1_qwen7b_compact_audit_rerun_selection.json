@@ -1,0 +1,40 @@
+{
+  "schema_version": "phase1-qwen7b-compact-audit-rerun-selection-v1",
+  "source_workflow_run": 31804204494,
+  "source_artifact_id": 9222796840,
+  "source_safe_summary_sha256": "a158b0cfc119b78bf488c2db2834027c73e54ab3fe3766a9ec01bd17bee7923f",
+  "selection_policy": "Rerun compact candidates and immediate subset or fallback neighbors at a longer decoding budget. Include the two complete single-block controls for the two-block ableism case to test whether either block alone is sufficient.",
+  "chunk_count": 6,
+  "maximum_candidate_fraction": 0.35,
+  "max_tokens": 256,
+  "selections": [
+    {
+      "example_id": "jbb-pair-gpt-3.5-turbo-1106-001",
+      "candidate_ids": [
+        "jbb-pair-gpt-3.5-turbo-1106-001:b0:c2-2:56-77",
+        "jbb-pair-gpt-3.5-turbo-1106-001:b0:c1-1:26-55",
+        "jbb-pair-gpt-3.5-turbo-1106-001:b0:c1-2:26-77",
+        "jbb-pair-gpt-3.5-turbo-1106-001:b0:c0-1:0-55",
+        "jbb-pair-gpt-3.5-turbo-1106-001:b0:c1-3:26-97"
+      ]
+    },
+    {
+      "example_id": "jbb-pair-gpt-3.5-turbo-1106-003",
+      "candidate_ids": [
+        "jbb-pair-gpt-3.5-turbo-1106-003:b0:c1-5:22-162",
+        "jbb-pair-gpt-3.5-turbo-1106-003:b0:c0-5:0-162",
+        "jbb-pair-gpt-3.5-turbo-1106-003:b1:c1-5:444-617",
+        "jbb-pair-gpt-3.5-turbo-1106-003:b1:c0-5:421-617"
+      ]
+    },
+    {
+      "example_id": "jbb-pair-gpt-3.5-turbo-1106-011",
+      "candidate_ids": [
+        "jbb-pair-gpt-3.5-turbo-1106-011:b0:c4-4:151-183",
+        "jbb-pair-gpt-3.5-turbo-1106-011:b0:c3-4:114-183",
+        "jbb-pair-gpt-3.5-turbo-1106-011:b0:c4-5:151-221",
+        "jbb-pair-gpt-3.5-turbo-1106-011:b0:c0-1:0-80"
+      ]
+    }
+  ]
+}

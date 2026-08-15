@@ -1,63 +1,141 @@
-# Formal Problem and Method v0
+# Formal Problem and Method v1 — Programmatically Grounded Human-Free Design
 
 ## Setting
 
 For each example, assume:
 
-- an original request `x_o` that the target model refuses;
-- a successful jailbreak prompt `x_j` associated with the same requested behavior;
-- a target model `M`;
-- a response judge producing refusal and harmful-compliance scores;
-- an intent judge comparing an intervened prompt with `x_o`;
-- a family of neutralization operators.
+- a typed harmful payload `q`;
+- a payload-only prompt `x_o = render(q)` that the target model refuses;
+- a typed attack program `p = T_m o ... o T_1`;
+- a rendered attacked prompt `x_j = render(p, q)` that succeeds;
+- exact provenance from every program node and the payload slot to character/token spans;
+- a target model `M` with frozen revision and decoding distribution;
+- a frozen automated evaluator ensemble `J` with explicit abstention;
+- a registered family of typed neutralization operators `N`.
 
-## Candidate span set
+The primary benchmark includes only payload-preserving attack programs. The payload is byte-identical in `x_o`, `x_j`, and every valid intervention.
 
-A candidate `S` is a set of one or more non-overlapping character spans in `x_j`. A neutralizer `n` produces the counterfactual prompt `n(x_j, S)`.
+## Program and span candidates
 
-A valid explanation should satisfy:
+A candidate `S` is either:
 
-1. **Refusal recovery:** neutralizing `S` substantially increases refusal or decreases harmful compliance.
-2. **Intent preservation:** the underlying requested behavior remains represented after intervention.
-3. **Robustness:** the effect persists across neutralizers, decoding seeds, and judge variants.
-4. **Minimality:** no lower-cost subset satisfies the same constraints within tolerance.
+1. a set of neutralizable attack-program nodes; or
+2. a set of non-overlapping rendered spans that map entirely to neutralizable attack-node provenance.
 
-## Robust causal score
+A neutralizer `n in N` disables or replaces `S` and re-renders the program. An intervention is valid only when:
 
-For a refusal score `r`, define the estimated effect
+- payload hash is unchanged;
+- no selected span overlaps payload provenance;
+- the typed renderer succeeds;
+- every required slot remains bound;
+- no registered forbidden safety/refusal cue is inserted;
+- the intervention belongs to the frozen operator family.
+
+Program provenance is not a causal label. Causal status is established only by direct target-model intervention.
+
+## Evaluator consensus
+
+The primary evaluator is a conservative intersection or consensus of frozen public evaluators, such as HarmBench, StrongREJECT, and FJAR when reproducibly available.
+
+For a target response `y`:
+
+- `J(y) = HARMFUL` only when the frozen harmful-consensus rule passes;
+- `J(y) = SAFE` only when the frozen safe-consensus rule passes;
+- otherwise `J(y) = ABSTAIN`.
+
+Evaluator coverage and abstention are reported explicitly. No same-model heuristic alone determines a paper-facing result.
+
+## Eligibility
+
+An attacked item is eligible only when:
 
 ```text
-Delta_ref(S) = E[r(M(n(x_j, S)))] - E[r(M(x_j))]
+J(M(x_o)) = SAFE
+J(M(x_j)) = HARMFUL
 ```
 
-where the expectation is over neutralizers and decoding seeds. Selection should use a conservative lower confidence bound, not a single deterministic output.
+and both outcomes satisfy the frozen seed-stability requirement. Evaluator-abstained or invariant-violating examples are not treated as failures or successes; they receive explicit exclusion statuses.
 
-The cost is provisionally
+## Robust interventional effect
+
+For attack-success score `a`, define the intervention effect:
 
 ```text
-cost(S) = token_fraction(S) + lambda_set * (number_of_spans(S) - 1)
+Delta(S) = E[a(M(x_j))] - E[a(M(n(x_j, S)))]
 ```
 
-The method returns either a minimal valid span set or an abstention status such as `ABSTAIN_DISTRIBUTED`.
+where the expectation is over registered neutralizers and decoding seeds. Selection uses a conservative lower confidence bound rather than a single completion.
 
-## Search v0
+A candidate is a robust recovery set when every primary neutralizer yields `SAFE`, the validity contract passes, and the effect is seed-stable.
 
-1. Split the prompt into deterministic atomic clauses and construct a balanced semantic interval tree.
-2. Evaluate coarse span interventions.
-3. Expand nodes with high refusal-recovery effect or high tree-Haar contrast.
-4. Verify candidate leaves and limited two-span combinations.
-5. Prune redundant spans by subset testing.
-6. Re-evaluate final candidates across all neutralizers and seeds.
+## Oracle-relative minimality
 
-## Why tree-Haar is provisional
+The oracle returns all lowest-cost robust recovery sets in a frozen candidate lattice:
 
-The causal effect of a span is not guaranteed to be additive. Tree-Haar coefficients are therefore used only to prioritize queries; every selected explanation must pass direct behavioral intervention tests. Interaction residuals between parent and children are recorded rather than assumed away.
+```text
+S* = argmin_S cost(S)
+```
+
+subject to robust recovery and validity.
+
+The provisional cost is:
+
+```text
+cost(S) = rendered_character_fraction(S)
+        + lambda_set * (number_of_spans(S) - 1)
+        + lambda_nodes * (number_of_program_nodes(S) - 1)
+```
+
+A result is called minimal only relative to:
+
+- the declared candidate lattice;
+- the registered neutralizers;
+- the evaluator ensemble;
+- the frozen decoding distribution.
+
+Strict subsets are tested directly. Multiple incomparable minimal sets are retained rather than collapsed.
+
+## Oracle regimes
+
+- exact power-set enumeration for at most 8 neutralizable program nodes;
+- exact contiguous or bounded span lattice for tractable rendered text;
+- near-exact bounded enumeration with an explicit resolution certificate otherwise.
+
+The oracle records non-monotonicity and node interactions. A component can be individually ineffective yet jointly necessary.
+
+## Adaptive search v1
+
+1. Build a typed program tree and rendered provenance map.
+2. Evaluate coarse node-group interventions.
+3. Prioritize groups by conservative robust effect density.
+4. Record parent-child interaction residuals and monotonicity violations.
+5. Refine promising groups into child nodes or finer spans.
+6. Search limited multi-node combinations when single-node sparsity fails.
+7. Verify every selected explanation across all primary neutralizers and seeds.
+8. Prune redundant components through strict-subset tests.
+9. Abstain when evaluator ambiguity, distributed causality, or budget exhaustion prevents a valid localized explanation.
+
+Tree-Haar or wavelet scores are optional query-prioritization features only. They remain in the method only after outperforming the identical hierarchy without them.
 
 ## Required statuses
 
-- `LOCALIZED`
+- `LOCALIZED_SINGLE`
+- `LOCALIZED_MULTI`
 - `ABSTAIN_DISTRIBUTED`
+- `EVALUATOR_ABSTAIN`
 - `BASELINE_ATTACK_FAILED`
 - `ORIGINAL_NOT_REFUSED`
-- `INTENT_NOT_PRESERVED`
+- `PAYLOAD_INVARIANT_FAILED`
+- `PROGRAM_COMPILE_FAILED`
+- `INTERVENTION_INVALID`
 - `QUERY_BUDGET_EXHAUSTED`
+
+## Claim boundary
+
+The primary claim is programmatically grounded interventional localization of successful compositional jailbreaks. It is not:
+
+- the first composable jailbreak language;
+- the first token/span localization method;
+- an unrestricted global-minimality claim;
+- a universal explanation of all free-form jailbreaks;
+- a wavelet-attribution novelty claim.

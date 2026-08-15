@@ -21,3 +21,34 @@ jobs:
       - run: ruff check .
       - run: mypy src/jbspan
       - run: pytest
+      - name: Assemble pinned Phase 1 micro-pilot
+        if: matrix.python-version == '3.11'
+        run: python scripts/assemble_phase1_jbb_micro_pilot.py
+      - name: Run Phase 1 validation-only path
+        if: matrix.python-version == '3.11'
+        run: >-
+          python scripts/run_phase1_micro_pilot.py
+          --config configs/phase1_micro_pilot.json
+          --validate-only
+      - name: Report safe Phase 1 manifest hashes
+        if: matrix.python-version == '3.11'
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          selection = json.loads(
+              Path("data/manifests/phase1_micro_pilot_20.selection.json").read_text()
+          )
+          validated = json.loads(
+              Path("artifacts/phase1-micro-pilot-v1/data_manifest.json").read_text()
+          )
+          print(
+              "::notice title=Phase 1 data validation::"
+              f"examples={validated['example_count']}; "
+              f"families={validated['attack_family_counts']}; "
+              f"source_sha256={validated['source_sha256']}; "
+              f"ids_sha256={validated['ids_sha256']}; "
+              f"selection_output_sha256={selection['output_sha256']}"
+          )
+          PY

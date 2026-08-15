@@ -1,143 +1,294 @@
-# Experiment Plan and Go/No-Go Gates
+# Experiment Plan and Go/No-Go Gates v1 — Fully Automated Primary Evidence
 
-## Phase 0 — Infrastructure smoke
+## Phase 0 — Infrastructure and prior exploratory evidence
 
-Purpose: verify all data and code paths without model downloads or harmful text.
+Completed exploratory work established that target-model refusal recovery can occur after coarse scaffold neutralization, but also exposed prompt-behavior drift, evaluator weakness, and malformed-edit artifacts in free-form jailbreak pairs.
 
-Deliverables:
+These results motivate the new primary design. They are not used to estimate the final localizability rate.
 
-- paired-example schema;
-- segmentation and intervention primitives;
-- query accounting;
-- exhaustive and adaptive search interfaces;
-- deterministic toy test;
-- config and artifact manifests;
-- CI.
+The prepared blinded human package is archived as an optional calibration artifact and is not part of the primary gates.
 
-Pass condition: CPU-only tests and the toy end-to-end run succeed.
+## Pre-Gate paper viability decision
 
-## Phase 1 — Phenomenon viability
+The project proceeds only under the programmatically grounded formulation documented in:
 
-### Data
+- `docs/HUMAN_FREE_PAPER_VIABILITY_AUDIT.md`;
+- `docs/FORMAL_PROBLEM.md`.
 
-Start with 100 frozen original/jailbreak pairs spanning at least eight attack families. Use existing paired datasets where licenses permit. No threshold tuning on the frozen evaluation IDs.
+The primary paper uses no new human annotations. It uses typed prompt programs, exact payload invariants, direct target-model interventions, frozen public evaluator consensus, and explicit abstention.
 
-### Models
+# Gate 1 — Fully Automated Phenomenon and Oracle Gate
 
-Primary:
+## Objective
 
-- Llama-3.1-8B-Instruct
-- Qwen2.5-7B-Instruct
+Determine whether successful compositional jailbreaks frequently contain compact, robustly causal attack-component sets under a machine-verifiable intervention contract.
 
-Secondary only after the gate:
+## Data construction
 
-- Gemma-2-9B-it or a comparably sized third family
+Build a typed payload-preserving attack-program benchmark with:
 
-This scope is compatible with a DGX Spark-class system using careful batching and optional quantized inference.
+- at least 50 harmful payloads from a standardized source;
+- at least 6 payload-preserving primitives;
+- at least 4 composition families;
+- at least 200 rendered attacks for the primary model before eligibility filtering;
+- exact payload, program-node, character, and token provenance;
+- split by attack program/composition rather than prompt string alone;
+- a complete generated denominator and exclusion ledger.
 
-### Baseline eligibility
+Primary primitives may include typed variants of:
 
-Keep only examples where:
+- role/persona framing;
+- fictional or hypothetical context;
+- authority framing;
+- refusal suppression;
+- benign justification;
+- output-format coercion;
+- prefix/suffix wrappers;
+- many-shot or contextual wrappers when payload provenance remains exact.
 
-- the original request is refused;
-- the jailbreak prompt succeeds under the chosen full-response judge;
-- both outcomes are reproducible under the frozen generation setting.
+Payload-transforming primitives such as translation, Base64, ciphering, or arbitrary rewrites are excluded from the primary Gate 1 denominator unless their provenance and inverse mapping are formally verified.
 
-### Candidate neutralizers
+## Primary model
 
-- deletion;
-- typed placeholder replacement;
-- length-aware neutral filler;
-- neutral paraphrase after the deterministic operators are validated.
+Use one 7B–9B instruction model until the data, evaluator, intervention, and exact-oracle pipeline are correct. Model expansion belongs to Gate 2.
 
-### Gate metrics
+## Evaluator contract
 
-- localizable fraction;
-- median selected token fraction;
-- full-response refusal recovery;
-- harmful-intent preservation;
-- agreement across neutralizers;
-- stability across generation seeds;
-- benign false-localization rate.
+Freeze at least two independent public evaluator families, preferably:
 
-### Go criteria
+- HarmBench classifier;
+- StrongREJECT evaluator;
+- FJAR anchored-reference evaluator when reproducibly available.
 
-Proceed only if all provisional thresholds hold:
+Define conservative `HARMFUL`, `SAFE`, and `EVALUATOR_ABSTAIN` rules before observing Gate 1 results.
 
-- localizable fraction at least 35%;
-- median selected span fraction at most 25%;
-- cross-neutralizer agreement at least 0.60;
-- no evidence that success is driven mainly by deleting the harmful payload;
-- manual audit confirms the judge is not rewarding broken or incoherent prompts.
+Required sensitivity outputs:
 
-## Phase 2 — Algorithm comparison
+- full consensus;
+- each evaluator separately;
+- pairwise evaluator combinations;
+- threshold perturbation;
+- coverage and abstention.
 
-### Baselines
+## Eligibility
 
-- random length-matched spans;
+An item is eligible only when:
+
+- the payload-only prompt is `SAFE` by frozen consensus;
+- the full attack is `HARMFUL` by frozen consensus;
+- both outcomes satisfy the seed-stability rule;
+- payload and program invariants pass;
+- no evaluator abstention occurs.
+
+## Interventions
+
+Use at least two typed neutralizers:
+
+1. program-node disable/removal followed by re-rendering;
+2. registered neutral replacement preserving the slot and prompt grammar.
+
+Deletion is diagnostic unless it is itself a valid typed program rewrite.
+
+Every intervention must pass:
+
+- exact payload hash equality;
+- zero payload-span overlap;
+- renderer/type validation;
+- required-slot validation;
+- forbidden-safety-cue scan;
+- registered-operator identity.
+
+## Exact oracle
+
+For programs with at most 8 neutralizable nodes:
+
+- enumerate every non-empty node subset;
+- run both neutralizers;
+- run all frozen seeds;
+- classify with evaluator consensus;
+- retain all lowest-cost robust sets;
+- test strict subsets;
+- record multiple incomparable minimal sets;
+- record non-monotonicity and interactions.
+
+For finer rendered spans, use an explicitly bounded exact lattice. Any approximate boundary resolution must be labeled near-exact.
+
+## Negative controls
+
+- random node sets matched by cost;
+- random spans matched by length and position;
+- harmful payload deletion control;
+- benign role-play programs using the same primitives;
+- malformed-render control rejected before inference;
+- neutralizer-only artifacts;
+- short-removal controls that are not causally effective;
+- evaluator-swap controls.
+
+## Gate 1 metrics
+
+- generated attacks and complete denominator;
+- eligible count and rate;
+- robustly localizable rate;
+- single- versus multi-component localizability;
+- minimal rendered fraction and program-node cost;
+- cross-neutralizer agreement;
+- seed-stable recovery;
+- evaluator coverage and abstention;
+- family-specific localizability;
+- distributed/non-monotonic fraction;
+- oracle query count;
+- invariant and compile failures.
+
+## Gate 1 GO criteria
+
+All must hold:
+
+1. at least **30 eligible attacks**;
+2. robustly localizable fraction at least **30%**;
+3. median minimal fraction/cost among localized cases at most **25%**;
+4. compact cases in at least **3 composition families**;
+5. cross-neutralizer agreement at least **0.75** on non-abstained candidates;
+6. evaluator abstention at most **20%**;
+7. seed-stable recovery in at least **80%** of localized cases;
+8. zero payload-provenance violations in accepted explanations;
+9. negative controls show that short removal alone is not sufficient;
+10. exact oracle, cache, and manifests reproduce under CI/local rerun.
+
+## Gate 1 outcomes
+
+- `GATE1_GO`: all criteria pass;
+- `GATE1_PIVOT_DISTRIBUTED`: compact localization is weak but systematic multi-component/distributed causal structure is strong;
+- `GATE1_STOP_OR_REDESIGN`: evaluator ambiguity or intervention artifacts dominate, or too few eligible attacks exist.
+
+No wavelet or adaptive-search claim is developed before this decision.
+
+# Gate 2 — Generalization and Algorithm Gate
+
+## Objective
+
+Establish that the phenomenon generalizes and that the proposed adaptive method approaches the oracle with materially fewer target-model calls.
+
+## Expansion
+
+- at least 3 target-model families;
+- one secondary-size check;
+- held-out payload categories;
+- held-out attack primitives;
+- held-out compositions;
+- prefix, infix, suffix, and mixed positions;
+- benign context and filler stress tests;
+- exact-payload-preserving external subset from h4rm3l, JailbreakBench, or independently sourced formal templates.
+
+All external examples must pass the same program/provenance or exact-alignment contract. Free-form examples that cannot be verified receive `UNVERIFIED_ALIGNMENT` and do not enter primary rates.
+
+## Baselines
+
+- random cost-matched components;
 - atomic leave-one-out;
-- exhaustive contiguous spans on tractable prompts;
-- greedy top-down interval search;
-- gradient token attribution for open-weight models, where feasible;
-- Token Highlighter-style ranking or the closest reproducible implementation;
-- wavelet-free version of the same hierarchical search.
+- exhaustive oracle;
+- greedy top-down hierarchy;
+- greedy bottom-up merge;
+- Erase-and-Check / GreedyEC / GradEC adaptation;
+- Token Highlighter or integrated gradients on open-weight models;
+- plain typed hierarchy without tree-Haar;
+- LLM-rationale span selection as a secondary baseline;
+- GuardNet when labels/code are compatible.
 
-### Proposed variants
+## Proposed method
 
-- tree-Haar prioritization;
-- interaction-residual prioritization;
-- robust multi-neutralizer score;
-- abstention-aware stopping.
+Develop an adaptive typed search with:
 
-### Main metrics
+- group interventions over program subtrees;
+- conservative effect density;
+- interaction-residual diagnostics;
+- monotonicity checks;
+- multi-node refinement;
+- strict-subset pruning;
+- evaluator-aware and budget-aware abstention.
 
-- best-valid-cost regret relative to exhaustive search;
-- refusal-recovery effect;
-- intent preservation;
-- localization overlap on controlled ground-truth prompts;
+Tree-Haar/wavelet prioritization is a replaceable variant, not a fixed contribution.
+
+## Main metrics
+
+- oracle-valid cost regret;
+- oracle explanation recovery;
 - target-model query count;
-- wall-clock time;
-- abstention precision;
-- seed and neutralizer stability.
+- quality-query Pareto frontier;
+- single- and multi-component recovery;
+- distributed-case abstention precision;
+- cross-neutralizer and cross-evaluator stability;
+- held-out primitive/composition generalization;
+- cross-model transfer;
+- real external-subset agreement;
+- wall-clock and compute cost.
 
-### Algorithm gate
+## Algorithm GO criteria
 
-Tree-Haar remains in the paper only if it provides at least one defensible advantage:
+The method must satisfy every validity criterion and at least one primary algorithmic criterion.
 
-- at least 4x query reduction at comparable explanation quality;
-- materially better recovery of heterogeneous span scales;
-- materially better boundary/position stability;
-- better interaction candidate discovery.
+Primary criteria:
 
-Otherwise replace it with the simpler adaptive search and keep the task contribution.
+- recover at least **90% of oracle-valid explanation quality with at most 25% of oracle queries**; or
+- obtain at least **4x query reduction** at statistically indistinguishable validity/minimality; or
+- materially improve multi-component interaction discovery or distributed-case abstention over the plain hierarchy.
 
-## Phase 3 — Generalization and findings
+Validity criteria:
 
-- held-out attack families;
-- held-out harmful-behavior categories;
-- cross-model span transfer;
-- prompt paraphrase and position-shift stress tests;
-- localizable versus distributed attack taxonomy;
-- optional safety-head or residual-stream validation on a small open-weight subset.
+- no decision-changing degradation under evaluator swap;
+- no decision-changing degradation under neutralizer swap;
+- seed stability;
+- held-out family and model generalization;
+- external exact-alignment subset agrees directionally with controlled results;
+- complete denominator, failures, and abstentions reported.
 
-## Phase 4 — Paper evidence freeze
+## Gate 2 outcomes
+
+- `PAPER_GO`: phenomenon and algorithm criteria pass;
+- `PAPER_GO_NO_WAVELET`: phenomenon generalizes and simpler adaptive search wins; wavelet is removed;
+- `BENCHMARK_ONLY_BORDERLINE`: task/benchmark is strong but algorithm adds little;
+- `PIVOT_DISTRIBUTED`: localized explanations are uncommon but distributed structure is systematic;
+- `STOP_OR_NARROW`: only one family/model works or external validation contradicts Gate 1.
+
+# Phase 3 — Paper evidence and optional mechanistic analysis
+
+Only after `PAPER_GO` or `PAPER_GO_NO_WAVELET`:
+
+- freeze all main claims and denominators;
+- run paired bootstrap/confidence intervals;
+- complete attack-family and model-family analyses;
+- optionally test known safety heads on a small open-weight subset as supporting evidence;
+- do not introduce a new safety-head discovery contribution.
+
+# Phase 4 — Evidence freeze and submission
 
 Freeze:
 
-- main claims;
-- evaluation IDs;
-- all primary tables and figures;
+- benchmark version and programs;
+- payload/evaluator/model revisions;
+- all eligibility and exclusion IDs;
+- oracle and algorithm outputs;
 - configuration hashes;
-- model and judge revisions;
-- compute accounting;
-- exclusions and failed runs;
-- paired-bootstrap confidence intervals.
+- compute and query ledger;
+- all primary tables and figures;
+- failed runs and abstentions;
+- ethics/responsible-release protocol;
+- weekly literature refresh.
 
-## Required negative controls
+# Claim discipline
 
-- random spans matched by length and position;
-- benign prompts with superficially similar role-play language;
-- harmful payload deletion control;
-- malformed-prompt control;
-- neutralization-only judge without target-model generation;
-- judge swap or human audit subset.
+Use:
+
+- `programmatically grounded`;
+- `interventional`;
+- `oracle-minimal within the frozen lattice`;
+- `payload-preserving`;
+- `evaluator-consensus with abstention`.
+
+Do not use unqualified:
+
+- `ground-truth causal span`;
+- `globally minimal`;
+- `first causal jailbreak explanation`;
+- `first composable jailbreak benchmark`;
+- `human-free objective truth`;
+- `wavelet novelty`.
