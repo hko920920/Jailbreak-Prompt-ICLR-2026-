@@ -38,6 +38,18 @@ def _array(value: object, *, where: str) -> list[object]:
     return value
 
 
+def _integer(value: object, *, where: str) -> int:
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise RuntimeError(f"{where} must be an integer")
+    return value
+
+
+def _number(value: object, *, where: str) -> float:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise RuntimeError(f"{where} must be numeric")
+    return float(value)
+
+
 def _apply_template(tokenizer: Any, prompt: str) -> str:
     rendered = tokenizer.apply_chat_template(
         [{"role": "user", "content": prompt}],
@@ -59,13 +71,18 @@ def select_calibration_candidates(
     ranked = sorted(
         candidate_rows,
         key=lambda row: (
-            -int(row["eligible_count"]),
-            int(row["attack_abstention_count"]),
+            -_integer(row["eligible_count"], where="eligible_count"),
+            _integer(
+                row["attack_abstention_count"],
+                where="attack_abstention_count",
+            ),
             str(row["candidate_id"]),
         ),
     )
     qualifying = [
-        row for row in ranked if int(row["eligible_count"]) >= minimum_eligible
+        row
+        for row in ranked
+        if _integer(row["eligible_count"], where="eligible_count") >= minimum_eligible
     ]
     if len(qualifying) < minimum_selected:
         selected: list[str] = []
@@ -94,7 +111,11 @@ def _load_private_payloads(root: Path, source_csv: Path) -> dict[str, JsonDict]:
     for raw in _array(safe_registry["payloads"], where="payload registry"):
         item = _object(raw, where="payload registry item")
         payload_id = str(item["payload_id"])
-        row = source_index[int(item["source_row_index"])]
+        source_row_index = _integer(
+            item["source_row_index"],
+            where="source_row_index",
+        )
+        row = source_index[source_row_index]
         if sha256_text(row.goal) != str(item["payload_sha256"]):
             raise RuntimeError(f"payload hash changed for {payload_id}")
         payloads[payload_id] = {
@@ -131,27 +152,30 @@ def prepare_calibration(
         raise RuntimeError("h4rm3l source SHA-256 differs from frozen identity")
 
     specs = candidate_specs(contract)
-    required = sorted(
-        {program_id for spec in specs for program_id in spec.source_program_ids}
-    )
+    required = sorted({program_id for spec in specs for program_id in spec.source_program_ids})
     source_programs = parse_h4rm3l_programs(
         attack_source_csv,
         required_program_ids=required,
     )
-    frozen_candidates = load_json(
-        root / "data/gate1/v2/frozen/candidate_registry.safe.json"
-    )
-    frozen_candidate_index = {
-        str(item["candidate_id"]): _object(item, where="candidate")
-        for item in _array(frozen_candidates["candidates"], where="candidates")
-    }
+    frozen_candidates = load_json(root / "data/gate1/v2/frozen/candidate_registry.safe.json")
+    frozen_candidate_index: dict[str, JsonDict] = {}
+    for raw_candidate in _array(
+        frozen_candidates["candidates"],
+        where="candidates",
+    ):
+        candidate = _object(raw_candidate, where="candidate")
+        frozen_candidate_index[str(candidate["candidate_id"])] = candidate
     sentinel = "__JBSPAN_EXACT_PAYLOAD_SENTINEL__"
     for spec in specs:
         rendered = render_candidate(spec, source_programs, payload_text=sentinel)
         expected = frozen_candidate_index[spec.candidate_id]
         if sha256_text(rendered.text) != str(expected["sentinel_render_sha256"]):
             raise RuntimeError(f"candidate render changed: {spec.candidate_id}")
-        if len(rendered.nodes) != int(expected["node_count"]):
+        expected_node_count = _integer(
+            expected["node_count"],
+            where="candidate.node_count",
+        )
+        if len(rendered.nodes) != expected_node_count:
             raise RuntimeError(f"candidate node count changed: {spec.candidate_id}")
 
     split = load_json(root / "data/gate1/v2/frozen/split_manifest.safe.json")
@@ -161,12 +185,17 @@ def prepare_calibration(
     ]
     if len(calibration_items) != 10:
         raise RuntimeError("calibration split must contain ten payloads")
-    if int(split["smoke_count"]) != 10 or int(split["evaluation_count"]) != 30:
+    smoke_count = _integer(split["smoke_count"], where="smoke_count")
+    evaluation_count = _integer(
+        split["evaluation_count"],
+        where="evaluation_count",
+    )
+    if smoke_count != 10 or evaluation_count != 30:
         raise RuntimeError("smoke and evaluation partitions are not sealed")
 
     payloads = _load_private_payloads(root, payload_source_csv)
     token_config = _object(runtime["token_provenance"], where="token provenance")
-    tokenizer = AutoTokenizer.from_pretrained(
+    tokenizer = AutoTokenizer.from_pretrained(  # type: ignore[no-untyped-call]
         str(token_config["tokenizer_repo_id"]),
         revision=str(token_config["tokenizer_revision"]),
         use_fast=True,
@@ -176,9 +205,7 @@ def prepare_calibration(
         raise RuntimeError("target tokenizer has no chat template")
     step3_identity = load_json(root / "data/gate1/step3/step3_identity.json")
     expected_template_sha = str(
-        _object(step3_identity["tokenizer"], where="tokenizer identity")[
-            "chat_template_sha256"
-        ]
+        _object(step3_identity["tokenizer"], where="tokenizer identity")["chat_template_sha256"]
     )
     if sha256_text(chat_template) != expected_template_sha:
         raise RuntimeError("chat template differs from frozen Step 3 identity")
@@ -224,9 +251,7 @@ def prepare_calibration(
         for spec in specs:
             rendered = render_candidate(spec, source_programs, payload_text=goal)
             if (
-                rendered.text[
-                    rendered.payload_character_start : rendered.payload_character_end
-                ]
+                rendered.text[rendered.payload_character_start : rendered.payload_character_end]
                 != goal
             ):
                 raise RuntimeError("candidate changed the payload span")
@@ -276,18 +301,10 @@ def prepare_calibration(
     identity: JsonDict = {
         "schema_version": "gate1-step3b-calibration-identity-v1",
         "paper_validity": False,
-        "target_identity_sha256": sha256_file(
-            root / "data/gate1/step3/step3_identity.json"
-        ),
-        "runtime_contract_sha256": sha256_file(
-            root / "configs/gate1/gate1_step3_runtime.json"
-        ),
-        "step3b_contract_sha256": sha256_file(
-            root / "configs/gate1/gate1_step3b.json"
-        ),
-        "source_identity_sha256": sha256_file(
-            root / "data/gate1/v2/frozen/source_identity.json"
-        ),
+        "target_identity_sha256": sha256_file(root / "data/gate1/step3/step3_identity.json"),
+        "runtime_contract_sha256": sha256_file(root / "configs/gate1/gate1_step3_runtime.json"),
+        "step3b_contract_sha256": sha256_file(root / "configs/gate1/gate1_step3b.json"),
+        "source_identity_sha256": sha256_file(root / "data/gate1/v2/frozen/source_identity.json"),
         "candidate_registry_sha256": sha256_file(
             root / "data/gate1/v2/frozen/candidate_registry.safe.json"
         ),
@@ -319,10 +336,12 @@ def generate_calibration(
     contract = load_step3b_contract(root)
     generation = _object(runtime["generation"], where="generation")
     calibration = _object(contract["calibration"], where="calibration")
-    seed = int(calibration["seed"])
-    if seed not in [
-        int(item) for item in _array(generation["seeds"], where="generation seeds")
-    ]:
+    seed = _integer(calibration["seed"], where="calibration.seed")
+    generation_seeds = [
+        _integer(item, where="generation seed")
+        for item in _array(generation["seeds"], where="generation seeds")
+    ]
+    if seed not in generation_seeds:
         raise RuntimeError("calibration seed is outside the Step 3 contract")
     inputs = load_jsonl(private_output_dir / "calibration_inputs.private.jsonl")
     outputs: list[JsonDict] = []
@@ -331,10 +350,22 @@ def generate_calibration(
             server_url.rstrip("/") + "/completion",
             {
                 "prompt": str(row["chat_prompt"]),
-                "n_predict": int(generation["max_tokens"]),
-                "temperature": float(generation["temperature"]),
-                "top_p": float(generation["top_p"]),
-                "top_k": int(generation["top_k"]),
+                "n_predict": _integer(
+                    generation["max_tokens"],
+                    where="generation.max_tokens",
+                ),
+                "temperature": _number(
+                    generation["temperature"],
+                    where="generation.temperature",
+                ),
+                "top_p": _number(
+                    generation["top_p"],
+                    where="generation.top_p",
+                ),
+                "top_k": _integer(
+                    generation["top_k"],
+                    where="generation.top_k",
+                ),
                 "seed": seed,
                 "stream": False,
                 "cache_prompt": False,
@@ -377,9 +408,7 @@ def evaluate_calibration_harmbench(
     _, _, prompts = load_step3_contract(root)
     inputs = {
         str(item["calibration_id"]): item
-        for item in load_jsonl(
-            private_output_dir / "calibration_inputs.private.jsonl"
-        )
+        for item in load_jsonl(private_output_dir / "calibration_inputs.private.jsonl")
     }
     responses = load_jsonl(private_output_dir / "target_responses.private.jsonl")
     results: list[JsonDict] = []
@@ -499,9 +528,7 @@ def finalize_calibration(
                 "denominator": len(payload_ids),
                 "eligible_count": len(eligible_ids),
                 "eligible_payload_ids": eligible_ids,
-                "eligible_payload_ids_sha256": canonical_json_sha256(
-                    sorted(eligible_ids)
-                ),
+                "eligible_payload_ids_sha256": canonical_json_sha256(sorted(eligible_ids)),
                 "attack_harmful_count": attack_harmful_count,
                 "attack_safe_count": attack_safe_count,
                 "attack_abstention_count": attack_abstention_count,
@@ -510,16 +537,21 @@ def finalize_calibration(
 
     selection_result = select_calibration_candidates(
         candidate_rows,
-        minimum_eligible=int(selection["minimum_eligible_payloads_per_candidate"]),
-        minimum_selected=int(selection["minimum_selected_candidates"]),
-        maximum_selected=int(selection["maximum_selected_candidates"]),
+        minimum_eligible=_integer(
+            selection["minimum_eligible_payloads_per_candidate"],
+            where="minimum_eligible_payloads_per_candidate",
+        ),
+        minimum_selected=_integer(
+            selection["minimum_selected_candidates"],
+            where="minimum_selected_candidates",
+        ),
+        maximum_selected=_integer(
+            selection["maximum_selected_candidates"],
+            where="maximum_selected_candidates",
+        ),
     )
-    original_safe_count = sum(
-        original_labels[payload_id] is False for payload_id in payload_ids
-    )
-    original_harmful_count = sum(
-        original_labels[payload_id] is True for payload_id in payload_ids
-    )
+    original_safe_count = sum(original_labels[payload_id] is False for payload_id in payload_ids)
+    original_harmful_count = sum(original_labels[payload_id] is True for payload_id in payload_ids)
     original_abstention_count = sum(
         original_labels[payload_id] is None for payload_id in payload_ids
     )
@@ -541,9 +573,7 @@ def finalize_calibration(
         "original_abstention_count": original_abstention_count,
         "candidate_results": candidate_rows,
         "selected_candidate_ids": selection_result["selected_candidate_ids"],
-        "qualifying_candidate_count": selection_result[
-            "qualifying_candidate_count"
-        ],
+        "qualifying_candidate_count": selection_result["qualifying_candidate_count"],
         "ranked_candidate_ids": selection_result["ranked_candidate_ids"],
         "selection_rule": selection,
         "smoke_outputs_observed": False,
@@ -568,9 +598,7 @@ def finalize_calibration(
         "selected_candidate_ids_sha256": canonical_json_sha256(
             selection_result["selected_candidate_ids"]
         ),
-        "qualifying_candidate_count": selection_result[
-            "qualifying_candidate_count"
-        ],
+        "qualifying_candidate_count": selection_result["qualifying_candidate_count"],
         "tie_break": selection["tie_break"],
         "minimum_eligible_payloads_per_candidate": selection[
             "minimum_eligible_payloads_per_candidate"
