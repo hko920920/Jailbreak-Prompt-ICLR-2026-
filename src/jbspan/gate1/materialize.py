@@ -14,6 +14,7 @@ from jbspan.gate1.models import ContractValidationError, Gate1Registry, PayloadS
 from jbspan.gate1.render import render_program
 from jbspan.gate1.util import canonical_json_sha256, sha256_text
 
+JsonDict = dict[str, Any]
 _SOURCE_PATH = "data/harmful-behaviors.csv"
 _SELECTION_METHOD = "per_category_sha256_rank_v1"
 
@@ -81,9 +82,8 @@ def _parse_row(raw: dict[str, str | None], line_number: int) -> SourceRow:
             raise ContractValidationError(f"source row {line_number} has invalid {name}")
         return value
 
-    raw_index = required("Index")
     try:
-        index = int(raw_index)
+        index = int(required("Index"))
     except ValueError as exc:
         raise ContractValidationError(f"source row {line_number} has invalid Index") from exc
     return SourceRow(
@@ -107,10 +107,10 @@ def _validate_source_rows(rows: tuple[SourceRow, ...], source: PayloadSource) ->
     category_counts = Counter(row.category for row in rows)
     if len(category_counts) != source.expected_category_count:
         raise ContractValidationError("source category count differs from frozen contract")
-    expected_per_category = source.expected_rows // source.expected_category_count
-    if source.expected_rows % source.expected_category_count:
-        raise ContractValidationError("source rows are not divisible by category count")
-    if set(category_counts.values()) != {expected_per_category}:
+    expected_per_category, remainder = divmod(
+        source.expected_rows, source.expected_category_count
+    )
+    if remainder or set(category_counts.values()) != {expected_per_category}:
         raise ContractValidationError("source categories are not uniformly populated")
 
 
@@ -122,77 +122,27 @@ def resolve_source_identity(
     source_file_path: str = _SOURCE_PATH,
     expected_source_sha256: str | None = None,
 ) -> SourceIdentity:
-    valid_hex = all(ch in "0123456789abcdef" for ch in resolved_revision)
+    valid_hex = all(character in "0123456789abcdef" for character in resolved_revision)
     if len(resolved_revision) != 40 or not valid_hex:
-        raise ContractValidationError(
-            "resolved source revision must be a 40-character hex SHA"
-        )
+        raise ContractValidationError("resolved source revision must be a 40-character hex SHA")
     if not resolved_revision.startswith(source.revision):
-        raise ContractValidationError(
-            "resolved source revision does not match requested prefix"
-        )
+        raise ContractValidationError("resolved source revision does not match requested prefix")
     if source_file_path != _SOURCE_PATH:
-        raise ContractValidationError(
-            "source file path differs from the frozen Step 2 path"
-        )
-    file_sha256 = sha256_file(path)
-    if expected_source_sha256 is not None and file_sha256 != expected_source_sha256:
-        raise ContractValidationError(
-            "source file SHA-256 differs from frozen identity"
-        )
+        raise ContractValidationError("source file path differs from the frozen Step 2 path")
+    source_file_sha256 = sha256_file(path)
+    if expected_source_sha256 is not None and source_file_sha256 != expected_source_sha256:
+        raise ContractValidationError("source file SHA-256 differs from frozen identity")
     rows = load_source_rows(path, source)
     return SourceIdentity(
         repository_id=source.repository_id,
         requested_revision=source.revision,
         resolved_revision=resolved_revision,
         source_file_path=source_file_path,
-        source_file_sha256=file_sha256,
+        source_file_sha256=source_file_sha256,
         source_file_size_bytes=path.stat().st_size,
         row_count=len(rows),
         category_count=len({row.category for row in rows}),
     )
-
-
-def select_payloads(
-    rows: tuple[SourceRow, ...],
-    source: PayloadSource,
-) -> tuple[SelectedPayload, ...]:
-    grouped: dict[str, list[SourceRow]] = defaultdict(list)
-    for row in rows:
-        grouped[row.category].append(row)
-    selected: list[SelectedPayload] = []
-    for category in sorted(grouped):
-        ranked = sorted(
-            (
-                (_selection_digest(source, row), row.index, row)
-                for row in grouped[category]
-            ),
-            key=lambda item: (item[0], item[1]),
-        )
-        if len(ranked) < source.selected_per_category:
-            raise ContractValidationError(f"category has too few rows: {category}")
-        for rank, (digest, _, row) in enumerate(
-            ranked[: source.selected_per_category]
-        ):
-            split = (
-                "gate1_development"
-                if rank < source.development_per_category
-                else "gate2_heldout"
-            )
-            selected.append(
-                SelectedPayload(
-                    row=row,
-                    payload_id=f"JBB-{row.index:03d}",
-                    split=split,
-                    category_rank=rank,
-                    selection_sha256=digest,
-                )
-            )
-    selected.sort(
-        key=lambda item: (item.split, item.row.category, item.category_rank)
-    )
-    _validate_selection(selected, source)
-    return tuple(selected)
 
 
 def _selection_digest(source: PayloadSource, row: SourceRow) -> str:
@@ -208,36 +158,55 @@ def _selection_digest(source: PayloadSource, row: SourceRow) -> str:
     return hashlib.sha256(identity.encode("utf-8")).hexdigest()
 
 
-def _validate_selection(
-    selected: list[SelectedPayload],
-    source: PayloadSource,
-) -> None:
-    if len(selected) != source.target_count:
-        raise ContractValidationError(
-            "selected payload count differs from frozen target"
+def select_payloads(
+    rows: tuple[SourceRow, ...], source: PayloadSource
+) -> tuple[SelectedPayload, ...]:
+    grouped: dict[str, list[SourceRow]] = defaultdict(list)
+    for row in rows:
+        grouped[row.category].append(row)
+    selected: list[SelectedPayload] = []
+    for category in sorted(grouped):
+        ranked = sorted(
+            ((_selection_digest(source, row), row.index, row) for row in grouped[category]),
+            key=lambda item: (item[0], item[1]),
         )
+        if len(ranked) < source.selected_per_category:
+            raise ContractValidationError(f"category has too few rows: {category}")
+        for rank, (digest, _, row) in enumerate(ranked[: source.selected_per_category]):
+            split = (
+                "gate1_development"
+                if rank < source.development_per_category
+                else "gate2_heldout"
+            )
+            selected.append(
+                SelectedPayload(
+                    row=row,
+                    payload_id=f"JBB-{row.index:03d}",
+                    split=split,
+                    category_rank=rank,
+                    selection_sha256=digest,
+                )
+            )
+    selected.sort(key=lambda item: (item.split, item.row.category, item.category_rank))
+    _validate_selection(selected, source)
+    return tuple(selected)
+
+
+def _validate_selection(selected: list[SelectedPayload], source: PayloadSource) -> None:
+    if len(selected) != source.target_count:
+        raise ContractValidationError("selected payload count differs from frozen target")
     if len({item.payload_id for item in selected}) != len(selected):
         raise ContractValidationError("selected payload IDs must be unique")
     split_counts = Counter(item.split for item in selected)
     if split_counts["gate1_development"] != source.development_count:
-        raise ContractValidationError(
-            "development payload count differs from contract"
-        )
+        raise ContractValidationError("development payload count differs from contract")
     if split_counts["gate2_heldout"] != source.heldout_count:
         raise ContractValidationError("heldout payload count differs from contract")
     category_split = Counter((item.row.category, item.split) for item in selected)
     for category in {item.row.category for item in selected}:
-        if (
-            category_split[(category, "gate1_development")]
-            != source.development_per_category
-        ):
-            raise ContractValidationError(
-                "development category allocation is invalid"
-            )
-        if (
-            category_split[(category, "gate2_heldout")]
-            != source.heldout_per_category
-        ):
+        if category_split[(category, "gate1_development")] != source.development_per_category:
+            raise ContractValidationError("development category allocation is invalid")
+        if category_split[(category, "gate2_heldout")] != source.heldout_per_category:
             raise ContractValidationError("heldout category allocation is invalid")
 
 
@@ -245,7 +214,7 @@ def safe_payload_registry(
     selected: tuple[SelectedPayload, ...],
     source: PayloadSource,
     identity: SourceIdentity,
-) -> dict[str, object]:
+) -> JsonDict:
     payloads = [
         {
             "payload_id": item.payload_id,
@@ -281,7 +250,7 @@ def _benchmark_record(
     contract_sha256: str,
     payload: SelectedPayload,
     family_id: str,
-) -> tuple[dict[str, object], dict[str, object]]:
+) -> tuple[JsonDict, JsonDict]:
     program_id = f"G1-{payload.payload_id}-{family_id}"
     rendered = render_program(
         registry,
@@ -291,7 +260,7 @@ def _benchmark_record(
         payload_text=payload.row.goal,
     )
     safe_rendered = rendered.to_safe_dict()
-    record: dict[str, object] = {
+    record: JsonDict = {
         "schema_version": "gate1-benchmark-record-v1",
         "contract_sha256": contract_sha256,
         "example_id": program_id,
@@ -301,12 +270,8 @@ def _benchmark_record(
         "family_id": family_id,
         "program_nodes": safe_rendered["resolved_nodes"],
         "rendered_prompt_sha256": safe_rendered["prompt_sha256"],
-        "rendered_prompt_character_length": safe_rendered[
-            "prompt_character_length"
-        ],
-        "rendered_prompt_utf8_byte_length": safe_rendered[
-            "prompt_utf8_byte_length"
-        ],
+        "rendered_prompt_character_length": safe_rendered["prompt_character_length"],
+        "rendered_prompt_utf8_byte_length": safe_rendered["prompt_utf8_byte_length"],
         "payload_character_span": safe_rendered["payload_character_span"],
         "payload_utf8_byte_span": safe_rendered["payload_utf8_byte_span"],
         "provenance": safe_rendered["provenance"],
@@ -319,7 +284,7 @@ def _benchmark_record(
             "inserted_forbidden_safety_cue_count": 0,
         },
     }
-    private = {
+    private: JsonDict = {
         "example_id": program_id,
         "payload_id": payload.payload_id,
         "payload_text": payload.row.goal,
@@ -335,15 +300,13 @@ def materialize_benchmark(
     root: Path,
     registry: Gate1Registry,
     selected: tuple[SelectedPayload, ...],
-) -> tuple[tuple[dict[str, object], ...], tuple[dict[str, object], ...]]:
+) -> tuple[tuple[JsonDict, ...], tuple[JsonDict, ...]]:
     contract_sha256 = str(contract_manifest(root, registry)["contract_sha256"])
     primary_families = sorted(
-        family.family_id
-        for family in registry.families.values()
-        if family.primary_gate1
+        family.family_id for family in registry.families.values() if family.primary_gate1
     )
-    safe_records: list[dict[str, object]] = []
-    private_records: list[dict[str, object]] = []
+    safe_records: list[JsonDict] = []
+    private_records: list[JsonDict] = []
     for payload in selected:
         if payload.split != "gate1_development":
             continue
@@ -358,12 +321,8 @@ def materialize_benchmark(
             private_records.append(private)
     projected = registry.payload_source.development_count * len(primary_families)
     if len(safe_records) != projected:
-        raise ContractValidationError(
-            "rendered attack denominator differs from contract"
-        )
-    if len({str(item["example_id"]) for item in safe_records}) != len(
-        safe_records
-    ):
+        raise ContractValidationError("rendered attack denominator differs from contract")
+    if len({str(item["example_id"]) for item in safe_records}) != len(safe_records):
         raise ContractValidationError("rendered attack IDs must be unique")
     return tuple(safe_records), tuple(private_records)
 
@@ -380,9 +339,7 @@ def write_jsonl(path: Path, values: Iterable[object]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as handle:
         for value in values:
-            handle.write(
-                json.dumps(value, ensure_ascii=False, sort_keys=True) + "\n"
-            )
+            handle.write(json.dumps(value, ensure_ascii=False, sort_keys=True) + "\n")
 
 
 def materialize_gate1_step2(
@@ -394,7 +351,7 @@ def materialize_gate1_step2(
     safe_output_dir: Path,
     private_output_dir: Path,
     expected_source_sha256: str | None = None,
-) -> dict[str, Any]:
+) -> JsonDict:
     rows = load_source_rows(source_csv, registry.payload_source)
     identity = resolve_source_identity(
         source_csv,
@@ -403,16 +360,8 @@ def materialize_gate1_step2(
         expected_source_sha256=expected_source_sha256,
     )
     selected = select_payloads(rows, registry.payload_source)
-    payload_registry = safe_payload_registry(
-        selected,
-        registry.payload_source,
-        identity,
-    )
-    safe_records, private_records = materialize_benchmark(
-        root,
-        registry,
-        selected,
-    )
+    payload_registry = safe_payload_registry(selected, registry.payload_source, identity)
+    safe_records, private_records = materialize_benchmark(root, registry, selected)
 
     source_identity_path = safe_output_dir / "source_identity.json"
     payload_registry_path = safe_output_dir / "payload_registry.safe.json"
@@ -432,13 +381,11 @@ def materialize_gate1_step2(
         },
     )
 
-    development = [
-        item for item in selected if item.split == "gate1_development"
-    ]
+    development = [item for item in selected if item.split == "gate1_development"]
     heldout = [item for item in selected if item.split == "gate2_heldout"]
     family_counts = Counter(str(item["family_id"]) for item in safe_records)
     category_counts = Counter(item.row.category for item in development)
-    denominator = {
+    denominator: JsonDict = {
         "schema_version": "gate1-step2-denominator-v1",
         "status": "GATE1_STEP2_DENOMINATOR_MATERIALIZED",
         "target_model_inference_performed": False,
@@ -452,27 +399,23 @@ def materialize_gate1_step2(
     }
     write_json(denominator_path, denominator)
 
-    private_payloads = (
-        {
-            "payload_id": item.payload_id,
-            "source_row_index": item.row.index,
-            "goal": item.row.goal,
-            "target": item.row.target,
-            "behavior": item.row.behavior,
-            "category": item.row.category,
-            "source_label": item.row.source_label,
-            "split": item.split,
-        }
-        for item in selected
-    )
     write_jsonl(
         private_output_dir / "payloads.private.jsonl",
-        private_payloads,
+        (
+            {
+                "payload_id": item.payload_id,
+                "source_row_index": item.row.index,
+                "goal": item.row.goal,
+                "target": item.row.target,
+                "behavior": item.row.behavior,
+                "category": item.row.category,
+                "source_label": item.row.source_label,
+                "split": item.split,
+            }
+            for item in selected
+        ),
     )
-    write_jsonl(
-        private_output_dir / "benchmark_records.private.jsonl",
-        private_records,
-    )
+    write_jsonl(private_output_dir / "benchmark_records.private.jsonl", private_records)
 
     safe_files = (
         source_identity_path,
@@ -481,17 +424,14 @@ def materialize_gate1_step2(
         denominator_path,
         exclusions_path,
     )
-    safe_hashes = {path.name: sha256_file(path) for path in safe_files}
-    manifest = {
+    manifest: JsonDict = {
         "schema_version": "gate1-step2-materialization-manifest-v1",
         "status": "GATE1_STEP2_MATERIALIZED",
         "paper_validity": False,
         "target_model_inference_performed": False,
         "raw_payloads_committed": False,
         "raw_rendered_prompts_committed": False,
-        "contract_sha256": contract_manifest(root, registry)[
-            "contract_sha256"
-        ],
+        "contract_sha256": contract_manifest(root, registry)["contract_sha256"],
         "source_identity": identity.to_dict(),
         "selection_sha256": canonical_json_sha256(
             [
@@ -508,12 +448,9 @@ def materialize_gate1_step2(
         "development_payload_count": len(development),
         "heldout_payload_count": len(heldout),
         "rendered_attack_count": len(safe_records),
-        "safe_file_sha256": safe_hashes,
+        "safe_file_sha256": {path.name: sha256_file(path) for path in safe_files},
         "private_file_count": 2,
         "exclusion_count": 0,
     }
-    write_json(
-        safe_output_dir / "materialization_manifest.json",
-        manifest,
-    )
+    write_json(safe_output_dir / "materialization_manifest.json", manifest)
     return manifest
