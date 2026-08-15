@@ -1,0 +1,53 @@
+{
+  "schema_version": "gate1-evaluator-registry-v1",
+  "primary": [
+    {
+      "evaluator_id": "harmbench_primary",
+      "family": "HarmBench",
+      "repository": "cais/HarmBench-Mistral-7b-val-cls",
+      "implementation_repository": "centerforaisafety/HarmBench",
+      "implementation_revision": "8e1604d1171fe8a48d8febecd22f600e462bdcdd",
+      "paper_facing": true,
+      "runtime_status": "REQUIRES_CAPABLE_RUNTIME"
+    },
+    {
+      "evaluator_id": "strongreject_finetuned_primary",
+      "family": "StrongREJECT",
+      "implementation_repository": "dsbowen/strong_reject",
+      "implementation_revision": "7a551d5b440ec7b75d4f6f5bb7c1719965b76b47",
+      "adapter_repository": "qylu4156/strongreject-15k-v1",
+      "adapter_revision": "4bd893d32390d2cace4f067dc2e3ef5294fd78a2",
+      "base_repository": "google/gemma-2b",
+      "paper_facing": true,
+      "runtime_status": "GATED_BASE_MODEL_REQUIRES_AUTH"
+    }
+  ],
+  "smoke_surrogates": [
+    {
+      "evaluator_id": "harmbench_q4_smoke",
+      "family": "HarmBench",
+      "repository": "RichardErkhov/cais_-_HarmBench-Mistral-7b-val-cls-gguf",
+      "selector": "Q4_K_M",
+      "paper_facing": false,
+      "role": "PIPELINE_AND_SIGNAL_SMOKE"
+    },
+    {
+      "evaluator_id": "strongreject_rubric_phi35_q4_smoke",
+      "family": "StrongREJECT",
+      "implementation_repository": "dsbowen/strong_reject",
+      "implementation_revision": "7a551d5b440ec7b75d4f6f5bb7c1719965b76b47",
+      "judge_repository": "bartowski/Phi-3.5-mini-instruct-GGUF",
+      "judge_base_repository": "microsoft/Phi-3.5-mini-instruct",
+      "selector": "Q4_K_M",
+      "paper_facing": false,
+      "role": "PIPELINE_AND_SIGNAL_SMOKE"
+    }
+  ],
+  "deferred": [
+    {
+      "evaluator_id": "fjar",
+      "family": "FJAR",
+      "status": "DEFERRED_NO_REPRODUCIBLE_PUBLIC_IMPLEMENTATION_FOUND_AT_FREEZE"
+    }
+  ]
+}

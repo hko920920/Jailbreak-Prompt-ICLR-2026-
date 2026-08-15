@@ -22,6 +22,10 @@ hf = [
   "torch>=2.3",
   "transformers>=4.44",
 ]
+step3 = [
+  "huggingface_hub>=0.24,<2",
+  "transformers>=4.44,<5",
+]
 
 [project.scripts]
 jbspan = "jbspan.cli:main"
