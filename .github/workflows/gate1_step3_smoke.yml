@@ -26,7 +26,7 @@ jobs:
       SOURCE_REVISION: d8d87b8fdcb7806e3b4e45fffb2bc24aa6b17f32
       SOURCE_PATH: data/harmful-behaviors.csv
       SAFE_OUTPUT: artifacts/gate1-step3/safe
-      PRIVATE_OUTPUT: ${{ runner.temp }}/gate1-step3/private
+      PRIVATE_OUTPUT: /tmp/gate1-step3/private
       TARGET_REF: Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M
       HARMBENCH_REF: RichardErkhov/cais_-_HarmBench-Mistral-7b-val-cls-gguf:Q4_K_M
       STRONGREJECT_JUDGE_REF: bartowski/Phi-3.5-mini-instruct-GGUF:Q4_K_M
