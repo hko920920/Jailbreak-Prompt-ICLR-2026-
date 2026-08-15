@@ -68,6 +68,12 @@ Public outputs may contain IDs, hashes, lengths, evaluator labels, candidate
 counts, and the selected candidate IDs. They must not contain raw harmful
 payloads, rendered attack prompts, target responses, or evaluator outputs.
 
+## Pre-output implementation validation
+
+Before the first calibration generation, strict typing and numeric validation
+were corrected and passed `ruff`, strict `mypy`, and the complete test suite.
+No target-model or evaluator output was produced by the failed preflight runs.
+
 ## Next-step rule
 
 ```text
