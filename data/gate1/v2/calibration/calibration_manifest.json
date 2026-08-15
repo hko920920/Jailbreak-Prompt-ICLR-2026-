@@ -1,0 +1,16 @@
+{
+  "final_evaluation_outputs_observed": false,
+  "identity_file_present": true,
+  "paper_validity": false,
+  "safe_bundle_identity_sha256": "48740acdeaafd79eb768b5d1dc14efe906131d8cf7d4aae19c8445b91c054738",
+  "safe_file_sha256": {
+    "calibration_identity.json": "4d2aee485384d333c006d323a14e805f8fd146a84c092959690363bb854ccc9f",
+    "calibration_inputs.safe.jsonl": "028dd94bca47355216dac9387d74c7cc90d97272ef76cdd127d49868f7f75ce3",
+    "calibration_records.safe.jsonl": "5a26cb19642295bd73a89d1dfebfea623ad84a06ecdb493cb2a36ddf62eaea89",
+    "calibration_summary.json": "bd544e40519f172a4980bb7fee938f46a5a1338845b658068e6fcb89c2214cce",
+    "selection_manifest.json": "64dc702092e95620d282189ab791d932b377a9f6327f6eb70d22c0d4b1ecaef3"
+  },
+  "schema_version": "gate1-step3b-calibration-manifest-v1",
+  "smoke_outputs_observed": false,
+  "status": "STEP3B_CALIBRATION_SELECTION_FROZEN"
+}

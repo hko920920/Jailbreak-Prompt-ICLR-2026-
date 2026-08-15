@@ -1,0 +1,20 @@
+{
+  "attack_input_count": 70,
+  "calibration_ids_sha256": "5efe604db57d704d27791169fbc9a872ab6b8a0f977148abde559733f0d8d637",
+  "calibration_payload_count": 10,
+  "candidate_count": 7,
+  "candidate_registry_sha256": "654c3b4497f44b3ff5a6ead1f014b5d5d329cd570952869ddb6de63ff367f533",
+  "final_evaluation_outputs_observed": false,
+  "gate2_heldout_used": false,
+  "original_input_count": 10,
+  "paper_validity": false,
+  "raw_prompts_committed": false,
+  "runtime_contract_sha256": "d1e2832096fea374d8c8a1667242af52c72c6f6e5e10337c1d63a8fa558aaf5f",
+  "schema_version": "gate1-step3b-calibration-identity-v1",
+  "smoke_outputs_observed": false,
+  "source_identity_sha256": "9065be515f31aaa3470058cd9af9fec298978ba0611f45b45ce8d230fe185c91",
+  "split_manifest_sha256": "38fa801d3ff61d6e0f31c88a88e7e2600b1e3ea020c229d23c359a3228ac4bcf",
+  "step3b_contract_sha256": "59db0f58de3a82fb40c058501ef2890692d1990b93cdf6a0bce48a2e7eb5160b",
+  "target_identity_sha256": "0f4990d43737346cfd715c787901deca97d8e9ecba294ae06a22bb7577f328d8",
+  "total_input_count": 80
+}
