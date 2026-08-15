@@ -97,8 +97,9 @@ jobs:
               handle.write(f"- status: **{manifest['status']}**\n")
               handle.write(f"- candidates: **{manifest['candidate_count']}**\n")
               handle.write(
-                  f"- calibration/evaluation payloads: "
+                  f"- calibration/smoke/final-evaluation payloads: "
                   f"**{manifest['calibration_payload_count']}/"
+                  f"{manifest['smoke_payload_count']}/"
                   f"{manifest['evaluation_payload_count']}**\n"
               )
               handle.write('- target outputs observed: **false**\n')
