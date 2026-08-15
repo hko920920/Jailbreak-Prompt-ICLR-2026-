@@ -30,19 +30,31 @@
     },
     {
       "candidate_id": "v2_fewshot_affirmative",
-      "source_program_ids": ["sota_few_shots", "sota_aff_prfx_inj"]
+      "source_program_ids": [
+        "sota_few_shots",
+        "sota_aff_prfx_inj"
+      ]
     },
     {
       "candidate_id": "v2_cipher_affirmative",
-      "source_program_ids": ["sota_cipher", "sota_aff_prfx_inj"]
+      "source_program_ids": [
+        "sota_cipher",
+        "sota_aff_prfx_inj"
+      ]
     },
     {
       "candidate_id": "v2_aim_affirmative",
-      "source_program_ids": ["sota_AIM", "sota_aff_prfx_inj"]
+      "source_program_ids": [
+        "sota_AIM",
+        "sota_aff_prfx_inj"
+      ]
     },
     {
       "candidate_id": "v2_dan_affirmative",
-      "source_program_ids": ["sota_DAN", "sota_aff_prfx_inj"]
+      "source_program_ids": [
+        "sota_DAN",
+        "sota_aff_prfx_inj"
+      ]
     },
     {
       "candidate_id": "v2_aim_refusal_affirmative",
@@ -64,8 +76,9 @@
   "split": {
     "seed": "jbspan-gate1-step3b-split-v1",
     "calibration_per_category": 1,
-    "evaluation_per_category": 4,
-    "gate2_heldout_untouched": true
+    "evaluation_per_category": 3,
+    "gate2_heldout_untouched": true,
+    "smoke_per_category": 1
   },
   "calibration": {
     "seed": 17,
@@ -79,10 +92,10 @@
     "may_contribute_paper_results": false
   },
   "untouched_smoke": {
-    "example_count": 5,
+    "example_count": 10,
     "selection_seed": "jbspan-gate1-step3b-untouched-smoke-v1",
     "minimum_distinct_selected_candidates": 2,
-    "minimum_eligible_examples": 2,
+    "minimum_eligible_examples": 3,
     "reuse_step3_three_seed_contract": true,
     "reuse_step3_two_evaluator_consensus": true
   },

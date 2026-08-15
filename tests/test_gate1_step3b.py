@@ -24,9 +24,7 @@ def test_static_h4rm3l_chain_and_nested_render() -> None:
         payload_text="PAYLOAD",
     )
     assert rendered.text == "BAPAYLOADab"
-    payload = rendered.text[
-        rendered.payload_character_start : rendered.payload_character_end
-    ]
+    payload = rendered.text[rendered.payload_character_start : rendered.payload_character_end]
     assert payload == "PAYLOAD"
 
 
@@ -47,7 +45,12 @@ def test_split_is_deterministic_and_keeps_gate2_out() -> None:
     second = split_gate1_payloads(registry, contract)
     assert first == second
     assert first["calibration_count"] == 10
-    assert first["evaluation_count"] == 40
+    assert first["smoke_count"] == 10
+    assert first["evaluation_count"] == 30
     calibration = {item["payload_id"] for item in first["calibration"]}
+    smoke = {item["payload_id"] for item in first["smoke"]}
     evaluation = {item["payload_id"] for item in first["evaluation"]}
+    assert calibration.isdisjoint(smoke)
     assert calibration.isdisjoint(evaluation)
+    assert smoke.isdisjoint(evaluation)
+    assert len(calibration | smoke | evaluation) == 50

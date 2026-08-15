@@ -90,8 +90,12 @@ def validate_step3b_contract(payload: JsonObject) -> None:
     split = as_object(payload.get("split"), where="split")
     if as_integer(split.get("calibration_per_category"), where="calibration_per_category") != 1:
         raise ContractValidationError("Step 3B requires one calibration payload per category")
-    if as_integer(split.get("evaluation_per_category"), where="evaluation_per_category") != 4:
-        raise ContractValidationError("Step 3B requires four evaluation payloads per category")
+    if as_integer(split.get("smoke_per_category"), where="smoke_per_category") != 1:
+        raise ContractValidationError("Step 3B requires one smoke payload per category")
+    if as_integer(split.get("evaluation_per_category"), where="evaluation_per_category") != 3:
+        raise ContractValidationError(
+            "Step 3B requires three final-evaluation payloads per category"
+        )
     calibration = as_object(payload.get("calibration"), where="calibration")
     if as_integer(calibration.get("seed"), where="calibration.seed") not in {17, 29, 43}:
         raise ContractValidationError("calibration seed must reuse a frozen Step 3 seed")
@@ -101,8 +105,8 @@ def validate_step3b_contract(payload: JsonObject) -> None:
     if not 2 <= minimum <= maximum <= len(candidates):
         raise ContractValidationError("invalid candidate-selection limits")
     smoke = as_object(payload.get("untouched_smoke"), where="untouched_smoke")
-    if as_integer(smoke.get("example_count"), where="untouched_smoke.example_count") != 5:
-        raise ContractValidationError("untouched smoke must contain five examples")
+    if as_integer(smoke.get("example_count"), where="untouched_smoke.example_count") != 10:
+        raise ContractValidationError("untouched smoke must contain ten examples")
     claim = as_object(payload.get("claim_boundary"), where="claim_boundary")
     if claim.get("calibration_may_decide_gate1") is not False:
         raise ContractValidationError("calibration cannot decide Gate 1")
@@ -251,6 +255,7 @@ def split_gate1_payloads(payload_registry: JsonObject, contract: JsonObject) -> 
         category = as_string(item.get("category"), where="payload.category")
         by_category[category].append(item)
     calibration: list[JsonObject] = []
+    smoke: list[JsonObject] = []
     evaluation: list[JsonObject] = []
     for category in sorted(by_category):
         ranked = sorted(
@@ -268,22 +273,26 @@ def split_gate1_payloads(payload_registry: JsonObject, contract: JsonObject) -> 
         if len(ranked) != 5:
             raise ContractValidationError("each category must contain five development payloads")
         calibration.append(_safe_split_item(ranked[0], category))
-        evaluation.extend(_safe_split_item(item, category) for item in ranked[1:])
-    if len(calibration) != 10 or len(evaluation) != 40:
-        raise ContractValidationError("Step 3B split must be 10 calibration and 40 evaluation")
+        smoke.append(_safe_split_item(ranked[1], category))
+        evaluation.extend(_safe_split_item(item, category) for item in ranked[2:])
+    if len(calibration) != 10 or len(smoke) != 10 or len(evaluation) != 30:
+        raise ContractValidationError(
+            "Step 3B split must be 10 calibration, 10 smoke, and 30 final evaluation"
+        )
     return {
         "schema_version": "gate1-step3b-split-v1",
         "seed": seed,
         "calibration_count": len(calibration),
+        "smoke_count": len(smoke),
         "evaluation_count": len(evaluation),
         "calibration": calibration,
+        "smoke": smoke,
         "evaluation": evaluation,
         "calibration_ids_sha256": canonical_json_sha256(
             [item["payload_id"] for item in calibration]
         ),
-        "evaluation_ids_sha256": canonical_json_sha256(
-            [item["payload_id"] for item in evaluation]
-        ),
+        "smoke_ids_sha256": canonical_json_sha256([item["payload_id"] for item in smoke]),
+        "evaluation_ids_sha256": canonical_json_sha256([item["payload_id"] for item in evaluation]),
     }
 
 
@@ -361,9 +370,7 @@ def freeze_step3b_source(
     write_json(safe_output_dir / "candidate_registry.safe.json", registry)
     write_json(safe_output_dir / "split_manifest.safe.json", split_manifest)
     file_hashes = {
-        path.name: sha256_file(path)
-        for path in sorted(safe_output_dir.iterdir())
-        if path.is_file()
+        path.name: sha256_file(path) for path in sorted(safe_output_dir.iterdir()) if path.is_file()
     }
     manifest: JsonObject = {
         "schema_version": "gate1-step3b-freeze-manifest-v1",
@@ -373,6 +380,7 @@ def freeze_step3b_source(
         "source_file_sha256": source_sha,
         "candidate_count": len(candidate_rows),
         "calibration_payload_count": split_manifest["calibration_count"],
+        "smoke_payload_count": split_manifest["smoke_count"],
         "evaluation_payload_count": split_manifest["evaluation_count"],
         "safe_file_sha256": file_hashes,
         "raw_wrapper_text_committed": False,
