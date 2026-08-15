@@ -41,6 +41,7 @@ jobs:
           ruff check .
           mypy src/jbspan
           pytest
+          git diff --check
 
       - name: Download and verify pinned h4rm3l source
         run: |
