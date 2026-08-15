@@ -19,6 +19,7 @@ from jbspan.gate1.util import load_json
 ROOT = Path(__file__).resolve().parents[1]
 
 
+# Re-runs the smoke after the strict-typing repair was validated.
 def test_step3_contract_and_manifest() -> None:
     runtime, evaluators, prompts = load_step3_contract(ROOT)
     assert runtime["frozen"] is True
