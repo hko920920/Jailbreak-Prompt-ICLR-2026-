@@ -46,7 +46,7 @@ jobs:
           pytest
           git diff --check
 
-      - name: Commit the frozen Step 3B source and remove bootstrap files
+      - name: Commit the frozen Step 3B source and remove temporary payload files
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
@@ -55,11 +55,9 @@ jobs:
             src/jbspan/gate1/step3b.py \
             scripts/run_gate1_step3b.py \
             tests/test_gate1_step3b.py \
-            docs/GATE1_STEP3B_PROTOCOL.md \
-            .github/workflows/gate1_step3b_freeze.yml
+            docs/GATE1_STEP3B_PROTOCOL.md
           git rm \
             data/gate1/step3b_payload.b85 \
-            scripts/bootstrap_step3b_payload.py \
-            .github/workflows/bootstrap_step3b_payload.yml
+            scripts/bootstrap_step3b_payload.py
           git commit -m "Freeze Gate 1 Step 3B pre-result source contract"
           git push origin HEAD:agent/gate1-contract
