@@ -1,0 +1,125 @@
+name: gate1-step2-materialize
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - .github/workflows/gate1_step2_materialize.yml
+      - scripts/materialize_gate1_benchmark.py
+      - src/jbspan/gate1/materialize.py
+      - tests/test_gate1_materialization.py
+      - configs/gate1/**
+      - data/gate1/**
+
+permissions:
+  contents: read
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FULL_REVISION: d8d87b8fdcb7806e3b4e45fffb2bc24aa6b17f32
+      SOURCE_PATH: data/harmful-behaviors.csv
+      SAFE_OUTPUT: artifacts/gate1-step2/safe
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install and validate project
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev]'
+          ruff check .
+          mypy src/jbspan
+          pytest
+
+      - name: Download immutable payload source
+        run: |
+          source_csv="$RUNNER_TEMP/harmful-behaviors.csv"
+          url="https://huggingface.co/datasets/JailbreakBench/JBB-Behaviors/resolve/${FULL_REVISION}/${SOURCE_PATH}?download=true"
+          curl --fail --location --silent --show-error "$url" --output "$source_csv"
+          test -s "$source_csv"
+          echo "SOURCE_CSV=$source_csv" >> "$GITHUB_ENV"
+
+      - name: Materialize frozen payload and benchmark denominator
+        run: |
+          private_dir="$RUNNER_TEMP/gate1-step2-private"
+          mkdir -p "$private_dir"
+          args=(
+            --root .
+            --source-csv "$SOURCE_CSV"
+            --resolved-revision "$FULL_REVISION"
+            --safe-output-dir "$SAFE_OUTPUT"
+            --private-output-dir "$private_dir"
+          )
+          if [ -f data/gate1/materialized/source_identity.json ]; then
+            expected_sha="$(python - <<'PY'
+          import json
+          from pathlib import Path
+          payload = json.loads(
+              Path('data/gate1/materialized/source_identity.json').read_text()
+          )
+          print(payload['source_file_sha256'])
+          PY
+          )"
+            args+=(--expected-source-sha256 "$expected_sha")
+          fi
+          python scripts/materialize_gate1_benchmark.py "${args[@]}"
+          find "$private_dir" -type f -print0 | xargs -0 -r shred -u
+          rmdir "$private_dir"
+
+      - name: Verify public outputs contain no raw payloads
+        run: |
+          python - <<'PY'
+          import csv
+          import os
+          from pathlib import Path
+          source = Path(os.environ['SOURCE_CSV'])
+          public = Path(os.environ['SAFE_OUTPUT'])
+          combined = '\n'.join(
+              path.read_text(encoding='utf-8')
+              for path in public.iterdir()
+              if path.is_file()
+          )
+          with source.open(encoding='utf-8', newline='') as handle:
+              for row in csv.DictReader(handle):
+                  goal = row['Goal']
+                  if goal in combined:
+                      raise SystemExit('raw payload leaked into public outputs')
+          PY
+
+      - name: Publish safe materialization summary
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          path = Path(os.environ['SAFE_OUTPUT']) / 'materialization_manifest.json'
+          payload = json.loads(path.read_text(encoding='utf-8'))
+          source = payload['source_identity']
+          with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a', encoding='utf-8') as handle:
+              handle.write('# Automated Gate 1 Step 2\n\n')
+              handle.write(f"- status: **{payload['status']}**\n")
+              handle.write(f"- source revision: `{source['resolved_revision']}`\n")
+              handle.write(f"- source SHA-256: `{source['source_file_sha256']}`\n")
+              handle.write(f"- development payloads: **{payload['development_payload_count']}**\n")
+              handle.write(f"- heldout payloads: **{payload['heldout_payload_count']}**\n")
+              handle.write(f"- rendered attacks: **{payload['rendered_attack_count']}**\n")
+              handle.write('- target-model inference: **false**\n')
+              handle.write('- raw payloads/prompts uploaded: **false**\n')
+          PY
+
+      - name: Upload safe Step 2 outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate1-step2-safe-materialization
+          path: artifacts/gate1-step2/safe
+          if-no-files-found: error
+          retention-days: 7
