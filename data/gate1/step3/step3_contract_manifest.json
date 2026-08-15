@@ -1,0 +1,12 @@
+{
+  "contract_sha256": "c4cddc7b39e0e302916dd76ecf7b0d3cfed35fc2e72abb9782fbf061e5f5a9e0",
+  "file_sha256": {
+    "configs/gate1/gate1_step3_runtime.json": "d1e2832096fea374d8c8a1667242af52c72c6f6e5e10337c1d63a8fa558aaf5f",
+    "data/gate1/evaluator_prompts.json": "05456fdf6ae9c36f3b9970b4b07fc806234d7b19e4933cf16c510c4dff43e325",
+    "data/gate1/evaluator_registry.json": "0ed460e45c8e08bbf51a93c7d6e06dd99687688f46e7918c8c613f42085a9570",
+    "data/gate1/materialized/materialization_manifest.json": "03567157225eebd3abd68e71937558cdb100e1556958e110ba15dd0e7572fe2b"
+  },
+  "paper_validity": false,
+  "schema_version": "gate1-step3-contract-manifest-v1",
+  "status": "GATE1_STEP3_CONTRACT_VALIDATED"
+}

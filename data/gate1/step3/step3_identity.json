@@ -1,0 +1,310 @@
+{
+  "harmbench_primary": {
+    "files": [
+      {
+        "filename": ".gitattributes",
+        "size": 1519
+      },
+      {
+        "filename": "README.md",
+        "size": 6706
+      },
+      {
+        "filename": "config.json",
+        "size": 651
+      },
+      {
+        "filename": "generation_config.json",
+        "size": 111
+      },
+      {
+        "filename": "model-00001-of-00003.safetensors",
+        "sha256": "8254f960961cf37c2be61ce10445bfe048bbb00b9c261ce95c8a9cee07c4128c",
+        "size": 4943162336
+      },
+      {
+        "filename": "model-00002-of-00003.safetensors",
+        "sha256": "d8291d04dc79742b8d5b2ffd7172a70372bf4aa411efecb1367a954b724a1e93",
+        "size": 4999819336
+      },
+      {
+        "filename": "model-00003-of-00003.safetensors",
+        "sha256": "5f44a15c9223436dcb1119f79a285ddf389e3629b9c19e0f8f1f204bb0525ee3",
+        "size": 4540516344
+      },
+      {
+        "filename": "model.safetensors.index.json",
+        "size": 23950
+      },
+      {
+        "filename": "special_tokens_map.json",
+        "size": 438
+      },
+      {
+        "filename": "tokenizer.model",
+        "sha256": "dadfd56d766715c61d2ef780a525ab43b8e6da4de6865bda3d95fdef5e134055",
+        "size": 493443
+      },
+      {
+        "filename": "tokenizer_config.json",
+        "size": 1470
+      },
+      {
+        "filename": "training_args.bin",
+        "sha256": "c06462345a677cf7efe8a928341ab7a4bcfe75b4ffb2b551636ba1b7fd58cd65",
+        "size": 5752
+      }
+    ],
+    "repo_id": "cais/HarmBench-Mistral-7b-val-cls",
+    "revision": "51182c7cdaf9b2e5f05b745b81b047b67e7384a1"
+  },
+  "harmbench_smoke": {
+    "files": [
+      {
+        "filename": "HarmBench-Mistral-7b-val-cls.Q4_K_M.gguf",
+        "sha256": "7196e35a98dd62c9400f1a56aef60eed7380974e2db046adec02c88986a96356",
+        "size": 4368439840
+      }
+    ],
+    "repo_id": "RichardErkhov/cais_-_HarmBench-Mistral-7b-val-cls-gguf",
+    "revision": "4bb2a322f63ee35df5fb8ad8e8eae077ffdaf6a2"
+  },
+  "paper_validity": false,
+  "runtime": {
+    "asset": "llama-b10441-bin-ubuntu-x64.tar.gz",
+    "commit": "0177dcc7300bad8914bb838baabce87899812491",
+    "release_tag": "b10441",
+    "repository": "ggml-org/llama.cpp"
+  },
+  "schema_version": "gate1-step3-identity-v1",
+  "step3_contract_sha256": "c4cddc7b39e0e302916dd76ecf7b0d3cfed35fc2e72abb9782fbf061e5f5a9e0",
+  "strongreject_adapter_primary": {
+    "files": [
+      {
+        "filename": ".gitattributes",
+        "size": 1570
+      },
+      {
+        "filename": "README.md",
+        "size": 5091
+      },
+      {
+        "filename": "adapter_config.json",
+        "size": 686
+      },
+      {
+        "filename": "adapter_model.safetensors",
+        "sha256": "c524d920e55530363bd11aa4baa6af48e0dcbe37a1a74d80e7a67bf8fcca20a3",
+        "size": 39256456
+      },
+      {
+        "filename": "special_tokens_map.json",
+        "size": 636
+      },
+      {
+        "filename": "tokenizer.json",
+        "sha256": "f160d6c8998f9c650c37bc37fea8aa313e2414643093d7d9b177378e1408cea4",
+        "size": 17518596
+      },
+      {
+        "filename": "tokenizer.model",
+        "sha256": "61a7b147390c64585d6c3543dd6fc636906c9af3865a5548f27f31aee1d4c8e2",
+        "size": 4241003
+      },
+      {
+        "filename": "tokenizer_config.json",
+        "size": 40018
+      }
+    ],
+    "repo_id": "qylu4156/strongreject-15k-v1",
+    "revision": "4bd893d32390d2cace4f067dc2e3ef5294fd78a2"
+  },
+  "strongreject_judge_base": {
+    "files": [
+      {
+        "filename": ".gitattributes",
+        "size": 1519
+      },
+      {
+        "filename": "CODE_OF_CONDUCT.md",
+        "size": 453
+      },
+      {
+        "filename": "LICENSE",
+        "size": 1084
+      },
+      {
+        "filename": "NOTICE.md",
+        "size": 1809
+      },
+      {
+        "filename": "README.md",
+        "size": 48686
+      },
+      {
+        "filename": "SECURITY.md",
+        "size": 2656
+      },
+      {
+        "filename": "added_tokens.json",
+        "size": 306
+      },
+      {
+        "filename": "config.json",
+        "size": 3451
+      },
+      {
+        "filename": "configuration_phi3.py",
+        "size": 11153
+      },
+      {
+        "filename": "data_summary_card.md",
+        "size": 4236
+      },
+      {
+        "filename": "generation_config.json",
+        "size": 195
+      },
+      {
+        "filename": "model-00001-of-00002.safetensors",
+        "sha256": "c5214cdb995ed3dd716add8d9efbfe016b76bb2f1c4c1e6c1c6a95497d7a8837",
+        "size": 4972489328
+      },
+      {
+        "filename": "model-00002-of-00002.safetensors",
+        "sha256": "41246eed2b75b66526339c5d32d6f7acdefe0bd24180f97c74303f4656877344",
+        "size": 2669692552
+      },
+      {
+        "filename": "model.safetensors.index.json",
+        "size": 16331
+      },
+      {
+        "filename": "modeling_phi3.py",
+        "size": 73814
+      },
+      {
+        "filename": "sample_finetune.py",
+        "size": 6131
+      },
+      {
+        "filename": "special_tokens_map.json",
+        "size": 665
+      },
+      {
+        "filename": "tokenizer.json",
+        "size": 1844408
+      },
+      {
+        "filename": "tokenizer.model",
+        "sha256": "9e556afd44213b6bd1be2b850ebbbd98f5481437a8021afaf58ee7fb1818d347",
+        "size": 499723
+      },
+      {
+        "filename": "tokenizer_config.json",
+        "size": 3984
+      }
+    ],
+    "repo_id": "microsoft/Phi-3.5-mini-instruct",
+    "revision": "2fe192450127e6a83f7441aef6e3ca586c338b77"
+  },
+  "strongreject_judge_smoke": {
+    "files": [
+      {
+        "filename": "Phi-3.5-mini-instruct-Q4_K_M.gguf",
+        "sha256": "e4165e3a71af97f1b4820da61079826d8752a2088e313af0c7d346796c38eff5",
+        "size": 2393232672
+      }
+    ],
+    "repo_id": "bartowski/Phi-3.5-mini-instruct-GGUF",
+    "revision": "6d70da17e749a471ccb62ade694486011a75cda3"
+  },
+  "target_base": {
+    "files": [
+      {
+        "filename": ".gitattributes",
+        "size": 1519
+      },
+      {
+        "filename": "LICENSE",
+        "size": 11343
+      },
+      {
+        "filename": "README.md",
+        "size": 6240
+      },
+      {
+        "filename": "config.json",
+        "size": 663
+      },
+      {
+        "filename": "generation_config.json",
+        "size": 243
+      },
+      {
+        "filename": "merges.txt",
+        "size": 1671839
+      },
+      {
+        "filename": "model-00001-of-00004.safetensors",
+        "sha256": "a1333e6293854747c481288ea83b348226af178dd565c49b6f9495ba1966aba7",
+        "size": 3945441440
+      },
+      {
+        "filename": "model-00002-of-00004.safetensors",
+        "sha256": "f5d25a2772cb825164a2a2c0fb6d51a87e282abf21e4dd75bc5cfb3cd0ea6185",
+        "size": 3864726352
+      },
+      {
+        "filename": "model-00003-of-00004.safetensors",
+        "sha256": "8efdec4c1bc12317ae1a38dc42b595ce777738a64deea3fcb8a0a91381bcdfd5",
+        "size": 3864726424
+      },
+      {
+        "filename": "model-00004-of-00004.safetensors",
+        "sha256": "1a72d403cdf0c1ec3cb7f289f17b394a01e64394c2e9b3c0f94dbce3faf879bd",
+        "size": 3556377672
+      },
+      {
+        "filename": "model.safetensors.index.json",
+        "size": 27752
+      },
+      {
+        "filename": "tokenizer.json",
+        "size": 7031645
+      },
+      {
+        "filename": "tokenizer_config.json",
+        "size": 7305
+      },
+      {
+        "filename": "vocab.json",
+        "size": 2776833
+      }
+    ],
+    "repo_id": "Qwen/Qwen2.5-7B-Instruct",
+    "revision": "a09a35458c702b33eeacc393d103063234e8bc28"
+  },
+  "target_gguf": {
+    "files": [
+      {
+        "filename": "qwen2.5-7b-instruct-q4_k_m-00001-of-00002.gguf",
+        "sha256": "dfce12e3862a5283ccfb88221b48480e58745165de856439950d0f22590580db",
+        "size": 3993201344
+      },
+      {
+        "filename": "qwen2.5-7b-instruct-q4_k_m-00002-of-00002.gguf",
+        "sha256": "539cf93f78e887edea1c04e2d7d8cdaca9d01dae9c9025bcb8accbe29df3d72a",
+        "size": 689872288
+      }
+    ],
+    "repo_id": "Qwen/Qwen2.5-7B-Instruct-GGUF",
+    "revision": "bb5d59e06d9551d752d08b292a50eb208b07ab1f"
+  },
+  "tokenizer": {
+    "chat_template_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+    "repo_id": "Qwen/Qwen2.5-7B-Instruct",
+    "revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+    "system_prompt_sha256": "66b9ea09bd5b7099cbb4fc820f31b575c0366fa439b08245566692c6784e281e"
+  }
+}
