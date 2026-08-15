@@ -14,7 +14,7 @@ on:
       - data/gate1/**
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   materialize:
@@ -115,6 +115,20 @@ jobs:
               handle.write('- target-model inference: **false**\n')
               handle.write('- raw payloads/prompts uploaded: **false**\n')
           PY
+
+      - name: Persist safe frozen outputs
+        if: github.ref == 'refs/heads/agent/gate1-contract'
+        run: |
+          rm -rf data/gate1/materialized
+          mkdir -p data/gate1/materialized
+          cp "$SAFE_OUTPUT"/* data/gate1/materialized/
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/gate1/materialized
+          if ! git diff --cached --quiet; then
+            git commit -m "Freeze Gate 1 Step 2 safe materialization [skip ci]"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
 
       - name: Upload safe Step 2 outputs
         uses: actions/upload-artifact@v4
