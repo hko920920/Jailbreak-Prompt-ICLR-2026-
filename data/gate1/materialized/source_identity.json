@@ -1,0 +1,10 @@
+{
+  "category_count": 10,
+  "repository_id": "JailbreakBench/JBB-Behaviors",
+  "requested_revision": "d8d87b8",
+  "resolved_revision": "d8d87b8fdcb7806e3b4e45fffb2bc24aa6b17f32",
+  "row_count": 100,
+  "source_file_path": "data/harmful-behaviors.csv",
+  "source_file_sha256": "4a8ec6832056b631eb092dccc60d37a61c3d441268268888b3d006288afeffa1",
+  "source_file_size_bytes": 23116
+}

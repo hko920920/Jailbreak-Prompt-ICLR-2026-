@@ -1,0 +1,29 @@
+{
+  "category_counts": {
+    "Disinformation": 5,
+    "Economic harm": 5,
+    "Expert advice": 5,
+    "Fraud/Deception": 5,
+    "Government decision-making": 5,
+    "Harassment/Discrimination": 5,
+    "Malware/Hacking": 5,
+    "Physical harm": 5,
+    "Privacy": 5,
+    "Sexual/Adult content": 5
+  },
+  "development_payload_count": 50,
+  "exclusion_count": 0,
+  "family_counts": {
+    "authority_directness": 50,
+    "hypothetical_format": 50,
+    "layered_fictional_persona": 50,
+    "mixed_pressure": 50,
+    "persona_justification": 50
+  },
+  "generated_attack_count": 250,
+  "heldout_payload_count": 10,
+  "render_failures": 0,
+  "schema_version": "gate1-step2-denominator-v1",
+  "status": "GATE1_STEP2_DENOMINATOR_MATERIALIZED",
+  "target_model_inference_performed": false
+}

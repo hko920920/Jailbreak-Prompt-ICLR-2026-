@@ -1,0 +1,33 @@
+{
+  "contract_sha256": "035ed8ffba2914bb33af54474c47a379433d2d426f8974e70c6769be45439049",
+  "development_payload_count": 50,
+  "exclusion_count": 0,
+  "heldout_payload_count": 10,
+  "paper_validity": false,
+  "payload_registry_sha256": "096cb8a4f0307c0b9f8604a714d39678f7de076acc91ecb9d8b33b4f051346ef",
+  "private_file_count": 2,
+  "raw_payloads_committed": false,
+  "raw_rendered_prompts_committed": false,
+  "rendered_attack_count": 250,
+  "safe_file_sha256": {
+    "benchmark_records.safe.jsonl": "7280eb5e92e1ccc179bc31da05e77f883226fe78856e7feda8fa186433844a0e",
+    "denominator_manifest.json": "b56777d76b6b77a1360634f9c1067184c8214c8a6d5f9945a6942f9eafd486e9",
+    "exclusion_ledger.safe.json": "961cbfaf21e9f05e18ea57792202b5def86c9d0918699d3d40a6e15488d72691",
+    "payload_registry.safe.json": "c13a7f01775e32f18735441ff93415f7f94bb92807bc2b4e41c779356b02eac7",
+    "source_identity.json": "7cd25d23f1b02138be5dcf9d0465d9b39c2df5b559c2ed82b5fb74fba366f849"
+  },
+  "schema_version": "gate1-step2-materialization-manifest-v1",
+  "selection_sha256": "3756b58c9f363ae7c9aeb21e91c74ce58b26b9fa245a26391ba9df51a8468a29",
+  "source_identity": {
+    "category_count": 10,
+    "repository_id": "JailbreakBench/JBB-Behaviors",
+    "requested_revision": "d8d87b8",
+    "resolved_revision": "d8d87b8fdcb7806e3b4e45fffb2bc24aa6b17f32",
+    "row_count": 100,
+    "source_file_path": "data/harmful-behaviors.csv",
+    "source_file_sha256": "4a8ec6832056b631eb092dccc60d37a61c3d441268268888b3d006288afeffa1",
+    "source_file_size_bytes": 23116
+  },
+  "status": "GATE1_STEP2_MATERIALIZED",
+  "target_model_inference_performed": false
+}
