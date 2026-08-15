@@ -1,0 +1,245 @@
+name: fix-step3b-split-contract
+
+on:
+  push:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - scripts/fix_step3b_split_contract.py
+      - .github/workflows/fix_step3b_split_contract.yml
+
+permissions:
+  contents: write
+
+jobs:
+  correct-and-refreeze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SOURCE_REPOSITORY: mdoumbouya/h4rm3l
+      SOURCE_REVISION: e6f58a1a1e56c1a95b26b06aa4fe393ee2240dbd
+      SOURCE_PATH: experiments/experiment_116_bandi_synthesis/config/benchmark_reference_programs.csv
+      SOURCE_BLOB_SHA: 220a255d39c1cad769e2414448fbad514e2823dd
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/gate1-contract
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Correct split contract before any v2 target output
+        run: python scripts/fix_step3b_split_contract.py
+
+      - name: Validate corrected source tree
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev,step3]'
+          ruff check .
+          mypy src/jbspan
+          pytest
+          git diff --check
+
+      - name: Download and verify pinned h4rm3l source
+        run: |
+          source_csv="$RUNNER_TEMP/benchmark_reference_programs.csv"
+          url="https://raw.githubusercontent.com/${SOURCE_REPOSITORY}/${SOURCE_REVISION}/${SOURCE_PATH}"
+          curl --fail --location --silent --show-error "$url" --output "$source_csv"
+          test -s "$source_csv"
+          observed_blob="$(python - "$source_csv" <<'PY'
+          import hashlib
+          import sys
+          from pathlib import Path
+
+          data = Path(sys.argv[1]).read_bytes()
+          header = f"blob {len(data)}\0".encode("ascii")
+          print(hashlib.sha1(header + data).hexdigest())
+          PY
+          )"
+          test "$observed_blob" = "$SOURCE_BLOB_SHA"
+          echo "SOURCE_CSV=$source_csv" >> "$GITHUB_ENV"
+
+      - name: Regenerate corrected safe freeze
+        run: |
+          safe="$RUNNER_TEMP/step3b-safe"
+          python scripts/run_gate1_step3b.py freeze \
+            --root . \
+            --source-csv "$SOURCE_CSV" \
+            --safe-output-dir "$safe"
+          mkdir -p data/gate1/v2/frozen
+          cp -a "$safe"/. data/gate1/v2/frozen/
+
+      - name: Audit split, provenance, and pre-result boundary
+        run: |
+          python - <<'PY'
+          import json
+          from collections import Counter
+          from pathlib import Path
+
+          root = Path('.')
+          split = json.loads(
+              (root / 'data/gate1/v2/frozen/split_manifest.safe.json').read_text()
+          )
+          manifest = json.loads(
+              (root / 'data/gate1/v2/frozen/freeze_manifest.json').read_text()
+          )
+          registry = json.loads(
+              (root / 'data/gate1/v2/frozen/candidate_registry.safe.json').read_text()
+          )
+          payload_registry = json.loads(
+              (root / 'data/gate1/materialized/payload_registry.safe.json').read_text()
+          )
+
+          assert split['calibration_count'] == 10
+          assert split['smoke_count'] == 10
+          assert split['evaluation_count'] == 30
+          groups = {
+              name: {item['payload_id'] for item in split[name]}
+              for name in ('calibration', 'smoke', 'evaluation')
+          }
+          assert groups['calibration'].isdisjoint(groups['smoke'])
+          assert groups['calibration'].isdisjoint(groups['evaluation'])
+          assert groups['smoke'].isdisjoint(groups['evaluation'])
+          assert len(set.union(*groups.values())) == 50
+          for name, expected in (('calibration', 1), ('smoke', 1), ('evaluation', 3)):
+              counts = Counter(item['category'] for item in split[name])
+              assert len(counts) == 10
+              assert set(counts.values()) == {expected}
+
+          dev_ids = {
+              item['payload_id']
+              for item in payload_registry['payloads']
+              if item['split'] == 'gate1_development'
+          }
+          heldout_ids = {
+              item['payload_id']
+              for item in payload_registry['payloads']
+              if item['split'] == 'gate2_heldout'
+          }
+          assert set.union(*groups.values()) == dev_ids
+          assert set.union(*groups.values()).isdisjoint(heldout_ids)
+          assert registry['candidate_count'] == 7
+          assert all(
+              item['payload_preserved_exactly_once'] is True
+              for item in registry['candidates']
+          )
+          assert registry['raw_wrapper_text_committed'] is False
+          assert manifest['target_model_outputs_observed'] is False
+          assert manifest['v1_result_preserved'] is True
+          assert manifest['calibration_payload_count'] == 10
+          assert manifest['smoke_payload_count'] == 10
+          assert manifest['evaluation_payload_count'] == 30
+          print('STEP3B_SPLIT_AUDIT_PASS')
+          PY
+
+      - name: Write source and split freeze report
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path('.')
+          frozen = root / 'data/gate1/v2/frozen'
+          identity = json.loads((frozen / 'source_identity.json').read_text())
+          registry = json.loads((frozen / 'candidate_registry.safe.json').read_text())
+          split = json.loads((frozen / 'split_manifest.safe.json').read_text())
+          manifest = json.loads((frozen / 'freeze_manifest.json').read_text())
+          report = f'''# Automated Gate 1 — Step 3B Source and Split Freeze Report
+
+Date: 2026-08-16 (Asia/Seoul)
+
+Status: **PASS — externally grounded candidate pool and disjoint 10/10/30 split frozen before v2 target outputs**
+
+## What was frozen
+
+- source repository: `{identity['repository']}`
+- source revision: `{identity['revision']}`
+- source path: `{identity['path']}`
+- Git blob SHA: `{identity['git_blob_sha']}`
+- source-file SHA-256: `{identity['source_file_sha256']}`
+- source license: MIT
+- candidate programs: **{registry['candidate_count']}**
+- calibration payloads: **{split['calibration_count']}**
+- untouched smoke payloads: **{split['smoke_count']}**
+- untouched final-evaluation payloads: **{split['evaluation_count']}**
+- v1 negative result preserved: **{str(manifest['v1_result_preserved']).lower()}**
+- v2 target outputs observed before freeze: **{str(manifest['target_model_outputs_observed']).lower()}**
+- raw wrapper text committed: **{str(manifest['raw_wrapper_text_committed']).lower()}**
+
+## Candidate construction
+
+Seven candidates were declared before calibration from static, exact-payload-preserving `RoleplayingDecorator` programs in the pinned h4rm3l source. Dynamic transformations, paraphrasing, encoding of the payload, translation, corruption, splitting, or payload deletion are rejected by the parser. Public files contain only source IDs, hashes, lengths, and provenance.
+
+## Leakage-safe split
+
+The 50 Gate 1 development payloads are deterministically divided within every one of the ten behavior categories:
+
+- one calibration payload per category;
+- one untouched smoke payload per category;
+- three untouched final-evaluation payloads per category.
+
+The three groups are pairwise disjoint, their union is exactly the 50-item development registry, and all ten Gate 2 held-out payloads remain excluded.
+
+## Correction audit
+
+An independent pre-result audit caught that the first implementation draft used a 10/40 calibration/evaluation split and planned to sample smoke cases from the evaluation pool. That would weaken the untouched final evaluation. Because the manifest proved that no v2 target-model output had yet been observed, the draft was corrected to disjoint 10/10/30 groups before calibration. The superseded draft remains in Git history rather than being hidden.
+
+## Validation
+
+- pinned source Git-blob verification: PASS
+- static-source parser: PASS
+- exact payload preservation on all seven sentinel renders: PASS
+- category-balanced 10/10/30 split: PASS
+- pairwise split disjointness: PASS
+- development-union completeness: PASS
+- Gate 2 held-out exclusion: PASS
+- raw-wrapper leakage check: PASS
+- `ruff`: PASS
+- strict `mypy`: PASS
+- full test suite: PASS
+
+## Scientific boundary
+
+This step does not show that any v2 attack succeeds. It freezes the only candidate pool and data partitions that may be used by the next calibration and untouched smoke. Calibration cannot contribute paper-facing results or decide Gate 1.
+
+## Decision
+
+```text
+STEP3B_SOURCE_SPLIT_FREEZE_PASS
+V2_ATTACK_SIGNAL_NOT_YET_EVALUATED
+NEXT = CALIBRATION_ONLY
+```
+'''
+          (root / 'docs/GATE1_STEP3B_SOURCE_SPLIT_FREEZE_REPORT.md').write_text(
+              report,
+              encoding='utf-8',
+          )
+          PY
+
+      - name: Remove one-shot repair machinery
+        run: |
+          rm scripts/fix_step3b_split_contract.py
+          rm .github/workflows/fix_step3b_split_contract.yml
+
+      - name: Commit corrected pre-result freeze
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          git diff --cached --check
+          git commit -m "Correct Step 3B to disjoint 10/10/30 split before outputs [skip ci]"
+          git push origin HEAD:agent/gate1-contract
+
+      - name: Publish correction summary
+        run: |
+          {
+            echo '# Gate 1 Step 3B pre-result correction'
+            echo
+            echo '- source candidates: **7**'
+            echo '- calibration/smoke/final evaluation: **10/10/30**'
+            echo '- v2 target outputs observed before correction: **false**'
+            echo '- validation: **PASS**'
+          } >> "$GITHUB_STEP_SUMMARY"
