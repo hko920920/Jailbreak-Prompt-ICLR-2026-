@@ -30,6 +30,8 @@ from jbspan.gate1.step3b import (
 )
 from jbspan.gate1.step3b_calibration import (
     _apply_template as apply_user_template,
+)
+from jbspan.gate1.step3b_calibration import (
     _array,
     _integer,
     _load_private_payloads,
