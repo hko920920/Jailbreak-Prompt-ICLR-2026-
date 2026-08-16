@@ -32,8 +32,10 @@ Thresholds are not lowered after observing the result, and no runner-up is promo
 
 ## Execution identity
 
-- canonical workflow: `31954421564` — PASS
+- source bootstrap workflow: `31954284767` — PASS
+- canonical validation workflow: `31954421564` — PASS
 - result commit: `411ad17dd4e68b92f723c373eee7e0149675be14`
+- documentation commit: `079c7ccb22ec4fec26385b77f12b1b5209916360`
 - safe artifact: `9265547576`
 - artifact SHA-256: `23866b7c776d2dd689cb701f3a209600194a0f760cd7e97a37d2b2d73bedceac`
 - source CSV SHA-256: `dacaf76a1057785f11b0fc6aa07b9a73cdab588319ddfc5e8cef2909e5b112a5`
