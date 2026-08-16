@@ -29,3 +29,11 @@ Gate 1 = NOT_EVALUATED
 ```
 
 Thresholds are not lowered after observing the result, and no runner-up is promoted. The next admissible evaluator attempt is a separately frozen, official WildGuard validation on the same external selection/validation split. If that attempt also fails the unchanged measurement-validity gate, the human-free free-form-response path must stop or pivot to a programmatically verifiable output task.
+
+## Execution identity
+
+- canonical workflow: `31954421564` — PASS
+- result commit: `411ad17dd4e68b92f723c373eee7e0149675be14`
+- safe artifact: `9265547576`
+- artifact SHA-256: `23866b7c776d2dd689cb701f3a209600194a0f760cd7e97a37d2b2d73bedceac`
+- source CSV SHA-256: `dacaf76a1057785f11b0fc6aa07b9a73cdab588319ddfc5e8cef2909e5b112a5`
