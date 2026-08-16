@@ -39,10 +39,10 @@ jobs:
             data/gate1/step3b_smoke_payload/chunk02.b64 \
             > "$payload_b64"
           test "$(sha256sum "$payload_b64" | cut -d' ' -f1)" = \
-            "239ab5bcb5eebb74cc3db1391a3c0bf82ae6c5aabcd7d07bda76409f9f3143d3"
+            "6a5e6112d66bf3f2c164c504ff7096514618f7cf8b65db5d20fdc62852832e28"
           base64 --decode "$payload_b64" > "$payload_tgz"
           test "$(sha256sum "$payload_tgz" | cut -d' ' -f1)" = \
-            "b503cfc50bb69de3ad2c4bf94b0191059bbf5fede427e7a729779ffd225c47af"
+            "d60947703220b00daf9217bdb22f58be2bc9131663b3fc75eddcaa5faeedcba4"
           tar -xzf "$payload_tgz" -C .
           chmod +x scripts/run_gate1_step3b_smoke_workflow.sh
           python -m py_compile scripts/run_gate1_step3b_smoke.py
