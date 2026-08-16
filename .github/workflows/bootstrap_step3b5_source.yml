@@ -84,11 +84,7 @@ jobs:
                   '-as_number(value["macro_f1"], "macro_f1")',
               'float(value["false_negative_rate"])':
                   'as_number(value["false_negative_rate"], "false_negative_rate")',
-              'def as_metric(value: object) -> str:\n    return f"{float(value):.3f}"':
-                  'def as_metric(value: object, where: str) -> str:\n'
-                  '    return f"{as_number(value, where):.3f}"',
-              'return "/".join(as_metric(value[key]) for key in keys)':
-                  'return "/".join(as_metric(value[key], key) for key in keys)',
+              'float(value)': 'as_number(value, "metric")',
           }
           for old, new in replacements.items():
               if old in wrapper:
