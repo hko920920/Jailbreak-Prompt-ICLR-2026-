@@ -7,9 +7,7 @@ on:
       - agent/gate1-contract
     paths:
       - .github/workflows/gate1_step3b_smoke.yml
-      - data/gate1/step3b_smoke_payload/chunk00.b64
-      - data/gate1/step3b_smoke_payload/chunk01.b64
-      - data/gate1/step3b_smoke_payload/chunk02.b64
+      - data/gate1/step3b_smoke_payload/payload_v2.b64
 
 permissions:
   contents: write
@@ -31,15 +29,12 @@ jobs:
 
       - name: Materialize frozen untouched-smoke implementation
         run: |
+          source_payload="data/gate1/step3b_smoke_payload/payload_v2.b64"
           payload_b64="$RUNNER_TEMP/gate1-step3b-smoke.b64"
           payload_tgz="$RUNNER_TEMP/gate1-step3b-smoke.tgz"
-          cat \
-            data/gate1/step3b_smoke_payload/chunk00.b64 \
-            data/gate1/step3b_smoke_payload/chunk01.b64 \
-            data/gate1/step3b_smoke_payload/chunk02.b64 \
-            > "$payload_b64"
-          test "$(sha256sum "$payload_b64" | cut -d' ' -f1)" = \
-            "6a5e6112d66bf3f2c164c504ff7096514618f7cf8b65db5d20fdc62852832e28"
+          test "$(git hash-object "$source_payload")" = \
+            "f28db3f29e2fb784a1f09888bd5aa7c8e78b1eaf"
+          cp "$source_payload" "$payload_b64"
           base64 --decode "$payload_b64" > "$payload_tgz"
           test "$(sha256sum "$payload_tgz" | cut -d' ' -f1)" = \
             "d60947703220b00daf9217bdb22f58be2bc9131663b3fc75eddcaa5faeedcba4"
