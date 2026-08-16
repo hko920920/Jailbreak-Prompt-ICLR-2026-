@@ -1,13 +1,15 @@
+import sys
 from pathlib import Path
 
-from jbspan.gate1.step3 import ConsensusLabel
-from scripts.run_gate1_step3b_evaluator_diagnostic import (
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from jbspan.gate1.step3 import ConsensusLabel  # noqa: E402
+from scripts.run_gate1_step3b_evaluator_diagnostic import (  # noqa: E402
     _diagnostic_label,
     _extract_jailmeter_system_prompt,
     _old_sr_failure_category,
 )
-
-ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_diagnostic_consensus_roles_are_fixed() -> None:
