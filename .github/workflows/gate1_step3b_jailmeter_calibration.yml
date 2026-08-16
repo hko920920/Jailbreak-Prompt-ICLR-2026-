@@ -1,0 +1,553 @@
+name: gate1-step3b-jailmeter-calibration
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - .github/workflows/gate1_step3b_jailmeter_calibration.yml
+      - configs/gate1/gate1_step3b_jailmeter_calibration.json
+      - scripts/run_gate1_step3b_jailmeter_calibration.py
+      - tests/test_gate1_step3b_jailmeter_calibration.py
+      - docs/GATE1_STEP3B_JAILMETER_CALIBRATION_PROTOCOL.md
+      - docs/GATE1_STEP3B_EVALUATOR_DIAGNOSTIC_EXECUTION_REPORT.md
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gate1-step3b-jailmeter-calibration
+  cancel-in-progress: false
+
+jobs:
+  calibration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 480
+    env:
+      PAYLOAD_SOURCE_REVISION: d8d87b8fdcb7806e3b4e45fffb2bc24aa6b17f32
+      PAYLOAD_SOURCE_PATH: data/harmful-behaviors.csv
+      PAYLOAD_SOURCE_SHA256: 4a8ec6832056b631eb092dccc60d37a61c3d441268268888b3d006288afeffa1
+      ATTACK_SOURCE_REPOSITORY: mdoumbouya/h4rm3l
+      ATTACK_SOURCE_REVISION: e6f58a1a1e56c1a95b26b06aa4fe393ee2240dbd
+      ATTACK_SOURCE_PATH: experiments/experiment_116_bandi_synthesis/config/benchmark_reference_programs.csv
+      ATTACK_SOURCE_SHA256: b4c07b11c9e92ecd332807e8ba32d8fe028b59f4c3499f72670d44105626ef07
+      JAILMETER_REPOSITORY: Magi2B0y/JailMeter
+      JAILMETER_REVISION: 6a492b5a547497d1aa852849025edf2cc7bfd632
+      JAILMETER_RUNNER_BLOB: 20447953a0b72e62947482e30b1577135be7ae52
+      JAILMETER_ADAPTER_CONFIG_BLOB: 19a51e3d502342cb412f5a209b5c334667ecac5f
+      JAILMETER_ADAPTER_MODEL_BLOB: ad2e53abea161a25d3950ac97ad0952c1e02f78c
+      TARGET_BASE_REVISION: a09a35458c702b33eeacc393d103063234e8bc28
+      LLAMA_RELEASE_TAG: b10441
+      LLAMA_RELEASE_COMMIT: 0177dcc7300bad8914bb838baabce87899812491
+      LLAMA_ASSET: llama-b10441-bin-ubuntu-x64.tar.gz
+      SAFE_OUTPUT: artifacts/gate1-step3b-jailmeter-calibration/safe
+      PRIVATE_OUTPUT: /tmp/gate1-step3b-jailmeter-calibration/private
+      PIP_NO_CACHE_DIR: "1"
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/gate1-contract
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install and validate the frozen recalibration code
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev,step3]'
+          ruff check scripts/run_gate1_step3b_jailmeter_calibration.py
+          mypy src/jbspan scripts/run_gate1_step3b_jailmeter_calibration.py
+          pytest
+          python -m json.tool \
+            configs/gate1/gate1_step3b_jailmeter_calibration.json >/dev/null
+
+      - name: Download and verify frozen prompt sources
+        run: |
+          payload_csv="$RUNNER_TEMP/harmful-behaviors.csv"
+          payload_url="https://huggingface.co/datasets/JailbreakBench/JBB-Behaviors/resolve/${PAYLOAD_SOURCE_REVISION}/${PAYLOAD_SOURCE_PATH}?download=true"
+          curl --fail --location --silent --show-error \
+            "$payload_url" --output "$payload_csv"
+          test "$(sha256sum "$payload_csv" | cut -d' ' -f1)" = \
+            "$PAYLOAD_SOURCE_SHA256"
+
+          attack_csv="$RUNNER_TEMP/benchmark_reference_programs.csv"
+          attack_url="https://raw.githubusercontent.com/${ATTACK_SOURCE_REPOSITORY}/${ATTACK_SOURCE_REVISION}/${ATTACK_SOURCE_PATH}"
+          curl --fail --location --silent --show-error \
+            "$attack_url" --output "$attack_csv"
+          test "$(sha256sum "$attack_csv" | cut -d' ' -f1)" = \
+            "$ATTACK_SOURCE_SHA256"
+          echo "PAYLOAD_CSV=$payload_csv" >> "$GITHUB_ENV"
+          echo "ATTACK_CSV=$attack_csv" >> "$GITHUB_ENV"
+
+      - name: Prepare the sealed 80-response calibration matrix
+        run: |
+          mkdir -p "$PRIVATE_OUTPUT" "$SAFE_OUTPUT"
+          python scripts/run_gate1_step3b_calibration.py prepare \
+            --root . \
+            --payload-source-csv "$PAYLOAD_CSV" \
+            --attack-source-csv "$ATTACK_CSV" \
+            --safe-output-dir "$SAFE_OUTPUT" \
+            --private-output-dir "$PRIVATE_OUTPUT"
+
+      - name: Install exact llama.cpp runtime
+        run: |
+          release_json="$RUNNER_TEMP/llama-release.json"
+          curl --fail --location --silent --show-error \
+            "https://api.github.com/repos/ggml-org/llama.cpp/releases/tags/${LLAMA_RELEASE_TAG}" \
+            --output "$release_json"
+          test "$(jq -r '.target_commitish' "$release_json")" = \
+            "$LLAMA_RELEASE_COMMIT"
+          asset_url="$(jq -r --arg name "$LLAMA_ASSET" \
+            '.assets[] | select(.name == $name) | .browser_download_url' \
+            "$release_json")"
+          asset_digest="$(jq -r --arg name "$LLAMA_ASSET" \
+            '.assets[] | select(.name == $name) | .digest' \
+            "$release_json")"
+          archive="$RUNNER_TEMP/$LLAMA_ASSET"
+          curl --fail --location --silent --show-error \
+            "$asset_url" --output "$archive"
+          test "sha256:$(sha256sum "$archive" | cut -d' ' -f1)" = \
+            "$asset_digest"
+          mkdir -p "$RUNNER_TEMP/llama-bin"
+          tar -xzf "$archive" -C "$RUNNER_TEMP/llama-bin"
+          llama_server="$(find "$RUNNER_TEMP/llama-bin" \
+            -type f -name llama-server | head -n1)"
+          test -x "$llama_server"
+          echo "LLAMA_SERVER=$llama_server" >> "$GITHUB_ENV"
+          llama_version="$($llama_server --version | tr '\n' ' ')"
+          echo "LLAMA_VERSION=$llama_version" >> "$GITHUB_ENV"
+
+      - name: Download exact target and HarmBench model files
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          from huggingface_hub import hf_hub_download
+
+          def digest(path: Path) -> str:
+              value = hashlib.sha256()
+              with path.open("rb") as handle:
+                  for block in iter(lambda: handle.read(1024 * 1024), b""):
+                      value.update(block)
+              return value.hexdigest()
+
+          identity = json.loads(
+              Path("data/gate1/step3/step3_identity.json").read_text()
+          )
+          runner_temp = Path(os.environ["RUNNER_TEMP"])
+          target_paths = []
+          for item in identity["target_gguf"]["files"]:
+              path = Path(
+                  hf_hub_download(
+                      repo_id=identity["target_gguf"]["repo_id"],
+                      revision=identity["target_gguf"]["revision"],
+                      filename=item["filename"],
+                      cache_dir=runner_temp / "hf-target",
+                  )
+              )
+              if digest(path) != item["sha256"]:
+                  raise SystemExit("target GGUF digest mismatch")
+              target_paths.append(path)
+          target = sorted(target_paths, key=lambda path: path.name)[0]
+
+          hb_item = identity["harmbench_smoke"]["files"][0]
+          harmbench = Path(
+              hf_hub_download(
+                  repo_id=identity["harmbench_smoke"]["repo_id"],
+                  revision=identity["harmbench_smoke"]["revision"],
+                  filename=hb_item["filename"],
+                  cache_dir=runner_temp / "hf-harmbench",
+              )
+          )
+          if digest(harmbench) != hb_item["sha256"]:
+              raise SystemExit("HarmBench GGUF digest mismatch")
+
+          with Path(os.environ["GITHUB_ENV"]).open("a") as handle:
+              handle.write(f"TARGET_MODEL_PATH={target}\n")
+              handle.write(f"HARMBENCH_MODEL_PATH={harmbench}\n")
+          PY
+
+      - name: Record the hosted-runner environment fingerprint
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import platform
+          from pathlib import Path
+
+          cpu = "unknown"
+          cpuinfo = Path("/proc/cpuinfo")
+          if cpuinfo.is_file():
+              for line in cpuinfo.read_text(errors="ignore").splitlines():
+                  if line.lower().startswith("model name"):
+                      cpu = line.split(":", 1)[1].strip()
+                      break
+          payload = {
+              "schema_version": "gate1-step3b-runner-environment-v1",
+              "github_run_id": os.environ.get("GITHUB_RUN_ID"),
+              "github_run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
+              "github_sha": os.environ.get("GITHUB_SHA"),
+              "runner_os": os.environ.get("RUNNER_OS"),
+              "runner_arch": os.environ.get("RUNNER_ARCH"),
+              "platform": platform.platform(),
+              "python": platform.python_version(),
+              "cpu_model": cpu,
+              "llama_version": os.environ.get("LLAMA_VERSION"),
+              "cross_runner_byte_identity_required": False,
+              "same_run_response_hash_binding_required": True,
+          }
+          path = Path(os.environ["SAFE_OUTPUT"]) / "runner_environment.json"
+          path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+          PY
+
+      - name: Generate all 80 Qwen responses at frozen seed 17
+        run: |
+          mkdir -p "$RUNNER_TEMP/target-server"
+          nohup "$LLAMA_SERVER" \
+            -m "$TARGET_MODEL_PATH" \
+            --host 127.0.0.1 \
+            --port 8080 \
+            -c 4096 \
+            -t 4 \
+            >"$RUNNER_TEMP/target-server/server.log" 2>&1 &
+          pid=$!
+          cleanup() {
+            kill "$pid" 2>/dev/null || true
+            wait "$pid" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+          ready=0
+          for _ in $(seq 1 240); do
+            if ! kill -0 "$pid" 2>/dev/null; then
+              tail -n 100 "$RUNNER_TEMP/target-server/server.log"
+              exit 1
+            fi
+            if [ "$(curl -sS -o /dev/null -w '%{http_code}' \
+              http://127.0.0.1:8080/health || true)" = "200" ]; then
+              ready=1
+              break
+            fi
+            sleep 5
+          done
+          test "$ready" = "1"
+          timeout 120m python scripts/run_gate1_step3b_calibration.py target \
+            --root . \
+            --private-output-dir "$PRIVATE_OUTPUT" \
+            --server-url http://127.0.0.1:8080
+          cleanup
+          trap - EXIT
+
+      - name: Evaluate the same-run responses with HarmBench
+        run: |
+          mkdir -p "$RUNNER_TEMP/harmbench-server"
+          nohup "$LLAMA_SERVER" \
+            -m "$HARMBENCH_MODEL_PATH" \
+            --host 127.0.0.1 \
+            --port 8081 \
+            -c 4096 \
+            -t 4 \
+            >"$RUNNER_TEMP/harmbench-server/server.log" 2>&1 &
+          pid=$!
+          cleanup() {
+            kill "$pid" 2>/dev/null || true
+            wait "$pid" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+          ready=0
+          for _ in $(seq 1 240); do
+            if ! kill -0 "$pid" 2>/dev/null; then
+              tail -n 100 "$RUNNER_TEMP/harmbench-server/server.log"
+              exit 1
+            fi
+            if [ "$(curl -sS -o /dev/null -w '%{http_code}' \
+              http://127.0.0.1:8081/health || true)" = "200" ]; then
+              ready=1
+              break
+            fi
+            sleep 5
+          done
+          test "$ready" = "1"
+          timeout 60m python scripts/run_gate1_step3b_calibration.py evaluate \
+            --root . \
+            --private-output-dir "$PRIVATE_OUTPUT" \
+            --server-url http://127.0.0.1:8081
+          cleanup
+          trap - EXIT
+          rm -rf "$RUNNER_TEMP/hf-harmbench"
+
+      - name: Pin JailMeter source and convert its adapter to GGUF
+        run: |
+          jailmeter_dir="$RUNNER_TEMP/JailMeter"
+          git clone --filter=blob:none \
+            "https://github.com/${JAILMETER_REPOSITORY}.git" "$jailmeter_dir"
+          git -C "$jailmeter_dir" checkout --detach "$JAILMETER_REVISION"
+          test "$(git -C "$jailmeter_dir" rev-parse HEAD)" = \
+            "$JAILMETER_REVISION"
+          test "$(git -C "$jailmeter_dir" hash-object \
+            jailmeter_slm/run_jailmeter_slm.py)" = \
+            "$JAILMETER_RUNNER_BLOB"
+          test "$(git -C "$jailmeter_dir" hash-object \
+            jailmeter_slm/with_cot_checkpoint-324/adapter_config.json)" = \
+            "$JAILMETER_ADAPTER_CONFIG_BLOB"
+          test "$(git -C "$jailmeter_dir" hash-object \
+            jailmeter_slm/with_cot_checkpoint-324/adapter_model.safetensors)" = \
+            "$JAILMETER_ADAPTER_MODEL_BLOB"
+          echo "JAILMETER_RUNNER=$jailmeter_dir/jailmeter_slm/run_jailmeter_slm.py" \
+            >> "$GITHUB_ENV"
+          echo "JAILMETER_ADAPTER=$jailmeter_dir/jailmeter_slm/with_cot_checkpoint-324" \
+            >> "$GITHUB_ENV"
+
+          llama_src="$RUNNER_TEMP/llama-src"
+          git clone --filter=blob:none \
+            https://github.com/ggml-org/llama.cpp.git "$llama_src"
+          git -C "$llama_src" checkout --detach "$LLAMA_RELEASE_COMMIT"
+          python -m pip install \
+            -r "$llama_src/requirements/requirements-convert_lora_to_gguf.txt"
+          export HF_HOME="$RUNNER_TEMP/hf-lora-convert"
+          export BASE_DIR="$RUNNER_TEMP/qwen-base-config"
+          python - <<'PY'
+          import os
+          from huggingface_hub import snapshot_download
+
+          snapshot_download(
+              repo_id="Qwen/Qwen2.5-7B-Instruct",
+              revision=os.environ["TARGET_BASE_REVISION"],
+              allow_patterns=[
+                  "config.json",
+                  "generation_config.json",
+                  "tokenizer.json",
+                  "tokenizer_config.json",
+                  "vocab.json",
+                  "merges.txt",
+              ],
+              local_dir=os.environ["BASE_DIR"],
+          )
+          PY
+          lora="$RUNNER_TEMP/jailmeter-slm-lora-f16.gguf"
+          python "$llama_src/convert_lora_to_gguf.py" \
+            --base "$BASE_DIR" \
+            --outtype f16 \
+            --outfile "$lora" \
+            "$JAILMETER_ADAPTER"
+          test -s "$lora"
+          echo "JAILMETER_LORA_GGUF=$lora" >> "$GITHUB_ENV"
+          echo "JAILMETER_LORA_SHA256=$(sha256sum "$lora" | cut -d' ' -f1)" \
+            >> "$GITHUB_ENV"
+          rm -rf "$HF_HOME"
+
+      - name: Evaluate all 80 responses with pinned JailMeter
+        run: |
+          export HF_HOME="$RUNNER_TEMP/hf-jailmeter"
+          mkdir -p "$RUNNER_TEMP/jailmeter-server"
+          nohup "$LLAMA_SERVER" \
+            -m "$TARGET_MODEL_PATH" \
+            --lora "$JAILMETER_LORA_GGUF" \
+            --host 127.0.0.1 \
+            --port 8082 \
+            -c 4096 \
+            -t 4 \
+            >"$RUNNER_TEMP/jailmeter-server/server.log" 2>&1 &
+          pid=$!
+          cleanup() {
+            kill "$pid" 2>/dev/null || true
+            wait "$pid" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+          ready=0
+          for _ in $(seq 1 300); do
+            if ! kill -0 "$pid" 2>/dev/null; then
+              tail -n 120 "$RUNNER_TEMP/jailmeter-server/server.log"
+              exit 1
+            fi
+            if [ "$(curl -sS -o /dev/null -w '%{http_code}' \
+              http://127.0.0.1:8082/health || true)" = "200" ]; then
+              ready=1
+              break
+            fi
+            sleep 5
+          done
+          test "$ready" = "1"
+          timeout 300m python \
+            scripts/run_gate1_step3b_jailmeter_calibration.py jailmeter \
+            --root . \
+            --private-output-dir "$PRIVATE_OUTPUT" \
+            --safe-output-dir "$SAFE_OUTPUT" \
+            --jailmeter-runner "$JAILMETER_RUNNER" \
+            --server-url http://127.0.0.1:8082
+          cleanup
+          trap - EXIT
+          rm -rf "$HF_HOME"
+
+      - name: Apply the frozen JailMeter-consistent selection rule
+        run: |
+          python scripts/run_gate1_step3b_jailmeter_calibration.py finalize \
+            --root . \
+            --private-output-dir "$PRIVATE_OUTPUT" \
+            --safe-output-dir "$SAFE_OUTPUT"
+
+      - name: Audit privacy, hashes, and sealed partitions
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          private = Path(os.environ["PRIVATE_OUTPUT"])
+          safe = Path(os.environ["SAFE_OUTPUT"])
+          combined = "\n".join(
+              path.read_text(encoding="utf-8")
+              for path in safe.iterdir()
+              if path.is_file()
+          )
+          for path in private.rglob("*.jsonl"):
+              for line in path.read_text(encoding="utf-8").splitlines():
+                  if not line.strip():
+                      continue
+                  row = json.loads(line)
+                  for key in (
+                      "forbidden_prompt",
+                      "chat_prompt",
+                      "response",
+                      "judge_output",
+                  ):
+                      value = row.get(key)
+                      if isinstance(value, str) and len(value) >= 16 and value in combined:
+                          raise SystemExit(f"private text leaked through {key}")
+          summary = json.loads(
+              (safe / "calibration_summary.json").read_text()
+          )
+          assert summary["attack_denominator"] == 70
+          assert summary["target_generation_count"] == 80
+          assert summary["same_run_response_hash_binding"] is True
+          assert summary["cross_runner_byte_identity_required"] is False
+          assert summary["smoke_outputs_observed"] is False
+          assert summary["final_evaluation_outputs_observed"] is False
+          assert summary["gate2_heldout_used"] is False
+          PY
+
+      - name: Create the safe result report and bundle manifest
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          safe = Path(os.environ["SAFE_OUTPUT"])
+          summary = json.loads(
+              (safe / "calibration_summary.json").read_text()
+          )
+          rows = [
+              "# Gate 1 Step 3B.5 — JailMeter-Consistent Calibration Result",
+              "",
+              f"Status: **{summary['status']}**",
+              "",
+              "- development-only calibration payloads: **10**",
+              "- frozen candidates: **7**",
+              "- target generations: **80**",
+              f"- JailMeter parse coverage: **{summary['jailmeter_parse_coverage']:.3f}**",
+              f"- original SAFE controls: **{summary['original_safe_count']}/10**",
+              "",
+              "| Candidate | Eligible | HARMFUL | SAFE | Abstain |",
+              "|---|---:|---:|---:|---:|",
+          ]
+          for item in summary["candidate_results"]:
+              rows.append(
+                  "| {candidate_id} | {eligible_count}/10 | "
+                  "{attack_harmful_count}/10 | {attack_safe_count}/10 | "
+                  "{attack_abstention_count}/10 |".format(**item)
+              )
+          selected = summary["selected_candidate_ids"]
+          rows.extend(
+              [
+                  "",
+                  "## Frozen decision",
+                  "",
+                  "- selected candidates: **"
+                  + (", ".join(selected) if selected else "none")
+                  + "**",
+                  "- old smoke was not relabelled as confirmatory evidence.",
+                  "- final evaluation and Gate 2 held-out remain sealed.",
+                  "- a fresh pre-frozen confirmatory smoke is required before Gate 1.",
+              ]
+          )
+          report = safe / "calibration_report.md"
+          report.write_text("\n".join(rows) + "\n", encoding="utf-8")
+
+          def digest(path: Path) -> str:
+              value = hashlib.sha256()
+              value.update(path.read_bytes())
+              return value.hexdigest()
+
+          files = {
+              path.name: digest(path)
+              for path in sorted(safe.iterdir())
+              if path.is_file()
+              and path.name != "calibration_bundle_manifest.json"
+          }
+          bundle = {
+              "schema_version": "gate1-step3b-jailmeter-calibration-bundle-v1",
+              "status": summary["status"],
+              "safe_file_sha256": files,
+              "final_evaluation_outputs_observed": False,
+              "gate2_heldout_used": False,
+          }
+          (safe / "calibration_bundle_manifest.json").write_text(
+              json.dumps(bundle, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Upload the safe bundle before branch persistence
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate1-step3b-jailmeter-calibration-safe
+          path: ${{ env.SAFE_OUTPUT }}
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Persist the safe result atomically
+        run: |
+          destination=data/gate1/v2/jailmeter_calibration
+          if [ -d "$destination" ]; then
+            diff -ru "$destination" "$SAFE_OUTPUT"
+          else
+            mkdir -p "$destination"
+            cp -a "$SAFE_OUTPUT"/. "$destination"/
+            git config user.name github-actions[bot]
+            git config user.email \
+              41898282+github-actions[bot]@users.noreply.github.com
+            git add "$destination"
+            git commit -m \
+              "Freeze Gate 1 Step 3B JailMeter calibration outputs [skip ci]"
+            git fetch origin agent/gate1-contract
+            git rebase origin/agent/gate1-contract
+            git push origin HEAD:agent/gate1-contract
+          fi
+
+      - name: Publish the safe calibration summary
+        run: |
+          cat "$SAFE_OUTPUT/calibration_report.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Cleanup private and model files
+        if: always()
+        run: |
+          if [ -d "$PRIVATE_OUTPUT" ]; then
+            find "$PRIVATE_OUTPUT" -type f -print0 | xargs -0 -r shred -u
+            rm -rf "$PRIVATE_OUTPUT"
+          fi
+          rm -rf \
+            "$RUNNER_TEMP/JailMeter" \
+            "$RUNNER_TEMP/llama-src" \
+            "$RUNNER_TEMP/qwen-base-config" \
+            "$RUNNER_TEMP/jailmeter-slm-lora-f16.gguf" \
+            "$RUNNER_TEMP/hf-target" \
+            "$RUNNER_TEMP/hf-harmbench"
