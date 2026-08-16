@@ -28,6 +28,74 @@ jobs:
       - name: Materialize frozen Step 3B.5 source
         run: python scripts/bootstrap_step3b5_judge_validation.py
 
+      - name: Apply strict-typing repair before any judge result is observed
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          core_path = Path("src/jbspan/gate1/jbb_judge_validation_core.py")
+          core = core_path.read_text(encoding="utf-8")
+          marker = '''def as_boolean(value: object, where: str) -> bool:
+              if not isinstance(value, bool):
+                  raise RuntimeError(f"{where} must be a boolean")
+              return value
+
+
+          '''.replace("          ", "")
+          helper = marker + '''def as_number(value: object, where: str) -> float:
+              if not isinstance(value, (int, float)) or isinstance(value, bool):
+                  raise RuntimeError(f"{where} must be numeric")
+              return float(value)
+
+
+          '''.replace("          ", "")
+          if "def as_number(" not in core:
+              if marker not in core:
+                  raise SystemExit("as_boolean insertion point not found")
+              core = core.replace(marker, helper, 1)
+          replacements = {
+              'float(limits["parse_coverage"])':
+                  'as_number(limits["parse_coverage"], "parse_coverage")',
+              'float(limits["accuracy"])':
+                  'as_number(limits["accuracy"], "accuracy")',
+              'float(limits["macro_f1"])':
+                  'as_number(limits["macro_f1"], "macro_f1")',
+              'float(limits["false_negative_rate"])':
+                  'as_number(limits["false_negative_rate"], "false_negative_rate")',
+              'float(limits["false_positive_rate"])':
+                  'as_number(limits["false_positive_rate"], "false_positive_rate")',
+          }
+          for old, new in replacements.items():
+              if old in core:
+                  core = core.replace(old, new)
+          core_path.write_text(core, encoding="utf-8")
+
+          wrapper_path = Path("src/jbspan/gate1/jbb_judge_validation.py")
+          wrapper = wrapper_path.read_text(encoding="utf-8")
+          if "    as_number,\n" not in wrapper:
+              import_marker = "    as_array,\n"
+              if import_marker not in wrapper:
+                  raise SystemExit("as_number import point not found")
+              wrapper = wrapper.replace(import_marker, import_marker + "    as_number,\n", 1)
+          replacements = {
+              '-float(value["balanced_accuracy"])':
+                  '-as_number(value["balanced_accuracy"], "balanced_accuracy")',
+              '-float(value["macro_f1"])':
+                  '-as_number(value["macro_f1"], "macro_f1")',
+              'float(value["false_negative_rate"])':
+                  'as_number(value["false_negative_rate"], "false_negative_rate")',
+              'def as_metric(value: object) -> str:\n    return f"{float(value):.3f}"':
+                  'def as_metric(value: object, where: str) -> str:\n'
+                  '    return f"{as_number(value, where):.3f}"',
+              'return "/".join(as_metric(value[key]) for key in keys)':
+                  'return "/".join(as_metric(value[key], key) for key in keys)',
+          }
+          for old, new in replacements.items():
+              if old in wrapper:
+                  wrapper = wrapper.replace(old, new)
+          wrapper_path.write_text(wrapper, encoding="utf-8")
+          PY
+
       - name: Validate generated source
         run: |
           python -m pip install --upgrade pip
