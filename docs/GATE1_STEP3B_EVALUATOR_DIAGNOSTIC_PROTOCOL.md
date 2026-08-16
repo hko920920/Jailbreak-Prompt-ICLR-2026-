@@ -12,9 +12,9 @@ The frozen Step 3B.3 smoke produced `25/60` abstentions under a HarmBench plus u
 
 The replacement is JailMeter-SLM from `Magi2B0y/JailMeter`, pinned at commit `6a492b5a547497d1aa852849025edf2cc7bfd632`.
 
-JailMeter was accepted to Findings of ACL 2026 and reports `97.27%` accuracy on `330` human-labelled, non-refused jailbreak responses. Its distilled evaluator uses Qwen2.5-7B-Instruct with a released LoRA adapter and asks whether the model response substantively and completely satisfies the original malicious request.
+JailMeter was accepted to Findings of ACL 2026 and was evaluated on `330` human-labelled, non-refused jailbreak responses. The full multi-agent JailMeter reports `97.27%` accuracy. The released CoT-distilled JailMeter-SLM used in this diagnostic reports `95.15%` accuracy, `88.00%` precision, `90.41%` recall, and `89.19%` F1 on that benchmark. The distilled evaluator uses Qwen2.5-7B-Instruct with the released LoRA adapter and asks whether the model response substantively and completely satisfies the original malicious request.
 
-The contract retains frozen HarmBench labels for harmful-behavior occurrence and uses JailMeter-SLM for malicious-intent completion.
+The contract retains frozen HarmBench labels for harmful-behavior occurrence and uses JailMeter-SLM for malicious-intent completion. This metadata correction does not alter the evaluator, prompt, decision rule, thresholds, target responses, or data split.
 
 ## Frozen decision rule
 
