@@ -22,7 +22,7 @@ jobs:
           ref: agent/gate1-contract
           fetch-depth: 0
 
-      - name: Recover and persist intact smoke runner
+      - name: Recover and persist damaged smoke runner for repair
         run: |
           set -euxo pipefail
           source_payload="data/gate1/step3b_smoke_payload/payload_v2.b64"
@@ -38,13 +38,12 @@ jobs:
           test -f scripts/run_gate1_step3b_smoke.py
           test "$(sha256sum scripts/run_gate1_step3b_smoke.py | cut -d' ' -f1)" = \
             "184ea900a520e4a03c72851bf79f3fe3a179cae69fdabbb56067532e397e239a"
-          python -m py_compile scripts/run_gate1_step3b_smoke.py
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add scripts/run_gate1_step3b_smoke.py
           if git diff --cached --quiet; then
             echo "Recovered runner already committed"
           else
-            git commit -m "Recover frozen Step 3B smoke runner [skip ci]"
+            git commit -m "Persist damaged Step 3B smoke runner for repair [skip ci]"
             git push origin HEAD:agent/gate1-contract
           fi
