@@ -29,16 +29,22 @@ jobs:
 
       - name: Materialize frozen untouched-smoke implementation
         run: |
+          set -euxo pipefail
           source_payload="data/gate1/step3b_smoke_payload/payload_v2.b64"
           payload_b64="$RUNNER_TEMP/gate1-step3b-smoke.b64"
           payload_tgz="$RUNNER_TEMP/gate1-step3b-smoke.tgz"
-          test "$(git hash-object "$source_payload")" = \
+          observed_blob="$(git hash-object "$source_payload")"
+          echo "observed payload Git blob: $observed_blob"
+          test "$observed_blob" = \
             "f28db3f29e2fb784a1f09888bd5aa7c8e78b1eaf"
           cp "$source_payload" "$payload_b64"
           base64 --decode "$payload_b64" > "$payload_tgz"
-          test "$(sha256sum "$payload_tgz" | cut -d' ' -f1)" = \
-            "d60947703220b00daf9217bdb22f58be2bc9131663b3fc75eddcaa5faeedcba4"
+          gzip -t "$payload_tgz"
+          tar -tzf "$payload_tgz" >/dev/null
           tar -xzf "$payload_tgz" -C .
+          test -f scripts/run_gate1_step3b_smoke.py
+          test -f scripts/run_gate1_step3b_smoke_workflow.sh
+          test -f configs/gate1/gate1_step3b_smoke.json
           chmod +x scripts/run_gate1_step3b_smoke_workflow.sh
           python -m py_compile scripts/run_gate1_step3b_smoke.py
           python -m json.tool \
