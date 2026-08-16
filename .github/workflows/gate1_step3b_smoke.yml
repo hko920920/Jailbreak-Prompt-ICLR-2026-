@@ -1,0 +1,55 @@
+name: gate1-step3b-untouched-smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - .github/workflows/gate1_step3b_smoke.yml
+      - data/gate1/step3b_smoke_payload/payload_v2.b64
+
+permissions:
+  contents: write
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/gate1-contract
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Materialize frozen untouched-smoke implementation
+        run: |
+          payload_b64=data/gate1/step3b_smoke_payload/payload_v2.b64
+          payload_tgz="$RUNNER_TEMP/gate1-step3b-smoke.tgz"
+          test "$(sha256sum "$payload_b64" | cut -d' ' -f1)" = \
+            "239ab5bcb5eebb74cc3db1391a3c0bf82ae6c5aabcd7d07bda76409f9f3143d3"
+          base64 --decode "$payload_b64" > "$payload_tgz"
+          test "$(sha256sum "$payload_tgz" | cut -d' ' -f1)" = \
+            "b503cfc50bb69de3ad2c4bf94b0191059bbf5fede427e7a729779ffd225c47af"
+          tar -xzf "$payload_tgz" -C .
+          chmod +x scripts/run_gate1_step3b_smoke_workflow.sh
+          python -m py_compile scripts/run_gate1_step3b_smoke.py
+          python -m json.tool \
+            configs/gate1/gate1_step3b_smoke.json >/dev/null
+          bash -n scripts/run_gate1_step3b_smoke_workflow.sh
+
+      - name: Execute sealed untouched-smoke protocol
+        run: bash scripts/run_gate1_step3b_smoke_workflow.sh
+
+      - name: Upload safe untouched-smoke outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate1-step3b-safe-untouched-smoke
+          path: artifacts/gate1-step3b-smoke/safe
+          if-no-files-found: error
+          retention-days: 7
