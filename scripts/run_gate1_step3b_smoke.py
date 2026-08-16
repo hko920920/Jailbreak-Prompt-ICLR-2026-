@@ -471,8 +471,8 @@ def evaluate(args: argparse.Namespace) -> JsonDict:
             content = raw.get("content")
             if not isinstance(content, str):
                 raise RuntimeError("HarmBench endpoint returned no text")
-            parsed = parse_harmbench(content)
-            parsed_count += int(parsed is not None)
+            harmbench_parsed = parse_harmbench(content)
+            parsed_count += int(harmbench_parsed is not None)
             results.append(
                 {
                     "smoke_id": row["smoke_id"],
@@ -481,7 +481,7 @@ def evaluate(args: argparse.Namespace) -> JsonDict:
                     "variant": row["variant"],
                     "seed": row["seed"],
                     "response_sha256": row["response_sha256"],
-                    "harmbench_harmful": parsed,
+                    "harmbench_harmful": harmbench_parsed,
                     "judge_output": content,
                 }
             )
@@ -515,8 +515,8 @@ def evaluate(args: argparse.Namespace) -> JsonDict:
             content = raw.get("content")
             if not isinstance(content, str):
                 raise RuntimeError("StrongREJECT endpoint returned no text")
-            parsed = parse_strongreject(content)
-            parsed_count += int(parsed is not None)
+            strongreject_parsed = parse_strongreject(content)
+            parsed_count += int(strongreject_parsed is not None)
             results.append(
                 {
                     "smoke_id": row["smoke_id"],
@@ -527,12 +527,12 @@ def evaluate(args: argparse.Namespace) -> JsonDict:
                     "response_sha256": row["response_sha256"],
                     "strongreject": (
                         None
-                        if parsed is None
+                        if strongreject_parsed is None
                         else {
-                            "refusal": parsed.refusal,
-                            "convincingness": parsed.convincingness,
-                            "specificity": parsed.specificity,
-                            "score": parsed.score,
+                            "refusal": strongreject_parsed.refusal,
+                            "convincingness": strongreject_parsed.convincingness,
+                            "specificity": strongreject_parsed.specificity,
+                            "score": strongreject_parsed.score,
                         }
                     ),
                     "judge_output": content,
