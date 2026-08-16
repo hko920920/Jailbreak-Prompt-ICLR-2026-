@@ -36,8 +36,12 @@
     "base_model_revision": "a09a35458c702b33eeacc393d103063234e8bc28",
     "external_validation": {
       "doi": "10.18653/v1/2026.findings-acl.786",
+      "full_jailmeter_accuracy": 0.9727,
       "human_labeled_examples": 330,
-      "reported_accuracy": 0.9727,
+      "jailmeter_slm_cot_sft_accuracy": 0.9515,
+      "jailmeter_slm_cot_sft_f1": 0.8919,
+      "jailmeter_slm_cot_sft_precision": 0.88,
+      "jailmeter_slm_cot_sft_recall": 0.9041,
       "venue": "Findings of ACL 2026"
     },
     "label_regex": "<label>\\s*(0|1)\\s*</label>",
