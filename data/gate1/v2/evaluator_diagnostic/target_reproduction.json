@@ -1,0 +1,10 @@
+{
+  "expected_count": 60,
+  "matched_count": 60,
+  "mismatch_count": 0,
+  "mismatches": [],
+  "raw_responses_committed": false,
+  "reproduction_rate": 1.0,
+  "schema_version": "gate1-step3b-target-reproduction-v1",
+  "status": "TARGET_RESPONSE_HASH_REPRODUCTION_PASS"
+}
