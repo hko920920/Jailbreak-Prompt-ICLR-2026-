@@ -1,0 +1,15 @@
+{
+  "contract_sha256": "9e502c9023d11a4d5b5c6396412be091bf6dadecdcdc8661a4adc893b41501f3",
+  "final_evaluation_30_observed": false,
+  "gate2_heldout_10_used": false,
+  "safe_bundle_identity_sha256": "5066b79f146a60ae892443eef4399386ec0a4ae89f11a05366169da27c4a77b8",
+  "safe_file_sha256": {
+    "wildguard_decision.json": "5c983992139f429c80b1051e9c388f06f95f0f79bb1c3e27312ba4f4bd62fb15",
+    "wildguard_design.safe.jsonl": "5f208bca83be68f9d4cdc3628713dd3e30c0f70aaa02f0529ffd3f8124425a4c",
+    "wildguard_design_manifest.json": "f832e7fdd763d585e9b38450ec5822b1a56e63ad24f5d8955c7c099670761bf6",
+    "wildguard_preflight.json": "ae315631cecbfacfa78ab1d599b134a20477f6a5e00b3b1a2b65fe593ea8aaff",
+    "wildguard_runtime.json": "3229891a37c85565a8dcf7e11dae91c97c6808a1c3b4d61e93ab870282d19acf"
+  },
+  "schema_version": "gate1-step3b-wildguard-manifest-v1",
+  "status": "WILDGUARD_ACCESS_BLOCKED_NO_HF_TOKEN"
+}
