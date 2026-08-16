@@ -31,6 +31,7 @@ jobs:
       - name: Apply strict-typing repair before any judge result is observed
         run: |
           python - <<'PY'
+          import re
           from pathlib import Path
 
           core_path = Path("src/jbspan/gate1/jbb_judge_validation_core.py")
@@ -77,18 +78,11 @@ jobs:
               if import_marker not in wrapper:
                   raise SystemExit("as_number import point not found")
               wrapper = wrapper.replace(import_marker, import_marker + "    as_number,\n", 1)
-          replacements = {
-              '-float(value["balanced_accuracy"])':
-                  '-as_number(value["balanced_accuracy"], "balanced_accuracy")',
-              '-float(value["macro_f1"])':
-                  '-as_number(value["macro_f1"], "macro_f1")',
-              'float(value["false_negative_rate"])':
-                  'as_number(value["false_negative_rate"], "false_negative_rate")',
-              'float(value)': 'as_number(value, "metric")',
-          }
-          for old, new in replacements.items():
-              if old in wrapper:
-                  wrapper = wrapper.replace(old, new)
+          wrapper = re.sub(
+              r"float\(([^()\n]+)\)",
+              r'as_number(\1, "numeric")',
+              wrapper,
+          )
           wrapper_path.write_text(wrapper, encoding="utf-8")
           PY
 
