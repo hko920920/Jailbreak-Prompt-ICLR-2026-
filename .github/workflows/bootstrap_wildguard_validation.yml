@@ -1,0 +1,56 @@
+name: bootstrap-gate1-step3b5-wildguard-validation
+
+on:
+  push:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - data/gate1/wildguard_validation_payload.b85
+      - scripts/bootstrap_wildguard_validation.py
+      - .github/workflows/bootstrap_wildguard_validation.yml
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/gate1-contract
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Decode frozen WildGuard source payload
+        run: python scripts/bootstrap_wildguard_validation.py
+
+      - name: Validate generated files
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev,step3]'
+          ruff check scripts/run_gate1_step3b_wildguard_validation.py \
+            tests/test_gate1_step3b_wildguard_validation.py
+          mypy src/jbspan
+          pytest
+          python -m json.tool \
+            configs/gate1/gate1_step3b_wildguard_validation.json >/dev/null
+
+      - name: Commit generated sources and remove bootstrap files
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add \
+            scripts/run_gate1_step3b_wildguard_validation.py \
+            tests/test_gate1_step3b_wildguard_validation.py \
+            docs/GATE1_STEP3B5_WILDGUARD_VALIDATION_PROTOCOL.md
+          git rm \
+            data/gate1/wildguard_validation_payload.b85 \
+            scripts/bootstrap_wildguard_validation.py
+          git commit -m "Materialize official WildGuard validation sources"
+          git pull --rebase origin agent/gate1-contract
+          git push origin HEAD:agent/gate1-contract
