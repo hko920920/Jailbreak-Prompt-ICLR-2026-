@@ -1,0 +1,366 @@
+name: gate1-step3b5-official-wildguard-validation
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - .github/workflows/gate1_step3b_wildguard_validation.yml
+      - configs/gate1/gate1_step3b_wildguard_validation.json
+      - scripts/run_gate1_step3b_wildguard_validation.py
+      - tests/test_gate1_step3b_wildguard_validation.py
+      - docs/GATE1_STEP3B5_WILDGUARD_VALIDATION_PROTOCOL.md
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gate1-step3b5-official-wildguard-validation
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      JBB_REVISION: d8d87b8fdcb7806e3b4e45fffb2bc24aa6b17f32
+      JBB_PATH: data/judge-comparison.csv
+      JBB_SHA256: dacaf76a1057785f11b0fc6aa07b9a73cdab588319ddfc5e8cef2909e5b112a5
+      WILDGUARD_SOURCE_REVISION: 495b9dc837be594c6c5665b0f7f56169baf0d5be
+      WILDGUARD_PY_BLOB: 3613afed3aa51437808da1be899e8c3944c170b0
+      WILDGUARD_UTILS_BLOB: e91b44df534625f6f1bab8096a93101800778dfd
+      LLAMA_REVISION: 0177dcc7300bad8914bb838baabce87899812491
+      LLAMA_RELEASE_TAG: b10441
+      LLAMA_ASSET: llama-b10441-bin-ubuntu-x64.tar.gz
+      SAFE_OUTPUT: artifacts/gate1-step3b5-wildguard/safe
+      PRIVATE_OUTPUT: /tmp/gate1-step3b5-wildguard/private
+      PIP_NO_CACHE_DIR: "1"
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/gate1-contract
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate frozen code and contract
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev,step3]'
+          ruff check scripts/run_gate1_step3b_wildguard_validation.py \
+            tests/test_gate1_step3b_wildguard_validation.py
+          mypy src/jbspan
+          pytest
+          python -m json.tool \
+            configs/gate1/gate1_step3b_wildguard_validation.json >/dev/null
+
+      - name: Verify pinned official WildGuard source
+        run: |
+          source_dir="$RUNNER_TEMP/wildguard-source"
+          git init "$source_dir"
+          git -C "$source_dir" remote add origin \
+            https://github.com/allenai/wildguard.git
+          git -C "$source_dir" fetch --depth 1 origin \
+            "$WILDGUARD_SOURCE_REVISION"
+          git -C "$source_dir" checkout --detach FETCH_HEAD
+          test "$(git -C "$source_dir" rev-parse HEAD)" = \
+            "$WILDGUARD_SOURCE_REVISION"
+          test "$(git -C "$source_dir" rev-parse HEAD:wildguard/wildguard.py)" = \
+            "$WILDGUARD_PY_BLOB"
+          test "$(git -C "$source_dir" rev-parse HEAD:wildguard/utils.py)" = \
+            "$WILDGUARD_UTILS_BLOB"
+
+      - name: Resolve official model access and immutable identity
+        run: |
+          mkdir -p "$SAFE_OUTPUT" "$PRIVATE_OUTPUT"
+          python scripts/run_gate1_step3b_wildguard_validation.py preflight \
+            --root . \
+            --safe-output-dir "$SAFE_OUTPUT" \
+            --github-env "$GITHUB_ENV"
+
+      - name: Download and verify the frozen JBB judge-comparison source
+        run: |
+          source_csv="$RUNNER_TEMP/judge-comparison.csv"
+          url="https://huggingface.co/datasets/JailbreakBench/JBB-Behaviors/resolve/${JBB_REVISION}/${JBB_PATH}?download=true"
+          curl --fail --location --silent --show-error \
+            "$url" --output "$source_csv"
+          test "$(sha256sum "$source_csv" | cut -d' ' -f1)" = \
+            "$JBB_SHA256"
+          echo "JBB_SOURCE_CSV=$source_csv" >> "$GITHUB_ENV"
+
+      - name: Freeze the external selection and validation design
+        run: |
+          python scripts/run_gate1_step3b_wildguard_validation.py prepare \
+            --root . \
+            --source-csv "$JBB_SOURCE_CSV" \
+            --safe-output-dir "$SAFE_OUTPUT" \
+            --private-output-dir "$PRIVATE_OUTPUT"
+
+      - name: Free hosted-runner disk for the official 7B conversion
+        if: env.WILDGUARD_ACCESS_OK == 'true'
+        run: |
+          sudo rm -rf \
+            /usr/local/lib/android \
+            /usr/share/dotnet \
+            /opt/ghc \
+            /usr/local/.ghcup \
+            /opt/hostedtoolcache/CodeQL || true
+          df -h
+
+      - name: Install the pinned llama.cpp runtime and converter
+        if: env.WILDGUARD_ACCESS_OK == 'true'
+        run: |
+          release_json="$RUNNER_TEMP/llama-release.json"
+          curl --fail --location --silent --show-error \
+            "https://api.github.com/repos/ggml-org/llama.cpp/releases/tags/${LLAMA_RELEASE_TAG}" \
+            --output "$release_json"
+          test "$(jq -r '.target_commitish' "$release_json")" = \
+            "$LLAMA_REVISION"
+          asset_url="$(jq -r --arg name "$LLAMA_ASSET" \
+            '.assets[] | select(.name == $name) | .browser_download_url' \
+            "$release_json")"
+          asset_digest="$(jq -r --arg name "$LLAMA_ASSET" \
+            '.assets[] | select(.name == $name) | .digest' \
+            "$release_json")"
+          archive="$RUNNER_TEMP/$LLAMA_ASSET"
+          curl --fail --location --silent --show-error \
+            "$asset_url" --output "$archive"
+          test "sha256:$(sha256sum "$archive" | cut -d' ' -f1)" = \
+            "$asset_digest"
+          mkdir -p "$RUNNER_TEMP/llama-bin"
+          tar -xzf "$archive" -C "$RUNNER_TEMP/llama-bin"
+          server="$(find "$RUNNER_TEMP/llama-bin" -type f \
+            -name llama-server | head -n1)"
+          quantize="$(find "$RUNNER_TEMP/llama-bin" -type f \
+            -name llama-quantize | head -n1)"
+          test -x "$server"
+          test -x "$quantize"
+          echo "LLAMA_SERVER=$server" >> "$GITHUB_ENV"
+          echo "LLAMA_QUANTIZE=$quantize" >> "$GITHUB_ENV"
+
+          source_dir="$RUNNER_TEMP/llama-src"
+          git init "$source_dir"
+          git -C "$source_dir" remote add origin \
+            https://github.com/ggml-org/llama.cpp.git
+          git -C "$source_dir" fetch --depth 1 origin "$LLAMA_REVISION"
+          git -C "$source_dir" checkout --detach FETCH_HEAD
+          test "$(git -C "$source_dir" rev-parse HEAD)" = "$LLAMA_REVISION"
+          echo "LLAMA_SOURCE=$source_dir" >> "$GITHUB_ENV"
+          python -m pip install sentencepiece protobuf
+
+      - name: Download and verify the exact official WildGuard model snapshot
+        if: env.WILDGUARD_ACCESS_OK == 'true'
+        run: |
+          export HF_HOME="$RUNNER_TEMP/hf-wildguard"
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          from huggingface_hub import snapshot_download
+
+          safe = Path(os.environ["SAFE_OUTPUT"])
+          identity = json.loads((safe / "wildguard_preflight.json").read_text())
+          snapshot = Path(
+              snapshot_download(
+                  repo_id=identity["official_model_repository"],
+                  revision=identity["model_revision"],
+                  token=os.environ["HF_TOKEN"],
+                  cache_dir=Path(os.environ["HF_HOME"]),
+              )
+          )
+
+          def digest(path: Path) -> str:
+              value = hashlib.sha256()
+              with path.open("rb") as handle:
+                  for block in iter(lambda: handle.read(1024 * 1024), b""):
+                      value.update(block)
+              return value.hexdigest()
+
+          for item in identity["files"]:
+              path = snapshot / item["filename"]
+              if not path.is_file():
+                  raise SystemExit(f"missing WildGuard file: {item['filename']}")
+              expected = item.get("sha256")
+              if expected and digest(path) != expected:
+                  raise SystemExit(f"WildGuard digest mismatch: {item['filename']}")
+          with Path(os.environ["GITHUB_ENV"]).open("a") as handle:
+              handle.write(f"WILDGUARD_MODEL_DIR={snapshot}\n")
+          PY
+
+      - name: Convert and quantize official WildGuard
+        if: env.WILDGUARD_ACCESS_OK == 'true'
+        run: |
+          q8="$RUNNER_TEMP/wildguard-q8_0.gguf"
+          q4="$RUNNER_TEMP/wildguard-q4_k_m.gguf"
+          python "$LLAMA_SOURCE/convert_hf_to_gguf.py" \
+            "$WILDGUARD_MODEL_DIR" \
+            --outfile "$q8" \
+            --outtype q8_0
+          rm -rf "$RUNNER_TEMP/hf-wildguard"
+          "$LLAMA_QUANTIZE" "$q8" "$q4" Q4_K_M
+          rm -f "$q8"
+          test -s "$q4"
+          echo "WILDGUARD_GGUF=$q4" >> "$GITHUB_ENV"
+          echo "WILDGUARD_GGUF_SHA256=$(sha256sum "$q4" | cut -d' ' -f1)" \
+            >> "$GITHUB_ENV"
+          df -h
+
+      - name: Run selection and conditionally untouched validation
+        if: env.WILDGUARD_ACCESS_OK == 'true'
+        run: |
+          mkdir -p "$RUNNER_TEMP/wildguard-server"
+          nohup "$LLAMA_SERVER" \
+            -m "$WILDGUARD_GGUF" \
+            --host 127.0.0.1 \
+            --port 8080 \
+            -c 4096 \
+            -t 4 \
+            >"$RUNNER_TEMP/wildguard-server/server.log" 2>&1 &
+          pid=$!
+          cleanup() {
+            kill "$pid" 2>/dev/null || true
+            wait "$pid" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+          ready=0
+          for _ in $(seq 1 240); do
+            if ! kill -0 "$pid" 2>/dev/null; then
+              tail -n 100 "$RUNNER_TEMP/wildguard-server/server.log"
+              exit 1
+            fi
+            if [ "$(curl -sS -o /dev/null -w '%{http_code}' \
+              http://127.0.0.1:8080/health || true)" = "200" ]; then
+              ready=1
+              break
+            fi
+            sleep 5
+          done
+          test "$ready" = "1"
+
+          timeout 140m python \
+            scripts/run_gate1_step3b_wildguard_validation.py evaluate \
+            --root . \
+            --subset selection \
+            --private-output-dir "$PRIVATE_OUTPUT" \
+            --safe-output-dir "$SAFE_OUTPUT" \
+            --server-url http://127.0.0.1:8080
+
+          selection_pass="$(jq -r '.passes_all_thresholds' \
+            "$SAFE_OUTPUT/wildguard_selection_metrics.json")"
+          if [ "$selection_pass" = "true" ]; then
+            timeout 70m python \
+              scripts/run_gate1_step3b_wildguard_validation.py evaluate \
+              --root . \
+              --subset validation \
+              --private-output-dir "$PRIVATE_OUTPUT" \
+              --safe-output-dir "$SAFE_OUTPUT" \
+              --server-url http://127.0.0.1:8080
+          fi
+          cleanup
+          trap - EXIT
+
+      - name: Finalize the immutable safe decision
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          safe = Path(os.environ["SAFE_OUTPUT"])
+          identity = json.loads((safe / "wildguard_preflight.json").read_text())
+          runtime = {
+              "schema_version": "gate1-step3b-wildguard-runtime-v1",
+              "model_revision": identity.get("model_revision"),
+              "converted_gguf_sha256": os.environ.get("WILDGUARD_GGUF_SHA256"),
+              "github_run_id": os.environ.get("GITHUB_RUN_ID"),
+              "github_sha": os.environ.get("GITHUB_SHA"),
+              "runner_os": os.environ.get("RUNNER_OS"),
+              "runner_arch": os.environ.get("RUNNER_ARCH"),
+          }
+          (safe / "wildguard_runtime.json").write_text(
+              json.dumps(runtime, indent=2, sort_keys=True) + "\n"
+          )
+          PY
+          python scripts/run_gate1_step3b_wildguard_validation.py finalize \
+            --root . \
+            --safe-output-dir "$SAFE_OUTPUT"
+
+      - name: Verify safe outputs contain no external text
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          safe = Path(os.environ["SAFE_OUTPUT"])
+          private = Path(os.environ["PRIVATE_OUTPUT"])
+          combined = "\n".join(
+              path.read_text(encoding="utf-8")
+              for path in safe.iterdir()
+              if path.is_file()
+          )
+          if private.exists():
+              for path in private.rglob("*.jsonl"):
+                  for line in path.read_text(encoding="utf-8").splitlines():
+                      if not line.strip():
+                          continue
+                      row = json.loads(line)
+                      for key in ("prompt", "response", "raw_output"):
+                          value = row.get(key)
+                          if isinstance(value, str) and len(value) >= 16:
+                              if value in combined:
+                                  raise SystemExit(f"private text leaked through {key}")
+          PY
+
+      - name: Publish safe summary
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          safe = Path(os.environ["SAFE_OUTPUT"])
+          decision = json.loads((safe / "wildguard_decision.json").read_text())
+          with Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a") as handle:
+              handle.write("# Official WildGuard external validation\n\n")
+              handle.write(f"- status: **{decision['status']}**\n")
+              handle.write(
+                  f"- selection pass: **{decision['selection_pass']}**\n"
+              )
+              handle.write(
+                  f"- validation pass: **{decision['validation_pass']}**\n"
+              )
+              handle.write("- final evaluation 30 observed: **false**\n")
+              handle.write("- Gate 1: **not evaluated**\n")
+          PY
+
+      - name: Upload safe validation bundle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate1-step3b5-official-wildguard-safe
+          path: ${{ env.SAFE_OUTPUT }}
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Cleanup private and model files
+        if: always()
+        run: |
+          if [ -d "$PRIVATE_OUTPUT" ]; then
+            find "$PRIVATE_OUTPUT" -type f -print0 | xargs -0 -r shred -u
+            rm -rf "$PRIVATE_OUTPUT"
+          fi
+          rm -rf "$RUNNER_TEMP/hf-wildguard" \
+            "$RUNNER_TEMP/wildguard-q4_k_m.gguf" \
+            "$RUNNER_TEMP/wildguard-source" \
+            "$RUNNER_TEMP/llama-src"
