@@ -1,0 +1,158 @@
+name: gate1-step3b5-judge-validation
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - .github/workflows/gate1_step3b5_judge_validation.yml
+      - configs/gate1/gate1_step3b_judge_validation.json
+      - src/jbspan/gate1/jbb_judge_validation_core.py
+      - src/jbspan/gate1/jbb_judge_validation.py
+      - scripts/run_gate1_step3b_judge_validation.py
+      - tests/test_gate1_step3b_judge_validation.py
+      - docs/GATE1_STEP3B_JUDGE_COMPARISON_PROTOCOL.md
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      JBB_REVISION: d8d87b8fdcb7806e3b4e45fffb2bc24aa6b17f32
+      JBB_PATH: data/judge-comparison.csv
+      SAFE_OUTPUT: artifacts/gate1-step3b5-judge-validation
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/gate1-contract
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install and validate frozen judge-validation code
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev]'
+          ruff check .
+          mypy src/jbspan
+          pytest
+          python -m json.tool \
+            configs/gate1/gate1_step3b_judge_validation.json >/dev/null
+
+      - name: Download immutable JBB judge-comparison source
+        run: |
+          source_csv="$RUNNER_TEMP/judge-comparison.csv"
+          url="https://huggingface.co/datasets/JailbreakBench/JBB-Behaviors/resolve/${JBB_REVISION}/${JBB_PATH}?download=true"
+          curl --fail --location --silent --show-error \
+            "$url" --output "$source_csv"
+          test -s "$source_csv"
+          echo "JBB_SOURCE_CSV=$source_csv" >> "$GITHUB_ENV"
+
+      - name: Run frozen 200-selection / 100-validation comparison
+        run: |
+          mkdir -p "$SAFE_OUTPUT"
+          python scripts/run_gate1_step3b_judge_validation.py \
+            --root . \
+            --source-csv "$JBB_SOURCE_CSV" \
+            --output-dir "$SAFE_OUTPUT" \
+            --report "$SAFE_OUTPUT/GATE1_STEP3B_JUDGE_COMPARISON_REPORT.md"
+
+      - name: Audit safe output boundary
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ["SAFE_OUTPUT"])
+          metrics = json.loads((root / "judge_metrics.json").read_text())
+          selection = json.loads((root / "primary_judge_selection.json").read_text())
+          forbidden = {"goal", "prompt", "target_response", "response", "judge_output"}
+
+          def visit(value):
+              if isinstance(value, dict):
+                  overlap = forbidden.intersection(value)
+                  if overlap:
+                      raise SystemExit(f"raw-text key leaked: {sorted(overlap)}")
+                  for child in value.values():
+                      visit(child)
+              elif isinstance(value, list):
+                  for child in value:
+                      visit(child)
+
+          visit(metrics)
+          visit(selection)
+          assert metrics["confirmatory_smoke_allowed"] is False
+          assert metrics["wrapper_stability_required"] is True
+          assert metrics["final_evaluation_30_observed"] is False
+          assert metrics["gate2_heldout_10_used"] is False
+          assert metrics["gate1_decision"] == "NOT_EVALUATED"
+          assert selection["confirmatory_smoke_allowed"] is False
+          PY
+
+      - name: Persist or verify frozen safe results
+        run: |
+          destination=data/gate1/v2/evaluator_validation
+          report=docs/GATE1_STEP3B_JUDGE_COMPARISON_REPORT.md
+          if [ -d "$destination" ]; then
+            diff -u "$destination/source_identity.json" \
+              "$SAFE_OUTPUT/source_identity.json"
+            diff -u "$destination/judge_metrics.json" \
+              "$SAFE_OUTPUT/judge_metrics.json"
+            diff -u "$destination/primary_judge_selection.json" \
+              "$SAFE_OUTPUT/primary_judge_selection.json"
+            diff -u "$report" \
+              "$SAFE_OUTPUT/GATE1_STEP3B_JUDGE_COMPARISON_REPORT.md"
+          else
+            mkdir -p "$destination"
+            cp "$SAFE_OUTPUT/source_identity.json" "$destination/"
+            cp "$SAFE_OUTPUT/judge_metrics.json" "$destination/"
+            cp "$SAFE_OUTPUT/primary_judge_selection.json" "$destination/"
+            cp "$SAFE_OUTPUT/GATE1_STEP3B_JUDGE_COMPARISON_REPORT.md" "$report"
+            git config user.name github-actions[bot]
+            git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+            git add "$destination" "$report"
+            git commit -m "Freeze Gate 1 Step 3B.5 judge-validation result [skip ci]"
+            git push origin HEAD:agent/gate1-contract
+          fi
+
+      - name: Publish safe summary
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ["SAFE_OUTPUT"])
+          result = json.loads((root / "judge_metrics.json").read_text())
+          with Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a") as handle:
+              handle.write("# Gate 1 Step 3B.5 judge validation\n\n")
+              handle.write(f"- status: **{result['status']}**\n")
+              handle.write("- selection / validation: **200 / 100**\n")
+              handle.write(
+                  f"- selected before validation: `{result['selected_before_validation']}`\n"
+              )
+              handle.write(
+                  f"- selected primary: `{result['selected_primary_evaluator']}`\n"
+              )
+              handle.write("- confirmatory smoke allowed: **false**\n")
+              handle.write("- wrapper stability required: **true**\n")
+              handle.write("- final evaluation 30 observed: **false**\n")
+              handle.write("- Gate 1 decision: **not evaluated**\n")
+          PY
+
+      - name: Upload safe judge-validation outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate1-step3b5-safe-judge-validation
+          path: ${{ env.SAFE_OUTPUT }}
+          if-no-files-found: error
+          retention-days: 7
