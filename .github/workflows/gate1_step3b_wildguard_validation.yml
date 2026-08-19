@@ -151,7 +151,7 @@ jobs:
           git -C "$source_dir" checkout --detach FETCH_HEAD
           test "$(git -C "$source_dir" rev-parse HEAD)" = "$LLAMA_REVISION"
           echo "LLAMA_SOURCE=$source_dir" >> "$GITHUB_ENV"
-          python -m pip install sentencepiece protobuf
+          python -m pip install -r "$source_dir/requirements/requirements-convert_hf_to_gguf.txt"
 
       - name: Download and verify the exact official WildGuard model snapshot
         if: env.WILDGUARD_ACCESS_OK == 'true'
