@@ -1,0 +1,432 @@
+name: gate1-step3b7-fresh-confirmatory-smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - data/gate1/v2/wildguard_wrapper_stability/wrapper_stability_decision.json
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gate1-step3b7-fresh-confirmatory-smoke
+  cancel-in-progress: true
+
+jobs:
+  confirm:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      PAYLOAD_SOURCE_REVISION: d8d87b8fdcb7806e3b4e45fffb2bc24aa6b17f32
+      PAYLOAD_SOURCE_PATH: data/harmful-behaviors.csv
+      PAYLOAD_SOURCE_SHA256: 4a8ec6832056b631eb092dccc60d37a61c3d441268268888b3d006288afeffa1
+      ATTACK_SOURCE_REPOSITORY: mdoumbouya/h4rm3l
+      ATTACK_SOURCE_REVISION: e6f58a1a1e56c1a95b26b06aa4fe393ee2240dbd
+      ATTACK_SOURCE_PATH: experiments/experiment_116_bandi_synthesis/config/benchmark_reference_programs.csv
+      ATTACK_SOURCE_SHA256: b4c07b11c9e92ecd332807e8ba32d8fe028b59f4c3499f72670d44105626ef07
+      TARGET_REF: Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M
+      HARMBENCH_REF: RichardErkhov/cais_-_HarmBench-Mistral-7b-val-cls-gguf:Q4_K_M
+      LLAMA_REVISION: 0177dcc7300bad8914bb838baabce87899812491
+      LLAMA_RELEASE_TAG: b10441
+      LLAMA_ASSET: llama-b10441-bin-ubuntu-x64.tar.gz
+      SAFE_OUTPUT: /tmp/gate1-step3b7-confirmatory/safe
+      PRIVATE_OUTPUT: /tmp/gate1-step3b7-confirmatory/private
+      PIP_NO_CACHE_DIR: "1"
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/gate1-contract
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate confirmatory implementation
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev,step3]'
+          ruff check scripts/run_gate1_step3b_primary_judge_experiment.py \
+            tests/test_gate1_step3b_primary_judge_experiment.py
+          mypy src/jbspan
+          pytest tests/test_gate1_step3b_primary_judge_experiment.py
+          mkdir -p "$SAFE_OUTPUT" "$PRIVATE_OUTPUT"
+
+      - name: Check wrapper-stability authorization
+        run: |
+          decision=data/gate1/v2/wildguard_wrapper_stability/wrapper_stability_decision.json
+          test -f "$decision"
+          allowed="$(jq -r '
+            .status == "WILDGUARD_Q8_WRAPPER_STABILITY_PASS"
+            and .wrapper_stability_pass == true
+            and .confirmatory_smoke_allowed == true
+          ' "$decision")"
+          echo "CONFIRMATORY_ALLOWED=$allowed" >> "$GITHUB_ENV"
+          if [ "$allowed" != "true" ]; then
+            cat >"$SAFE_OUTPUT/confirmatory_decision.json" <<'JSON'
+          {
+            "schema_version": "gate1-confirmatory-decision-v1",
+            "stage": "confirmatory",
+            "status": "STEP3B_CONFIRMATORY_BLOCKED",
+            "passes_all_thresholds": false,
+            "final_evaluation_allowed": false,
+            "primary_evaluator": null,
+            "gate2_heldout_10_used": false,
+            "wavelet_enabled": false,
+            "raw_prompts_committed": false,
+            "raw_responses_committed": false,
+            "raw_judge_outputs_committed": false
+          }
+          JSON
+          fi
+
+      - name: Download immutable payload and attack sources
+        if: env.CONFIRMATORY_ALLOWED == 'true'
+        run: |
+          payload_csv="$RUNNER_TEMP/harmful-behaviors.csv"
+          payload_url="https://huggingface.co/datasets/JailbreakBench/JBB-Behaviors/resolve/${PAYLOAD_SOURCE_REVISION}/${PAYLOAD_SOURCE_PATH}?download=true"
+          curl --fail --location --silent --show-error "$payload_url" --output "$payload_csv"
+          test "$(sha256sum "$payload_csv" | cut -d' ' -f1)" = "$PAYLOAD_SOURCE_SHA256"
+
+          attack_csv="$RUNNER_TEMP/benchmark_reference_programs.csv"
+          attack_url="https://raw.githubusercontent.com/${ATTACK_SOURCE_REPOSITORY}/${ATTACK_SOURCE_REVISION}/${ATTACK_SOURCE_PATH}"
+          curl --fail --location --silent --show-error "$attack_url" --output "$attack_csv"
+          test "$(sha256sum "$attack_csv" | cut -d' ' -f1)" = "$ATTACK_SOURCE_SHA256"
+          echo "PAYLOAD_SOURCE_CSV=$payload_csv" >> "$GITHUB_ENV"
+          echo "ATTACK_SOURCE_CSV=$attack_csv" >> "$GITHUB_ENV"
+
+      - name: Install pinned llama.cpp runtime
+        if: env.CONFIRMATORY_ALLOWED == 'true'
+        run: |
+          release_json="$RUNNER_TEMP/llama-release.json"
+          curl --fail --location --silent --show-error \
+            "https://api.github.com/repos/ggml-org/llama.cpp/releases/tags/${LLAMA_RELEASE_TAG}" \
+            --output "$release_json"
+          test "$(jq -r '.target_commitish' "$release_json")" = "$LLAMA_REVISION"
+          asset_url="$(jq -r --arg name "$LLAMA_ASSET" '.assets[] | select(.name == $name) | .browser_download_url' "$release_json")"
+          asset_digest="$(jq -r --arg name "$LLAMA_ASSET" '.assets[] | select(.name == $name) | .digest' "$release_json")"
+          archive="$RUNNER_TEMP/$LLAMA_ASSET"
+          curl --fail --location --silent --show-error "$asset_url" --output "$archive"
+          test "sha256:$(sha256sum "$archive" | cut -d' ' -f1)" = "$asset_digest"
+          mkdir -p "$RUNNER_TEMP/llama-bin"
+          tar -xzf "$archive" -C "$RUNNER_TEMP/llama-bin"
+          server="$(find "$RUNNER_TEMP/llama-bin" -type f -name llama-server | head -n1)"
+          test -x "$server"
+          echo "LLAMA_SERVER=$server" >> "$GITHUB_ENV"
+
+      - name: Prepare the frozen fresh confirmatory design
+        if: env.CONFIRMATORY_ALLOWED == 'true'
+        run: |
+          export HF_HOME="$RUNNER_TEMP/hf-prepare"
+          python scripts/run_gate1_step3b_primary_judge_experiment.py prepare \
+            --stage confirmatory \
+            --root . \
+            --payload-source-csv "$PAYLOAD_SOURCE_CSV" \
+            --attack-source-csv "$ATTACK_SOURCE_CSV" \
+            --safe-output-dir "$SAFE_OUTPUT" \
+            --private-output-dir "$PRIVATE_OUTPUT"
+          rm -rf "$HF_HOME"
+
+      - name: Generate the canonical Qwen response batch
+        if: env.CONFIRMATORY_ALLOWED == 'true'
+        run: |
+          export HF_HOME="$RUNNER_TEMP/hf-target"
+          mkdir -p "$HF_HOME" "$RUNNER_TEMP/target-server"
+          nohup "$LLAMA_SERVER" \
+            -hf "$TARGET_REF" \
+            --host 127.0.0.1 \
+            --port 8080 \
+            -c 4096 \
+            -t 4 \
+            >"$RUNNER_TEMP/target-server/server.log" 2>&1 &
+          pid=$!
+          cleanup() {
+            kill "$pid" 2>/dev/null || true
+            wait "$pid" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+          ready=0
+          for _ in $(seq 1 240); do
+            if ! kill -0 "$pid" 2>/dev/null; then
+              tail -n 100 "$RUNNER_TEMP/target-server/server.log"
+              exit 1
+            fi
+            if [ "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/health || true)" = "200" ]; then
+              ready=1
+              break
+            fi
+            sleep 5
+          done
+          test "$ready" = "1"
+          timeout 130m python scripts/run_gate1_step3b_primary_judge_experiment.py target \
+            --stage confirmatory \
+            --root . \
+            --private-output-dir "$PRIVATE_OUTPUT" \
+            --server-url http://127.0.0.1:8080
+          cleanup
+          trap - EXIT
+          rm -rf "$HF_HOME"
+
+      - name: Evaluate HarmBench sensitivity on the same response batch
+        if: env.CONFIRMATORY_ALLOWED == 'true'
+        run: |
+          export HF_HOME="$RUNNER_TEMP/hf-harmbench"
+          mkdir -p "$HF_HOME" "$RUNNER_TEMP/harmbench-server"
+          nohup "$LLAMA_SERVER" \
+            -hf "$HARMBENCH_REF" \
+            --host 127.0.0.1 \
+            --port 8081 \
+            -c 4096 \
+            -t 4 \
+            >"$RUNNER_TEMP/harmbench-server/server.log" 2>&1 &
+          pid=$!
+          cleanup() {
+            kill "$pid" 2>/dev/null || true
+            wait "$pid" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+          ready=0
+          for _ in $(seq 1 240); do
+            if ! kill -0 "$pid" 2>/dev/null; then
+              tail -n 100 "$RUNNER_TEMP/harmbench-server/server.log"
+              exit 1
+            fi
+            if [ "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:8081/health || true)" = "200" ]; then
+              ready=1
+              break
+            fi
+            sleep 5
+          done
+          test "$ready" = "1"
+          timeout 70m python scripts/run_gate1_step3b_primary_judge_experiment.py evaluate \
+            --stage confirmatory \
+            --mode harmbench \
+            --root . \
+            --private-output-dir "$PRIVATE_OUTPUT" \
+            --server-url http://127.0.0.1:8081
+          cleanup
+          trap - EXIT
+          rm -rf "$HF_HOME"
+
+      - name: Free disk and install the Q8 converter
+        if: env.CONFIRMATORY_ALLOWED == 'true'
+        run: |
+          sudo rm -rf \
+            /usr/local/lib/android \
+            /usr/share/dotnet \
+            /opt/ghc \
+            /usr/local/.ghcup \
+            /opt/hostedtoolcache/CodeQL || true
+          source_dir="$RUNNER_TEMP/llama-src"
+          git init "$source_dir"
+          git -C "$source_dir" remote add origin https://github.com/ggml-org/llama.cpp.git
+          git -C "$source_dir" fetch --depth 1 origin "$LLAMA_REVISION"
+          git -C "$source_dir" checkout --detach FETCH_HEAD
+          test "$(git -C "$source_dir" rev-parse HEAD)" = "$LLAMA_REVISION"
+          echo "LLAMA_SOURCE=$source_dir" >> "$GITHUB_ENV"
+          python -m pip install -r "$source_dir/requirements/requirements-convert_hf_to_gguf.txt"
+          df -h
+
+      - name: Download and verify official WildGuard snapshot
+        if: env.CONFIRMATORY_ALLOWED == 'true'
+        run: |
+          export HF_HOME="$RUNNER_TEMP/hf-wildguard"
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          from huggingface_hub import snapshot_download
+
+          identity = json.loads(
+              Path("data/gate1/v2/wildguard_q8/wildguard_preflight.json").read_text()
+          )
+          snapshot = Path(
+              snapshot_download(
+                  repo_id=identity["official_model_repository"],
+                  revision=identity["model_revision"],
+                  token=os.environ["HF_TOKEN"],
+                  cache_dir=Path(os.environ["HF_HOME"]),
+              )
+          )
+
+          def digest(path: Path) -> str:
+              value = hashlib.sha256()
+              with path.open("rb") as handle:
+                  for block in iter(lambda: handle.read(1024 * 1024), b""):
+                      value.update(block)
+              return value.hexdigest()
+
+          for item in identity["files"]:
+              path = snapshot / item["filename"]
+              if not path.is_file():
+                  raise SystemExit(f"missing WildGuard file: {item['filename']}")
+              expected = item.get("sha256")
+              if expected and digest(path) != expected:
+                  raise SystemExit(f"WildGuard digest mismatch: {item['filename']}")
+          with Path(os.environ["GITHUB_ENV"]).open("a") as handle:
+              handle.write(f"WILDGUARD_MODEL_DIR={snapshot}\n")
+          PY
+
+      - name: Convert and run official WildGuard Q8 primary evaluation
+        if: env.CONFIRMATORY_ALLOWED == 'true'
+        run: |
+          q8="$RUNNER_TEMP/wildguard-q8_0.gguf"
+          python "$LLAMA_SOURCE/convert_hf_to_gguf.py" \
+            "$WILDGUARD_MODEL_DIR" \
+            --outfile "$q8" \
+            --outtype q8_0
+          rm -rf "$RUNNER_TEMP/hf-wildguard"
+          test -s "$q8"
+
+          mkdir -p "$RUNNER_TEMP/wildguard-server"
+          nohup "$LLAMA_SERVER" \
+            -m "$q8" \
+            --host 127.0.0.1 \
+            --port 8082 \
+            -c 4096 \
+            -t 4 \
+            >"$RUNNER_TEMP/wildguard-server/server.log" 2>&1 &
+          pid=$!
+          cleanup() {
+            kill "$pid" 2>/dev/null || true
+            wait "$pid" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+          ready=0
+          for _ in $(seq 1 240); do
+            if ! kill -0 "$pid" 2>/dev/null; then
+              tail -n 100 "$RUNNER_TEMP/wildguard-server/server.log"
+              exit 1
+            fi
+            if [ "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:8082/health || true)" = "200" ]; then
+              ready=1
+              break
+            fi
+            sleep 5
+          done
+          test "$ready" = "1"
+          timeout 90m python scripts/run_gate1_step3b_primary_judge_experiment.py evaluate \
+            --stage confirmatory \
+            --mode wildguard \
+            --root . \
+            --private-output-dir "$PRIVATE_OUTPUT" \
+            --server-url http://127.0.0.1:8082
+          cleanup
+          trap - EXIT
+          rm -f "$q8"
+
+      - name: Finalize the fresh confirmatory decision
+        if: env.CONFIRMATORY_ALLOWED == 'true'
+        run: |
+          python scripts/run_gate1_step3b_primary_judge_experiment.py finalize \
+            --stage confirmatory \
+            --root . \
+            --private-output-dir "$PRIVATE_OUTPUT" \
+            --safe-output-dir "$SAFE_OUTPUT"
+
+      - name: Verify the private-text boundary
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          safe = Path(os.environ["SAFE_OUTPUT"])
+          private = Path(os.environ["PRIVATE_OUTPUT"])
+          combined = "\n".join(
+              path.read_text(encoding="utf-8")
+              for path in safe.iterdir()
+              if path.is_file()
+          )
+          if private.exists():
+              for path in private.rglob("*.jsonl"):
+                  for line in path.read_text(encoding="utf-8").splitlines():
+                      if not line.strip():
+                          continue
+                      row = json.loads(line)
+                      for key in ("forbidden_prompt", "chat_prompt", "response", "judge_output"):
+                          value = row.get(key)
+                          if isinstance(value, str) and len(value) >= 16 and value in combined:
+                              raise SystemExit(f"private text leaked through {key}")
+          PY
+
+      - name: Create and persist the safe confirmatory report
+        if: always()
+        run: |
+          test -f "$SAFE_OUTPUT/confirmatory_decision.json"
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          safe = Path(os.environ["SAFE_OUTPUT"])
+          value = json.loads((safe / "confirmatory_decision.json").read_text())
+          rows = [
+              "# Gate 1 Step 3B.7 — Fresh Confirmatory Smoke",
+              "",
+              "Date: 2026-08-20 (Asia/Seoul)",
+              "",
+              f"Status: **{value['status']}**",
+              "",
+              f"- primary parse coverage: **{value.get('primary_parse_coverage')}**",
+              f"- primary abstention rate: **{value.get('primary_abstention_rate')}**",
+              f"- original stable non-success: **{value.get('original_stable_non_success_count')} / 10**",
+              f"- eligible attacks: **{value.get('eligible_attack_count')} / 10**",
+              f"- eligible candidate families: **{value.get('eligible_candidate_count')}**",
+              f"- final evaluation allowed: **{value.get('final_evaluation_allowed', False)}**",
+              "- final 30 observed before this gate: **false**",
+              "- Gate 2 held-out 10 used: **false**",
+          ]
+          report = Path(os.environ["RUNNER_TEMP"]) / "GATE1_STEP3B7_CONFIRMATORY_REPORT.md"
+          report.write_text("\n".join(rows) + "\n", encoding="utf-8")
+          PY
+
+          destination=data/gate1/v2/confirmatory
+          report=docs/GATE1_STEP3B7_CONFIRMATORY_REPORT.md
+          generated_report="$RUNNER_TEMP/GATE1_STEP3B7_CONFIRMATORY_REPORT.md"
+          git fetch origin agent/gate1-contract
+          git checkout -B agent/gate1-contract origin/agent/gate1-contract
+          if [ -d "$destination" ]; then
+            diff -ru "$destination" "$SAFE_OUTPUT"
+            diff -u "$report" "$generated_report"
+          else
+            mkdir -p "$destination"
+            cp -a "$SAFE_OUTPUT"/. "$destination"/
+            cp "$generated_report" "$report"
+            git config user.name github-actions[bot]
+            git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+            git add "$destination" "$report"
+            git diff --cached --check
+            git commit -m "Freeze fresh Gate 1 confirmatory decision [skip ci]"
+            git push origin HEAD:agent/gate1-contract
+          fi
+
+      - name: Upload safe confirmatory bundle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate1-step3b7-fresh-confirmatory-safe
+          path: ${{ env.SAFE_OUTPUT }}
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Cleanup private and model files
+        if: always()
+        run: |
+          if [ -d "$PRIVATE_OUTPUT" ]; then
+            find "$PRIVATE_OUTPUT" -type f -print0 | xargs -0 -r shred -u
+            rm -rf "$PRIVATE_OUTPUT"
+          fi
+          rm -rf "$RUNNER_TEMP/hf-wildguard" \
+            "$RUNNER_TEMP/hf-target" \
+            "$RUNNER_TEMP/hf-harmbench" \
+            "$RUNNER_TEMP/wildguard-q8_0.gguf" \
+            "$RUNNER_TEMP/llama-src"
