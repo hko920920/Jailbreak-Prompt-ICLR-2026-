@@ -1,0 +1,42 @@
+name: gate1-stage-run-locator
+
+on:
+  push:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - .github/triggers/**
+
+permissions:
+  actions: read
+  issues: write
+  pull-requests: write
+  contents: read
+
+jobs:
+  locate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Locate all stage runs for this trigger commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          result='[]'
+          for _ in $(seq 1 30); do
+            result="$(gh api \
+              -H 'Accept: application/vnd.github+json' \
+              "/repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$GITHUB_SHA&per_page=100" \
+              --jq '[.workflow_runs[] | {id, name, status, conclusion, html_url}]')"
+            count="$(jq 'length' <<<"$result")"
+            if [ "$count" -ge 2 ]; then
+              break
+            fi
+            sleep 2
+          done
+          body="$(jq -r '
+            ["Gate 1 stage trigger `" + env.GITHUB_SHA + "` launched:"]
+            + map("- " + .name + ": " + .html_url + " (" + .status + ")")
+            | join("\n")
+          ' <<<"$result")"
+          gh pr comment 3 --body "$body"
