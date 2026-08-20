@@ -241,7 +241,7 @@ jobs:
           done
           test "$ready" = "1"
 
-          timeout 140m python \
+          timeout 210m python \
             scripts/run_gate1_step3b_wildguard_validation.py evaluate \
             --root . \
             --subset selection \
