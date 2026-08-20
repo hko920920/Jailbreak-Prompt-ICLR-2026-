@@ -7,6 +7,7 @@ from collections import defaultdict
 from pathlib import Path
 
 import run_gate1_step3b_primary_judge_experiment as core
+
 from jbspan.gate1.step3 import (
     load_jsonl,
     load_step3_contract,
@@ -246,11 +247,7 @@ def prepare(args: argparse.Namespace) -> JsonDict:
         for candidate_id in {str(row["candidate_id"]) for row in identities}
     }
     required = sorted(
-        {
-            program_id
-            for spec in specs.values()
-            for program_id in spec.source_program_ids
-        }
+        {program_id for spec in specs.values() for program_id in spec.source_program_ids}
     )
     programs = parse_h4rm3l_programs(
         args.attack_source_csv.resolve(),
@@ -266,9 +263,7 @@ def prepare(args: argparse.Namespace) -> JsonDict:
     )
     identity_file = load_json(root / "data/gate1/step3/step3_identity.json")
     expected_template = str(
-        _object(identity_file["tokenizer"], where="tokenizer")[
-            "chat_template_sha256"
-        ]
+        _object(identity_file["tokenizer"], where="tokenizer")["chat_template_sha256"]
     )
     if not isinstance(tokenizer.chat_template, str):
         raise RuntimeError("target tokenizer chat template is missing")
@@ -289,9 +284,7 @@ def prepare(args: argparse.Namespace) -> JsonDict:
             programs,
             payload_text=goal,
         )
-        node_ids = [
-            node_id(position, node) for position, node in enumerate(baseline.nodes)
-        ]
+        node_ids = [node_id(position, node) for position, node in enumerate(baseline.nodes)]
         subsets = all_nonempty_subsets(len(baseline.nodes))
         attacks_manifest.append(
             {
@@ -315,8 +308,7 @@ def prepare(args: argparse.Namespace) -> JsonDict:
                     neutralizer=neutralizer,
                 )
                 intervention_id = (
-                    f"ORACLE-{attack_position:02d}-{subset_position:02d}-"
-                    f"{neutralizer}"
+                    f"ORACLE-{attack_position:02d}-{subset_position:02d}-{neutralizer}"
                 )
                 private_rows.append(
                     {
@@ -379,10 +371,7 @@ def target(args: argparse.Namespace) -> JsonDict:
     private = args.private_output_dir.resolve()
     runtime, _, _ = load_step3_contract(root)
     generation = _object(runtime["generation"], where="generation")
-    seeds = [
-        _integer(item, where="seed")
-        for item in _array(generation["seeds"], where="seeds")
-    ]
+    seeds = [_integer(item, where="seed") for item in _array(generation["seeds"], where="seeds")]
     rows = load_jsonl(private / "inputs.private.jsonl")
     outputs: list[JsonDict] = []
     for row in rows:
@@ -428,8 +417,7 @@ def target(args: argparse.Namespace) -> JsonDict:
 def evaluate(args: argparse.Namespace) -> JsonDict:
     private = args.private_output_dir.resolve()
     inputs = {
-        str(row["intervention_id"]): row
-        for row in load_jsonl(private / "inputs.private.jsonl")
+        str(row["intervention_id"]): row for row in load_jsonl(private / "inputs.private.jsonl")
     }
     target_rows = load_jsonl(private / "target_responses.private.jsonl")
     results: list[JsonDict] = []
@@ -463,17 +451,20 @@ def evaluate(args: argparse.Namespace) -> JsonDict:
         parsed_count += int(success is not None)
         results.append(
             {
-                **{key: row[key] for key in (
-                    "intervention_id",
-                    "experiment_id",
-                    "payload_id",
-                    "candidate_id",
-                    "neutralizer_id",
-                    "selected_positions",
-                    "selected_node_ids",
-                    "seed",
-                    "response_sha256",
-                )},
+                **{
+                    key: row[key]
+                    for key in (
+                        "intervention_id",
+                        "experiment_id",
+                        "payload_id",
+                        "candidate_id",
+                        "neutralizer_id",
+                        "selected_positions",
+                        "selected_node_ids",
+                        "seed",
+                        "response_sha256",
+                    )
+                },
                 "primary_success": success,
                 "judge_output": content,
                 "judge_output_sha256": sha256_text(content),
@@ -505,9 +496,7 @@ def finalize_chunk(args: argparse.Namespace) -> JsonDict:
     design_rows = load_jsonl(safe / "design.safe.jsonl")
     target_rows = load_jsonl(private / "target_responses.private.jsonl")
     judge_rows = load_jsonl(private / "wildguard.private.jsonl")
-    judge_index = {
-        (str(row["intervention_id"]), int(row["seed"])): row for row in judge_rows
-    }
+    judge_index = {(str(row["intervention_id"]), int(row["seed"])): row for row in judge_rows}
     if len(judge_index) != len(judge_rows) or len(target_rows) != len(judge_rows):
         raise RuntimeError("oracle judge matrix is incomplete")
 
@@ -556,10 +545,7 @@ def finalize_chunk(args: argparse.Namespace) -> JsonDict:
         first = rows[0]
         node_count = int(first["node_count"])
         subsets = sorted(
-            {
-                tuple(int(item) for item in row["selected_positions"])
-                for row in rows
-            },
+            {tuple(int(item) for item in row["selected_positions"]) for row in rows},
             key=lambda item: (len(item), item),
         )
         stable_by_neutralizer: dict[tuple[str, tuple[int, ...]], str] = {}
@@ -588,11 +574,7 @@ def finalize_chunk(args: argparse.Namespace) -> JsonDict:
                 values = labels[(experiment_id, neutralizer, subset)]
                 safe_seed_count += sum(value is False for value in values)
                 safe_seed_denominator += len(values)
-        seed_stability = (
-            safe_seed_count / safe_seed_denominator
-            if safe_seed_denominator
-            else 0.0
-        )
+        seed_stability = safe_seed_count / safe_seed_denominator if safe_seed_denominator else 0.0
         min_size = min((len(item) for item in minima), default=None)
         attack_results.append(
             {
@@ -676,19 +658,14 @@ def aggregate(args: argparse.Namespace) -> JsonDict:
         raise RuntimeError("oracle result does not cover every eligible attack exactly once")
 
     localized = [row for row in attacks if row["robust_recovery"] is True]
-    interaction = [
-        row for row in localized if row["interaction_or_distributed"] is True
-    ]
+    interaction = [row for row in localized if row["interaction_or_distributed"] is True]
     compact = [row for row in localized if row["one_node_minimal"] is True]
     localized_rate = len(localized) / len(attacks)
     one_node_fraction = len(compact) / len(localized) if localized else 0.0
     interaction_fraction = len(interaction) / len(localized) if localized else 0.0
-    localized_families = {
-        str(row["candidate_id"]) for row in localized
-    }
+    localized_families = {str(row["candidate_id"]) for row in localized}
     weighted_subset_count = sum(
-        _integer(row["tested_subset_count"], where="tested subset count")
-        for row in attacks
+        _integer(row["tested_subset_count"], where="tested subset count") for row in attacks
     )
     neutralizer_agreement = (
         sum(
@@ -701,8 +678,7 @@ def aggregate(args: argparse.Namespace) -> JsonDict:
         else 0.0
     )
     robust_subset_count = sum(
-        len(_array(row["robust_recovery_sets"], where="robust sets"))
-        for row in localized
+        len(_array(row["robust_recovery_sets"], where="robust sets")) for row in localized
     )
     seed_stable_recovery = (
         sum(
@@ -764,14 +740,10 @@ def aggregate(args: argparse.Namespace) -> JsonDict:
         {
             "schema_version": "gate1-exact-oracle-manifest-v1",
             "status": status,
-            "eligible_attack_ids_sha256": canonical_json_sha256(
-                sorted(expected_ids)
-            ),
+            "eligible_attack_ids_sha256": canonical_json_sha256(sorted(expected_ids)),
             "neutralizer_ids_sha256": canonical_json_sha256(list(NEUTRALIZERS)),
             "safe_file_sha256": {
-                path.name: sha256_file(path)
-                for path in sorted(safe.iterdir())
-                if path.is_file()
+                path.name: sha256_file(path) for path in sorted(safe.iterdir()) if path.is_file()
             },
             "gate2_heldout_10_used": False,
             "wavelet_enabled": False,

@@ -277,8 +277,7 @@ def evaluate(args: argparse.Namespace) -> JsonDict:
             if parsed is not None:
                 prompt_harmfulness, response_refusal, response_harmfulness = parsed
                 prediction = int(
-                    response_harmfulness == "harmful"
-                    and response_refusal == "compliance"
+                    response_harmfulness == "harmful" and response_refusal == "compliance"
                 )
             human = int(row["human_majority"])
             labels.append((human, prediction))
@@ -291,8 +290,7 @@ def evaluate(args: argparse.Namespace) -> JsonDict:
                 "prediction": prediction,
                 "baseline_prediction": baseline[index],
                 "parsed": parsed is not None,
-                "agrees_with_baseline": prediction is not None
-                and prediction == baseline[index],
+                "agrees_with_baseline": prediction is not None and prediction == baseline[index],
                 "prompt_harmfulness": prompt_harmfulness,
                 "response_refusal": response_refusal,
                 "response_harmfulness": response_harmfulness,
@@ -314,9 +312,7 @@ def evaluate(args: argparse.Namespace) -> JsonDict:
         }
         write_jsonl(safe / f"{transformation}.safe.jsonl", records)
 
-    overall = all(
-        bool(value["passes_all_thresholds"]) for value in results.values()
-    )
+    overall = all(bool(value["passes_all_thresholds"]) for value in results.values())
     decision: JsonDict = {
         "schema_version": "gate1-step3b-wildguard-wrapper-decision-v1",
         "status": (

@@ -7,6 +7,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import run_gate1_step3b_primary_judge_experiment as core
+
 from jbspan.gate1.step3 import (
     load_jsonl,
     load_step3_contract,
@@ -122,10 +123,7 @@ def target(args: argparse.Namespace) -> JsonDict:
     private = args.private_output_dir.resolve()
     runtime, _, _ = load_step3_contract(root)
     generation = _object(runtime["generation"], where="generation")
-    seeds = [
-        _integer(item, where="seed")
-        for item in _array(generation["seeds"], where="seeds")
-    ]
+    seeds = [_integer(item, where="seed") for item in _array(generation["seeds"], where="seeds")]
     rows = load_jsonl(private / "inputs.private.jsonl")
     if len(rows) != 30:
         raise RuntimeError("final shard input denominator changed")
@@ -173,8 +171,7 @@ def evaluate(args: argparse.Namespace) -> JsonDict:
     root = args.root.resolve()
     private = args.private_output_dir.resolve()
     inputs = {
-        str(row["experiment_id"]): row
-        for row in load_jsonl(private / "inputs.private.jsonl")
+        str(row["experiment_id"]): row for row in load_jsonl(private / "inputs.private.jsonl")
     }
     target_rows = load_jsonl(private / "target_responses.private.jsonl")
     if len(target_rows) != 90:
@@ -214,14 +211,17 @@ def evaluate(args: argparse.Namespace) -> JsonDict:
             parsed_count += int(success is not None)
             results.append(
                 {
-                    **{key: row[key] for key in (
-                        "experiment_id",
-                        "payload_id",
-                        "candidate_id",
-                        "variant",
-                        "seed",
-                        "response_sha256",
-                    )},
+                    **{
+                        key: row[key]
+                        for key in (
+                            "experiment_id",
+                            "payload_id",
+                            "candidate_id",
+                            "variant",
+                            "seed",
+                            "response_sha256",
+                        )
+                    },
                     "primary_success": success,
                     "judge_output": content,
                     "judge_output_sha256": sha256_text(content),
@@ -249,14 +249,17 @@ def evaluate(args: argparse.Namespace) -> JsonDict:
             parsed_count += int(parsed is not None)
             results.append(
                 {
-                    **{key: row[key] for key in (
-                        "experiment_id",
-                        "payload_id",
-                        "candidate_id",
-                        "variant",
-                        "seed",
-                        "response_sha256",
-                    )},
+                    **{
+                        key: row[key]
+                        for key in (
+                            "experiment_id",
+                            "payload_id",
+                            "candidate_id",
+                            "variant",
+                            "seed",
+                            "response_sha256",
+                        )
+                    },
                     "harmbench_harmful": parsed,
                     "judge_output": content,
                     "judge_output_sha256": sha256_text(content),
@@ -279,12 +282,9 @@ def finalize_shard(args: argparse.Namespace) -> JsonDict:
     sensitivity_rows = load_jsonl(private / "harmbench.private.jsonl")
     if any(len(rows) != 90 for rows in (target_rows, primary_rows, sensitivity_rows)):
         raise RuntimeError("final shard result matrix is incomplete")
-    primary_index = {
-        (str(row["experiment_id"]), int(row["seed"])): row for row in primary_rows
-    }
+    primary_index = {(str(row["experiment_id"]), int(row["seed"])): row for row in primary_rows}
     sensitivity_index = {
-        (str(row["experiment_id"]), int(row["seed"])): row
-        for row in sensitivity_rows
+        (str(row["experiment_id"]), int(row["seed"])): row for row in sensitivity_rows
     }
     labels: dict[str, list[bool | None]] = defaultdict(list)
     parsed = 0
@@ -341,9 +341,7 @@ def finalize_shard(args: argparse.Namespace) -> JsonDict:
                     else "EVALUATOR_ABSTAIN"
                     for value in values
                 ],
-                "payload_preserved_exactly_once": design[
-                    "payload_preserved_exactly_once"
-                ],
+                "payload_preserved_exactly_once": design["payload_preserved_exactly_once"],
             }
         )
     summary: JsonDict = {
@@ -390,10 +388,7 @@ def load_json(path: Path) -> JsonDict:
 def aggregate(args: argparse.Namespace) -> JsonDict:
     shards_root = args.shards_root.resolve()
     safe = args.safe_output_dir.resolve()
-    summaries = {
-        shard: load_json(find_shard_summary(shards_root, shard))
-        for shard in ALL_SHARDS
-    }
+    summaries = {shard: load_json(find_shard_summary(shards_root, shard)) for shard in ALL_SHARDS}
     if any(value.get("status") != "GATE1_FINAL_SHARD_COMPLETE" for value in summaries.values()):
         raise RuntimeError("one or more final shards are incomplete")
 
@@ -430,8 +425,7 @@ def aggregate(args: argparse.Namespace) -> JsonDict:
         payload_id = str(row["payload_id"])
         candidate_id = str(row["candidate_id"])
         is_eligible = (
-            original_by_payload[payload_id] == "SAFE"
-            and str(row["stable_label"]) == "HARMFUL"
+            original_by_payload[payload_id] == "SAFE" and str(row["stable_label"]) == "HARMFUL"
         )
         eligible += int(is_eligible)
         if is_eligible:
@@ -461,11 +455,7 @@ def aggregate(args: argparse.Namespace) -> JsonDict:
     )
     decision: JsonDict = {
         "schema_version": "gate1-final-decision-v1",
-        "status": (
-            "GATE1_FINAL_ELIGIBILITY_PASS"
-            if passed
-            else "GATE1_FINAL_ELIGIBILITY_FAIL"
-        ),
+        "status": ("GATE1_FINAL_ELIGIBILITY_PASS" if passed else "GATE1_FINAL_ELIGIBILITY_FAIL"),
         "passes_all_thresholds": passed,
         "causal_oracle_allowed": passed,
         "primary_evaluator": "official_wildguard_7b_q8_0",
@@ -491,9 +481,7 @@ def aggregate(args: argparse.Namespace) -> JsonDict:
             "shard_ids": list(ALL_SHARDS),
             "shard_ids_sha256": canonical_json_sha256(list(ALL_SHARDS)),
             "safe_file_sha256": {
-                path.name: sha256_file(path)
-                for path in sorted(safe.iterdir())
-                if path.is_file()
+                path.name: sha256_file(path) for path in sorted(safe.iterdir()) if path.is_file()
             },
             "gate2_heldout_10_used": False,
             "wavelet_enabled": False,
