@@ -1,0 +1,220 @@
+name: repair-gate1-orchestration
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - .github/workflows/repair_gate1_orchestration.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: repair-gate1-orchestration
+  cancel-in-progress: true
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/gate1-contract
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Make all Gate 1 stages reusable and fix Q8 access assertion
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          workflows = (
+              Path(".github/workflows/gate1_step3b_wildguard_q8_canonical.yml"),
+              Path(".github/workflows/gate1_step3b_wildguard_wrapper_stability.yml"),
+              Path(".github/workflows/gate1_step3b_confirmatory.yml"),
+              Path(".github/workflows/gate1_step3b_final_eligibility.yml"),
+              Path(".github/workflows/gate1_exact_oracle.yml"),
+          )
+          for path in workflows:
+              text = path.read_text(encoding="utf-8")
+              old = "on:\n  workflow_dispatch:\n"
+              new = "on:\n  workflow_call:\n  workflow_dispatch:\n"
+              if "  workflow_call:\n" not in text:
+                  if old not in text:
+                      raise SystemExit(f"workflow trigger marker missing: {path}")
+                  text = text.replace(old, new, 1)
+              path.write_text(text, encoding="utf-8")
+
+          q8_path = workflows[0]
+          q8 = q8_path.read_text(encoding="utf-8")
+          old_assertion = '          test "$WILDGUARD_ACCESS_OK" = "true"\n'
+          new_assertion = '''          python - <<'PY'\n          import json\n          import os\n          from pathlib import Path\n\n          value = json.loads(\n              (Path(os.environ["SAFE_OUTPUT"]) / "wildguard_preflight.json").read_text()\n          )\n          if value.get("access_ok") is not True:\n              raise SystemExit("official WildGuard access preflight did not pass")\n          PY\n'''
+          if old_assertion not in q8:
+              raise SystemExit("stale same-step GITHUB_ENV assertion not found")
+          q8 = q8.replace(old_assertion, new_assertion, 1)
+          q8_path.write_text(q8, encoding="utf-8")
+          PY
+
+      - name: Archive the non-scientific Q8 operational attempt
+        run: |
+          if [ -d data/gate1/v2/wildguard_q8 ]; then
+            test ! -e data/gate1/v2/wildguard_q8_operational_32357880091
+            git mv \
+              data/gate1/v2/wildguard_q8 \
+              data/gate1/v2/wildguard_q8_operational_32357880091
+          fi
+          if [ -f docs/GATE1_STEP3B5_WILDGUARD_Q8_RESULT.md ]; then
+            git mv \
+              docs/GATE1_STEP3B5_WILDGUARD_Q8_RESULT.md \
+              docs/GATE1_STEP3B5_WILDGUARD_Q8_OPERATIONAL_32357880091.md
+          fi
+
+      - name: Create the single-run Gate 1 orchestrator
+        run: |
+          cat >.github/workflows/gate1_full_orchestrator.yml <<'YAML'
+          name: gate1-full-canonical-orchestrator
+
+          on:
+            workflow_dispatch:
+            push:
+              branches:
+                - agent/gate1-contract
+              paths:
+                - .github/workflows/gate1_full_orchestrator.yml
+
+          permissions:
+            contents: write
+            issues: write
+            pull-requests: write
+
+          concurrency:
+            group: gate1-full-canonical-orchestrator
+            cancel-in-progress: true
+
+          jobs:
+            q8_external_validation:
+              uses: ./.github/workflows/gate1_step3b_wildguard_q8_canonical.yml
+              secrets: inherit
+
+            wrapper_stability:
+              needs: q8_external_validation
+              if: always() && needs.q8_external_validation.result == 'success'
+              uses: ./.github/workflows/gate1_step3b_wildguard_wrapper_stability.yml
+              secrets: inherit
+
+            fresh_confirmatory:
+              needs: wrapper_stability
+              if: always() && needs.wrapper_stability.result == 'success'
+              uses: ./.github/workflows/gate1_step3b_confirmatory.yml
+              secrets: inherit
+
+            final_eligibility:
+              needs: fresh_confirmatory
+              if: always() && needs.fresh_confirmatory.result == 'success'
+              uses: ./.github/workflows/gate1_step3b_final_eligibility.yml
+              secrets: inherit
+
+            exact_oracle:
+              needs: final_eligibility
+              if: always() && needs.final_eligibility.result == 'success'
+              uses: ./.github/workflows/gate1_exact_oracle.yml
+              secrets: inherit
+
+            publish_summary:
+              needs:
+                - q8_external_validation
+                - wrapper_stability
+                - fresh_confirmatory
+                - final_eligibility
+                - exact_oracle
+              if: always()
+              runs-on: ubuntu-latest
+              steps:
+                - uses: actions/checkout@v4
+                  with:
+                    ref: agent/gate1-contract
+                    fetch-depth: 0
+                - name: Publish final execution status
+                  env:
+                    GH_TOKEN: ${{ github.token }}
+                  run: |
+                    git fetch origin agent/gate1-contract
+                    git checkout -B agent/gate1-contract origin/agent/gate1-contract
+                    decision=data/gate1/v2/oracle/gate1_decision.json
+                    if [ -f "$decision" ]; then
+                      status="$(jq -r '.gate1_decision // .status' "$decision")"
+                    else
+                      status=GATE1_OPERATIONAL_INCOMPLETE
+                    fi
+                    {
+                      echo '# Gate 1 canonical orchestration'
+                      echo
+                      echo "- Q8 external validation: **${{ needs.q8_external_validation.result }}**"
+                      echo "- wrapper stability: **${{ needs.wrapper_stability.result }}**"
+                      echo "- fresh confirmatory: **${{ needs.fresh_confirmatory.result }}**"
+                      echo "- final eligibility: **${{ needs.final_eligibility.result }}**"
+                      echo "- exact oracle: **${{ needs.exact_oracle.result }}**"
+                      echo "- final Gate 1 status: **$status**"
+                    } >>"$GITHUB_STEP_SUMMARY"
+                    gh pr comment 3 --body \
+                      "Gate 1 canonical orchestration: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID — final status: **$status**"
+          YAML
+          sed -i 's/^          //' .github/workflows/gate1_full_orchestrator.yml
+
+      - name: Validate repaired workflows and complete pipeline source
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev,step3]'
+          python -m pip install pyyaml
+          python - <<'PY'
+          from pathlib import Path
+          import yaml
+
+          paths = (
+              Path(".github/workflows/gate1_step3b_wildguard_q8_canonical.yml"),
+              Path(".github/workflows/gate1_step3b_wildguard_wrapper_stability.yml"),
+              Path(".github/workflows/gate1_step3b_confirmatory.yml"),
+              Path(".github/workflows/gate1_step3b_final_eligibility.yml"),
+              Path(".github/workflows/gate1_exact_oracle.yml"),
+              Path(".github/workflows/gate1_full_orchestrator.yml"),
+          )
+          for path in paths:
+              value = yaml.safe_load(path.read_text(encoding="utf-8"))
+              if not isinstance(value, dict):
+                  raise SystemExit(f"invalid workflow document: {path}")
+          PY
+          ruff check \
+            scripts/run_gate1_step3b_wildguard_wrapper_stability.py \
+            scripts/run_gate1_step3b_primary_judge_experiment.py \
+            scripts/run_gate1_step3b_final_shard.py \
+            scripts/run_gate1_exact_oracle.py
+          mypy src/jbspan
+          pytest \
+            tests/test_gate1_step3b_wildguard_wrapper_stability.py \
+            tests/test_gate1_step3b_primary_judge_experiment.py \
+            tests/test_gate1_exact_oracle.py
+          git diff --check
+
+      - name: Commit the repaired end-to-end orchestration
+        run: |
+          git rm .github/workflows/repair_gate1_orchestration.yml
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -- \
+            .github/workflows/gate1_step3b_wildguard_q8_canonical.yml \
+            .github/workflows/gate1_step3b_wildguard_wrapper_stability.yml \
+            .github/workflows/gate1_step3b_confirmatory.yml \
+            .github/workflows/gate1_step3b_final_eligibility.yml \
+            .github/workflows/gate1_exact_oracle.yml \
+            .github/workflows/gate1_full_orchestrator.yml \
+            data/gate1/v2/wildguard_q8_operational_32357880091 \
+            docs/GATE1_STEP3B5_WILDGUARD_Q8_OPERATIONAL_32357880091.md
+          git diff --cached --check
+          git commit -m "Repair and connect the complete Gate 1 pipeline [skip ci]"
+          git push origin HEAD:agent/gate1-contract
