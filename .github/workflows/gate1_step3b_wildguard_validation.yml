@@ -194,21 +194,18 @@ jobs:
               handle.write(f"WILDGUARD_MODEL_DIR={snapshot}\n")
           PY
 
-      - name: Convert and quantize official WildGuard
+      - name: Convert official WildGuard to Q8_0
         if: env.WILDGUARD_ACCESS_OK == 'true'
         run: |
-          f16="$RUNNER_TEMP/wildguard-f16.gguf"
-          q4="$RUNNER_TEMP/wildguard-q4_k_m.gguf"
+          q8="$RUNNER_TEMP/wildguard-q8_0.gguf"
           python "$LLAMA_SOURCE/convert_hf_to_gguf.py" \
             "$WILDGUARD_MODEL_DIR" \
-            --outfile "$f16" \
-            --outtype f16
+            --outfile "$q8" \
+            --outtype q8_0
           rm -rf "$RUNNER_TEMP/hf-wildguard"
-          "$LLAMA_QUANTIZE" "$f16" "$q4" Q4_K_M
-          rm -f "$f16"
-          test -s "$q4"
-          echo "WILDGUARD_GGUF=$q4" >> "$GITHUB_ENV"
-          echo "WILDGUARD_GGUF_SHA256=$(sha256sum "$q4" | cut -d' ' -f1)" \
+          test -s "$q8"
+          echo "WILDGUARD_GGUF=$q8" >> "$GITHUB_ENV"
+          echo "WILDGUARD_GGUF_SHA256=$(sha256sum "$q8" | cut -d' ' -f1)" \
             >> "$GITHUB_ENV"
           df -h
 
