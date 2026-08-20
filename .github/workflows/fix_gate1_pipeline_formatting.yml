@@ -17,6 +17,8 @@ on:
 
 permissions:
   contents: write
+  issues: write
+  pull-requests: write
 
 concurrency:
   group: fix-gate1-pipeline-formatting
@@ -30,6 +32,12 @@ jobs:
         with:
           ref: agent/gate1-contract
           fetch-depth: 0
+      - name: Publish formatting-run marker
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr comment 3 --body \
+            "Gate 1 formatting run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
