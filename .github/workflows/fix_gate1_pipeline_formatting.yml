@@ -57,6 +57,24 @@ jobs:
             tests/test_gate1_exact_oracle.py
           )
           ruff check --fix "${files[@]}"
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("scripts/run_gate1_step3b_primary_judge_experiment.py")
+          text = path.read_text(encoding="utf-8")
+          old = (
+              "def source_payloads_for_final(root: Path, source_csv: Path) "
+              "-> tuple[dict[str, JsonDict], list[str]]:\n"
+          )
+          new = (
+              "def source_payloads_for_final(\n"
+              "    root: Path, source_csv: Path\n"
+              ") -> tuple[dict[str, JsonDict], list[str]]:\n"
+          )
+          if old not in text and new not in text:
+              raise SystemExit("source_payloads_for_final signature not found")
+          path.write_text(text.replace(old, new, 1), encoding="utf-8")
+          PY
           ruff format "${files[@]}"
           ruff check "${files[@]}"
           git diff --check
