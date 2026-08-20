@@ -1,0 +1,13 @@
+{
+  "contract_sha256": "da5e629ffd7e0a4fd15db11036b22dc06a1dfd908f23fee4e181d3bff5300da7",
+  "final_evaluation_30_observed": false,
+  "gate2_heldout_10_used": false,
+  "safe_bundle_identity_sha256": "6b2112ae901513a4251b0a07426b137c7810c47da6e55e122f173a06734963c8",
+  "safe_file_sha256": {
+    "wildguard_decision.json": "15bfeec5a3764e5ac0e84bcaa687f4e9a00507b4c38f8284498cd9a56374d366",
+    "wildguard_preflight.json": "52effb50495e37b77a1d2b461dfe03270128062f1549c87c965ba456e7c6158b",
+    "wildguard_runtime.json": "60918d02066e315f23b4aee81836c5f78f579a7e8f9e9c6921efbe938201d4c7"
+  },
+  "schema_version": "gate1-step3b-wildguard-manifest-v1",
+  "status": "WILDGUARD_RUNTIME_OR_SELECTION_NOT_COMPLETED"
+}
