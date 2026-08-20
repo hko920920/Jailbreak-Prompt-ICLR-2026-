@@ -1,0 +1,8 @@
+{
+  "raw_text_committed": false,
+  "schema_version": "gate1-step3b-wildguard-design-manifest-v1",
+  "selection_count": 200,
+  "selection_ids_sha256": "f3a88da89ea5a814897f3925255e930cf40fdc2ce02952c6f46fbcc2cc200885",
+  "validation_count": 100,
+  "validation_ids_sha256": "795b0bf35c217733e600b9bd90836a0267637a9cd1b5d258463726ef89c9266b"
+}

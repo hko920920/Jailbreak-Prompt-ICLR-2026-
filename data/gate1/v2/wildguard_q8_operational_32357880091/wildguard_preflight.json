@@ -1,0 +1,56 @@
+{
+  "access_ok": true,
+  "error_type": null,
+  "files": [
+    {
+      "filename": "added_tokens.json",
+      "size": 18292
+    },
+    {
+      "filename": "config.json",
+      "size": 649
+    },
+    {
+      "filename": "generation_config.json",
+      "size": 116
+    },
+    {
+      "filename": "model-00001-of-00002.safetensors",
+      "sha256": "093f6d42cd8153a552c5fc03ece1dc04855c152f791201603deefb4818821bc0",
+      "size": 9949281344
+    },
+    {
+      "filename": "model-00002-of-00002.safetensors",
+      "sha256": "99c175a413115200d30910546c898baf3a1c664f5131e5bb717d4b4d542181a5",
+      "size": 4546815992
+    },
+    {
+      "filename": "model.safetensors.index.json",
+      "size": 25125
+    },
+    {
+      "filename": "pytorch_model.bin.index.json",
+      "size": 23950
+    },
+    {
+      "filename": "special_tokens_map.json",
+      "size": 16201
+    },
+    {
+      "filename": "tokenizer.model",
+      "sha256": "37f00374dea48658ee8f5d0f21895b9bc55cb0103939607c8185bfd1c6ca1f89",
+      "size": 587404
+    },
+    {
+      "filename": "tokenizer_config.json",
+      "size": 152968
+    }
+  ],
+  "final_evaluation_30_observed": false,
+  "gate2_heldout_10_used": false,
+  "model_revision": "cbba4823f3e8020e5a74a5e29bf85072def6f2ff",
+  "official_model_repository": "allenai/wildguard",
+  "raw_model_content_committed": false,
+  "schema_version": "gate1-step3b-wildguard-preflight-v1",
+  "status": "WILDGUARD_ACCESS_AND_IDENTITY_FROZEN"
+}

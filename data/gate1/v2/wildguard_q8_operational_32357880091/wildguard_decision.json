@@ -9,7 +9,7 @@
   "schema_version": "gate1-step3b-wildguard-decision-v1",
   "selected_evaluator": null,
   "selection_pass": false,
-  "status": "WILDGUARD_SELECTION_FAIL",
+  "status": "WILDGUARD_RUNTIME_OR_SELECTION_NOT_COMPLETED",
   "validation_pass": false,
   "wrapper_stability_required": true
 }

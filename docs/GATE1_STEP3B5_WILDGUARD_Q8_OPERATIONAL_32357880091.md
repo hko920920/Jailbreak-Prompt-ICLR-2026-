@@ -2,7 +2,7 @@
 
 Date: 2026-08-20 (Asia/Seoul)
 
-Status: **WILDGUARD_SELECTION_FAIL**
+Status: **WILDGUARD_RUNTIME_OR_SELECTION_NOT_COMPLETED**
 
 ## Decision
 
@@ -17,14 +17,9 @@ Status: **WILDGUARD_SELECTION_FAIL**
 
 ## Frozen metrics
 
-### Selection
-
-- count: **200**
-- parse coverage: **1.000000**
-- accuracy: **0.885000**
-- macro-F1: **0.879426**
-- false-negative rate: **0.082192**
-- false-positive rate: **0.133858**
-- passes all thresholds: **False**
-
+- selection: **not observed**
 - validation: **not observed**
+## Scientific boundary
+
+No threshold, split, prompt, parser, label contract, or seed was changed after observing Q4.
+Confirmatory smoke, final 30, causal oracle, adaptive search, and wavelet remain sealed unless the predeclared continuation gate authorizes them.
