@@ -22,8 +22,11 @@
       "release_tag": "b10441",
       "release_asset": "llama-b10441-bin-ubuntu-x64.tar.gz",
       "intermediate_outtype": "f16",
-      "quantization": "Q4_K_M"
-    }
+      "intermediate_outtype": "q8_0",
+      "quantization": "Q8_0_DIRECT",
+      "selection_candidate": "FINAL_HIGH_FIDELITY_RUNTIME_CANDIDATE",
+      "previous_q4_selection_run": 32229162422,
+      "no_further_runtime_candidates_if_selection_fails": true
   },
   "source": {
     "repository": "JailbreakBench/JBB-Behaviors",
