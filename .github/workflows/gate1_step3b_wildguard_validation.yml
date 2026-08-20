@@ -252,7 +252,7 @@ jobs:
           selection_pass="$(jq -r '.passes_all_thresholds' \
             "$SAFE_OUTPUT/wildguard_selection_metrics.json")"
           if [ "$selection_pass" = "true" ]; then
-            timeout 70m python \
+            timeout 105m python \
               scripts/run_gate1_step3b_wildguard_validation.py evaluate \
               --root . \
               --subset validation \
