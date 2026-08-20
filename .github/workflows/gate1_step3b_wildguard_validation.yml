@@ -358,6 +358,6 @@ jobs:
             rm -rf "$PRIVATE_OUTPUT"
           fi
           rm -rf "$RUNNER_TEMP/hf-wildguard" \
-            "$RUNNER_TEMP/wildguard-q4_k_m.gguf" \
+            "$RUNNER_TEMP/wildguard-q8_0.gguf" \
             "$RUNNER_TEMP/wildguard-source" \
             "$RUNNER_TEMP/llama-src"
