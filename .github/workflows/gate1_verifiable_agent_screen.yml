@@ -1,0 +1,174 @@
+name: gate1-verifiable-agent-screen
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - .github/workflows/gate1_verifiable_agent_screen.yml
+      - configs/gate1/gate1_verifiable_agent_screen.json
+      - data/gate1/verifiable_agent_screen_runtime.zip
+      - docs/GATE1_VERIFIABLE_AGENT_SCREEN_PROTOCOL.md
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: gate1-verifiable-agent-screen
+  cancel-in-progress: true
+
+jobs:
+  screen:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 340
+    env:
+      MODEL_REF: Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M
+      CONFIG: configs/gate1/gate1_verifiable_agent_screen.json
+      SCREEN_OUTPUT: artifacts/gate1-verifiable-agent-screen/screen.json
+      PIP_NO_CACHE_DIR: "1"
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/gate1-contract
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Materialize pinned screen runtime bundle
+        run: |
+          test "$(sha256sum data/gate1/verifiable_agent_screen_runtime.zip | cut -d' ' -f1)" = \
+            "7e9eddd22ca49a9f33369ba26d0fec4d42ac74fd6b603440b5ea98c7f74a373d"
+          unzip -q data/gate1/verifiable_agent_screen_runtime.zip -d .
+
+      - name: Validate frozen screen implementation
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev]'
+          ruff check \
+            src/jbspan/gate1/verifiable_agent.py \
+            scripts/run_verifiable_agent_screen.py \
+            tests/test_verifiable_agent_screen.py
+          mypy src/jbspan
+          pytest tests/test_verifiable_agent_screen.py
+          python -m json.tool "$CONFIG" >/dev/null
+          git diff --check
+
+      - name: Install official llama.cpp runtime
+        run: |
+          curl -LsSf https://llama.app/install.sh | \
+            SKIP_CUDA=1 SKIP_ROCM=1 SKIP_VULKAN=1 sh
+          ~/.llama-app/llama --version
+
+      - name: Start Qwen2.5-7B-Instruct sandbox model
+        run: |
+          export HF_HOME="$RUNNER_TEMP/huggingface"
+          mkdir -p "$HF_HOME" "$RUNNER_TEMP/llama-server"
+          nohup ~/.llama-app/llama serve \
+            -hf "$MODEL_REF" \
+            --host 127.0.0.1 \
+            --port 8080 \
+            -c 6144 \
+            -t 4 \
+            >"$RUNNER_TEMP/llama-server/server.log" 2>&1 &
+          echo "$!" >"$RUNNER_TEMP/llama-server/pid"
+
+          ready=0
+          for _ in $(seq 1 180); do
+            if ! kill -0 "$(cat "$RUNNER_TEMP/llama-server/pid")" 2>/dev/null; then
+              tail -n 100 "$RUNNER_TEMP/llama-server/server.log"
+              exit 1
+            fi
+            status="$(curl -sS -o /dev/null -w '%{http_code}' \
+              http://127.0.0.1:8080/health || true)"
+            if [ "$status" = "200" ]; then
+              ready=1
+              break
+            fi
+            sleep 10
+          done
+          test "$ready" = "1"
+
+      - name: Run calibration and untouched confirmatory only
+        run: |
+          mkdir -p "$(dirname "$SCREEN_OUTPUT")"
+          timeout 300m python scripts/run_verifiable_agent_screen.py \
+            --config "$CONFIG" \
+            --server-url http://127.0.0.1:8080 \
+            --output "$SCREEN_OUTPUT"
+          test "$(jq -r '.final_partition_observed' "$SCREEN_OUTPUT")" = "false"
+          test "$(jq -r '.design.final_model_call_count' "$SCREEN_OUTPUT")" = "0"
+
+      - name: Publish safe screen summary
+        if: always()
+        run: |
+          if [ -f "$SCREEN_OUTPUT" ]; then
+            {
+              echo '# Verifiable-agent Gate 1 screen'
+              echo
+              echo "- status: **$(jq -r '.status' "$SCREEN_OUTPUT")**"
+              echo "- selected programs: **$(jq -c '.selected_programs' "$SCREEN_OUTPUT")**"
+              echo "- confirmatory eligible: **$(jq -r '.confirmatory_summary.eligible_count' "$SCREEN_OUTPUT") / 15**"
+              echo "- eligible programs: **$(jq -c '.confirmatory_summary.eligible_programs' "$SCREEN_OUTPUT")**"
+              echo "- baseline utility: **$(jq -r '.confirmatory_summary.baseline_utility_count' "$SCREEN_OUTPUT") / 15**"
+              echo "- payload-only safe utility: **$(jq -r '.confirmatory_summary.payload_only_safe_utility_count' "$SCREEN_OUTPUT") / 15**"
+              echo "- parse coverage: **$(jq -r '.confirmatory_summary.parse_coverage' "$SCREEN_OUTPUT")**"
+              echo "- model calls: **$(jq -r '.model_call_count' "$SCREEN_OUTPUT")**"
+              echo '- final partition observed: **false**'
+              echo '- human/LLM judge used: **false**'
+              echo '- real-world side effects: **false**'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload safe screen artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate1-verifiable-agent-screen
+          path: ${{ env.SCREEN_OUTPUT }}
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Report run to PR 3
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          run_url="https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          if [ -f "$SCREEN_OUTPUT" ]; then
+            status="$(jq -r '.status' "$SCREEN_OUTPUT")"
+            eligible="$(jq -r '.confirmatory_summary.eligible_count' "$SCREEN_OUTPUT")"
+            programs="$(jq -c '.confirmatory_summary.eligible_programs' "$SCREEN_OUTPUT")"
+            criteria="$(jq -c '.confirmatory_summary.criteria' "$SCREEN_OUTPUT")"
+            next="$(jq -r '.permitted_next_operation' "$SCREEN_OUTPUT")"
+            body=$(cat <<EOF
+          ## Verifiable-agent Gate 1 screen result
+
+          - run: $run_url
+          - status: **$status**
+          - confirmatory eligible: **$eligible / 15**
+          - eligible programs: **$programs**
+          - criteria: \`$criteria\`
+          - final partition observed: **false**
+          - human/LLM judge used: **false**
+          - next permitted operation: **$next**
+          EOF
+          )
+          else
+            body="Verifiable-agent Gate 1 screen did not produce a safe result artifact. Run: $run_url"
+          fi
+          gh pr comment 3 --body "$body"
+
+      - name: Stop local model server
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/llama-server/pid" ]; then
+            kill "$(cat "$RUNNER_TEMP/llama-server/pid")" 2>/dev/null || true
+          fi
+          rm -rf "$RUNNER_TEMP/huggingface"
