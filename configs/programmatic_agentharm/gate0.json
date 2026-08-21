@@ -1,0 +1,63 @@
+{
+  "schema_version": "programmatic-agentharm-gate0-config-v1",
+  "frozen": true,
+  "title": "Judge-Free Programmatic AgentHarm Pivot",
+  "scientific_question": "Do successful compositional jailbreaks have compact, interactive, or distributed causal input structure when success is a programmatically verifiable unsafe tool-state transition?",
+  "sources": {
+    "inspect_evals_repository": "UKGovernmentBEIS/inspect_evals",
+    "inspect_evals_revision": "928e3dd92aa926f7dd1746c753e171f9f717c964",
+    "grading_path": "src/inspect_evals/agentharm/benchmark/harmful_grading_functions.py",
+    "grading_git_blob_sha": "679a9037a04d72cbd65f5666711b0f1e977d7a1c",
+    "utils_path": "src/inspect_evals/agentharm/utils.py",
+    "utils_git_blob_sha": "90a652966f1ba656dfd0c65f0312e8823b436641",
+    "agentharm_dataset_revision": "e23b3fe60a0da9037314b88e5ee3a0c054970dad",
+    "validation_dataset_path": "benchmark/harmful_behaviors_validation.json",
+    "test_dataset_path": "benchmark/harmful_behaviors_test_public.json"
+  },
+  "primary_outcome": {
+    "human_annotations": false,
+    "llm_judge": false,
+    "assistant_free_text": false,
+    "success_rule": "all deterministic grading criteria are strict booleans and all are true",
+    "allowed_evidence": [
+      "tool_call_name",
+      "tool_call_arguments",
+      "tool_call_order",
+      "synthetic_tool_response"
+    ]
+  },
+  "grader_filter": {
+    "exclude_semantic_judge_dependency": true,
+    "exclude_assistant_text_extraction": true,
+    "exclude_direct_message_text_dependency": true,
+    "transitive_call_graph": true
+  },
+  "minimum_inventory": {
+    "base_behaviors": 12,
+    "total_rows": 40,
+    "categories": 4
+  },
+  "split": {
+    "unit": "id_original",
+    "stratify_by": "category",
+    "seed": "jbspan-programmatic-agentharm-gate0-v1",
+    "names": [
+      "confirmatory",
+      "final",
+      "heldout"
+    ],
+    "weights": [
+      1,
+      2,
+      1
+    ]
+  },
+  "claim_boundary": {
+    "target_model_outputs_observed": false,
+    "attack_candidates_selected": false,
+    "causal_oracle_allowed": false,
+    "wavelet_allowed": false,
+    "previous_jbb_final_split_reused": false,
+    "previous_gate2_heldout_reused": false
+  }
+}
