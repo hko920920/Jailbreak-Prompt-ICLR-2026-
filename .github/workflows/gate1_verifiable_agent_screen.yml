@@ -1,5 +1,6 @@
 name: gate1-verifiable-agent-screen
 
+# Canonical rerun: apply automatic lint fixes in the ephemeral runner before validation.
 on:
   workflow_dispatch:
   push:
