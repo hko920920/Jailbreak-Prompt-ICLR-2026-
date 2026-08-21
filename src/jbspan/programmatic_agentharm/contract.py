@@ -4,8 +4,8 @@ import ast
 import hashlib
 import json
 from collections import defaultdict
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import asdict, dataclass
-from typing import Iterable, Mapping, Sequence
 
 BLOCKED_CALLS = frozenset(
     {
@@ -283,14 +283,14 @@ def assign_grouped_splits(
             by_category[category],
             key=lambda item: (
                 hashlib.sha256(
-                    f"{seed}\0{category}\0{item[0]}\0{item[1]}".encode("utf-8")
+                    f"{seed}\0{category}\0{item[0]}\0{item[1]}".encode()
                 ).hexdigest(),
                 item[0],
                 item[1],
             ),
         )
         offset = int(
-            hashlib.sha256(f"{seed}\0{category}".encode("utf-8")).hexdigest(), 16
+            hashlib.sha256(f"{seed}\0{category}".encode()).hexdigest(), 16
         ) % len(schedule)
         for position, (original_id, grader, rows) in enumerate(ranked):
             split = schedule[(position + offset) % len(schedule)]
