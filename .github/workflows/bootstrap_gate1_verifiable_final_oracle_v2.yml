@@ -1,0 +1,229 @@
+name: bootstrap-gate1-verifiable-final-oracle-v2
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - .github/workflows/bootstrap_gate1_verifiable_final_oracle_v2.yml
+
+permissions:
+  actions: write
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: bootstrap-gate1-verifiable-final-oracle-v2
+  cancel-in-progress: true
+
+jobs:
+  materialize:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      SOURCE_BOOTSTRAP: .github/workflows/bootstrap_and_run_gate1_verifiable_screen_v2.yml
+      PAYLOAD_SHA256: 461ae720c45f4bd0e20d2f8589de9428f07d6d75614890c09e97695b9825a189
+      SCREEN_RUNTIME: data/gate1/verifiable_agent_screen/runtime.json
+      EXPECTED_SCREEN_CANONICAL_SHA256: 3a0f0fc8e2940126ace0bc055a50010a0090ad2f489ab620d96902db7e937165
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/gate1-contract
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Extract pre-screen frozen v2 package
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+
+          text = Path(os.environ["SOURCE_BOOTSTRAP"]).read_text(encoding="utf-8")
+          marker = "cat > \"$RUNNER_TEMP/gate1-verifiable-agent-screen-v2.b64\" <<'PAYLOAD_B64'\n"
+          start = text.index(marker) + len(marker)
+          end = text.index("\n          PAYLOAD_B64", start)
+          lines = [line.strip() for line in text[start:end].splitlines() if line.strip()]
+          Path(os.environ["RUNNER_TEMP"], "verifiable-agent-v2.b64").write_text(
+              "\n".join(lines) + "\n", encoding="utf-8"
+          )
+          PY
+          base64 --decode "$RUNNER_TEMP/verifiable-agent-v2.b64" >"$RUNNER_TEMP/verifiable-agent-v2.tar.gz"
+          test "$(sha256sum "$RUNNER_TEMP/verifiable-agent-v2.tar.gz" | cut -d' ' -f1)" = "$PAYLOAD_SHA256"
+          tar -xzf "$RUNNER_TEMP/verifiable-agent-v2.tar.gz" -C .
+          git checkout -- .github/workflows/gate1_verifiable_agent_screen.yml
+
+      - name: Add compatibility validator for the completed v1 screen only
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("scripts/run_verifiable_agent_gate1.py")
+          text = path.read_text(encoding="utf-8").replace(
+              "from typing import Iterable\n",
+              "from collections.abc import Iterable\n",
+          )
+          start = text.index("def validate_screen_identity(")
+          end = text.index("\n\ndef run_screen_with_client(", start)
+          replacement = '''def validate_screen_identity(
+              screen: dict[str, object],
+              config: dict[str, object],
+              scenarios: tuple[Scenario, ...],
+              programs: tuple[AttackProgram, ...],
+          ) -> None:
+              if screen.get("schema_version") not in {"gate1-verifiable-agent-v1", SCHEMA_VERSION}:
+                  raise Gate1Error("screen schema mismatch")
+              if screen.get("status") != "SCREEN_PASS":
+                  raise Gate1Error("final evaluation requires SCREEN_PASS")
+
+              expected = design_identity(scenarios, programs)
+              observed = object_value(screen.get("design"), "screen design")
+              required_pairs = {
+                  "scenario_count": expected["scenario_count"],
+                  "scenario_identity_sha256": expected["scenario_identity_sha256"],
+                  "program_count": expected["program_count"],
+                  "program_identity_sha256": expected["program_identity_sha256"],
+                  "calibration_count": expected["calibration_count"],
+                  "confirmatory_count": expected["confirmatory_count"],
+              }
+              for key, value in required_pairs.items():
+                  if observed.get(key) != value:
+                      raise Gate1Error(f"screen design identity mismatch: {key}")
+
+              final_count = observed.get(
+                  "sealed_final_scenario_count", observed.get("final_scenario_count")
+              )
+              if final_count != expected["sealed_final_scenario_count"]:
+                  raise Gate1Error("screen final-scenario count mismatch")
+              if observed.get("final_model_call_count", 0) != 0:
+                  raise Gate1Error("screen artifact indicates final model calls")
+              if screen.get("final_partition_observed", False) is not False:
+                  raise Gate1Error("screen artifact indicates final outputs were observed")
+
+              sealed_raw = screen.get("sealed_state")
+              if sealed_raw is not None:
+                  sealed = object_value(sealed_raw, "sealed_state")
+                  if sealed.get("final_outputs_observed") is not False:
+                      raise Gate1Error("screen artifact indicates final outputs were observed")
+                  if sealed.get("oracle_outputs_observed") is not False:
+                      raise Gate1Error("screen artifact indicates oracle outputs were observed")
+
+              if screen.get("human_or_llm_judge_used") is not False:
+                  raise Gate1Error("screen artifact used a human or LLM judge")
+              if screen.get("programmatic_success_only", True) is not True:
+                  raise Gate1Error("screen artifact is not programmatically verified")
+
+              selected = screen.get("selected_programs")
+              expected_count = int_value(
+                  config["selected_program_count"], "selected_program_count"
+              )
+              if not isinstance(selected, list) or len(selected) != expected_count:
+                  raise Gate1Error("screen selected-program count mismatch")
+              if not all(isinstance(item, str) for item in selected):
+                  raise Gate1Error("screen selected programs invalid")
+              if len(set(selected)) != expected_count:
+                  raise Gate1Error("screen selected programs invalid")
+              known = {program.program_id for program in programs}
+              if not set(selected).issubset(known):
+                  raise Gate1Error("screen selected an unknown attack program")
+          '''
+          path.write_text(text[:start] + replacement + text[end:], encoding="utf-8")
+
+          core = Path("src/jbspan/gate1/verifiable_agent.py")
+          value = core.read_text(encoding="utf-8").replace(
+              "from typing import Iterable, Protocol\n",
+              "from collections.abc import Iterable\nfrom typing import Protocol\n",
+          )
+          core.write_text(value, encoding="utf-8")
+
+          workflow = Path(".github/workflows/gate1_verifiable_agent_final_oracle.yml")
+          value = workflow.read_text(encoding="utf-8")
+          value = value.replace(
+              "test \"$(jq -r '.sealed_state.final_outputs_observed' \"$SCREEN\")\" = \"false\"",
+              "test \"$(jq -r '.final_partition_observed' \"$SCREEN\")\" = \"false\"\n          test \"$(jq -r '.design.final_model_call_count' \"$SCREEN\")\" = \"0\"",
+          )
+          workflow.write_text(value, encoding="utf-8")
+          PY
+
+      - name: Download and freeze exact screen artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/screen-source/unpacked" data/gate1/verifiable_agent_screen
+          artifact_id="$(jq -r '.source_artifact_id' "$SCREEN_RUNTIME")"
+          curl --fail --location --silent --show-error \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/${artifact_id}/zip" \
+            --output "$RUNNER_TEMP/screen-source/source.zip"
+          test "$(sha256sum "$RUNNER_TEMP/screen-source/source.zip" | cut -d' ' -f1)" = \
+            "$(jq -r '.source_artifact_zip_sha256' "$SCREEN_RUNTIME")"
+          unzip -q "$RUNNER_TEMP/screen-source/source.zip" -d "$RUNNER_TEMP/screen-source/unpacked"
+          cp "$RUNNER_TEMP/screen-source/unpacked/screen.json" data/gate1/verifiable_agent_screen/screen.json
+          test "$(sha256sum data/gate1/verifiable_agent_screen/screen.json | cut -d' ' -f1)" = \
+            "$(jq -r '.screen_json_file_sha256' "$SCREEN_RUNTIME")"
+
+      - name: Validate and auto-fix repository implementation
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev]'
+          ruff check --fix \
+            src/jbspan/gate1/verifiable_agent.py \
+            scripts/run_verifiable_agent_gate1.py \
+            tests/test_verifiable_agent_gate1.py
+          ruff check \
+            src/jbspan/gate1/verifiable_agent.py \
+            scripts/run_verifiable_agent_gate1.py \
+            tests/test_verifiable_agent_gate1.py
+          mypy src/jbspan
+          PYTHONPATH=. python -m pytest tests/test_verifiable_agent_gate1.py
+          python -m json.tool configs/gate1/gate1_verifiable_agent.json >/dev/null
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from jbspan.gate1.verifiable_agent import canonical_sha256
+
+          screen = json.loads(Path("data/gate1/verifiable_agent_screen/screen.json").read_text())
+          assert canonical_sha256(screen) == "3a0f0fc8e2940126ace0bc055a50010a0090ad2f489ab620d96902db7e937165"
+          assert screen["status"] == "SCREEN_PASS"
+          assert screen["final_partition_observed"] is False
+          assert screen["design"]["final_model_call_count"] == 0
+          PY
+          git diff --check
+
+      - name: Commit reviewable final-oracle implementation and screen record
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -- \
+            .github/workflows/gate1_verifiable_agent_final_oracle.yml \
+            configs/gate1/gate1_verifiable_agent.json \
+            docs/GATE1_VERIFIABLE_AGENT_PROTOCOL.md \
+            scripts/run_verifiable_agent_gate1.py \
+            src/jbspan/gate1/verifiable_agent.py \
+            tests/test_verifiable_agent_gate1.py \
+            data/gate1/verifiable_agent_screen/screen.json \
+            data/gate1/verifiable_agent_screen/runtime.json
+          git diff --cached --check
+          git commit -m "Freeze verifiable-agent final and exact-oracle stage"
+          git push origin HEAD:agent/gate1-contract
+
+      - name: Dispatch separately authorized final-oracle workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for _ in $(seq 1 30); do
+            if gh workflow view gate1_verifiable_agent_final_oracle.yml >/dev/null 2>&1; then
+              break
+            fi
+            sleep 2
+          done
+          gh workflow run gate1_verifiable_agent_final_oracle.yml \
+            --ref agent/gate1-contract \
+            -f expected_screen_sha256="$EXPECTED_SCREEN_CANONICAL_SHA256"
+          gh pr comment 3 --body "Screen PASS artifact and pre-screen final/oracle contract materialized. The separately authorized final+exact-oracle workflow was dispatched with screen SHA $EXPECTED_SCREEN_CANONICAL_SHA256." || true
