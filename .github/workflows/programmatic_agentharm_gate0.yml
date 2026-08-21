@@ -1,0 +1,149 @@
+name: programmatic-agentharm-gate0
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/programmatic_agentharm_gate0.yml
+      - configs/programmatic_agentharm/gate0.json
+      - docs/PROGRAMMATIC_AGENTHARM_PIVOT.md
+      - scripts/freeze_programmatic_agentharm.py
+      - src/jbspan/programmatic_agentharm/**
+      - tests/test_programmatic_agentharm_contract.py
+
+permissions:
+  contents: write
+
+concurrency:
+  group: programmatic-agentharm-gate0
+  cancel-in-progress: true
+
+jobs:
+  freeze:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      SAFE_OUTPUT: data/programmatic_agentharm/gate0/gate0_manifest.json
+      CACHE_DIR: /tmp/programmatic-agentharm-gate0
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/programmatic-agentharm-pivot
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate implementation and frozen contract
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev]'
+          ruff check \
+            src/jbspan/programmatic_agentharm \
+            scripts/freeze_programmatic_agentharm.py \
+            tests/test_programmatic_agentharm_contract.py
+          mypy src/jbspan
+          pytest
+          python -m json.tool configs/programmatic_agentharm/gate0.json >/dev/null
+          git diff --check
+
+      - name: Freeze deterministic AgentHarm inventory
+        run: |
+          set +e
+          python scripts/freeze_programmatic_agentharm.py \
+            --config configs/programmatic_agentharm/gate0.json \
+            --output "$SAFE_OUTPUT" \
+            --cache-dir "$CACHE_DIR"
+          gate_exit=$?
+          set -e
+          echo "GATE0_EXIT=$gate_exit" >> "$GITHUB_ENV"
+
+      - name: Verify safe artifact boundary
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          path = Path(os.environ["SAFE_OUTPUT"])
+          value = json.loads(path.read_text(encoding="utf-8"))
+          forbidden_keys = {
+              "prompt",
+              "response",
+              "raw_output",
+              "tool_output",
+              "generation",
+          }
+
+          def visit(node: object) -> None:
+              if isinstance(node, dict):
+                  leaked = forbidden_keys.intersection(node)
+                  if leaked:
+                      raise SystemExit(f"unsafe artifact keys: {sorted(leaked)}")
+                  for child in node.values():
+                      visit(child)
+              elif isinstance(node, list):
+                  for child in node:
+                      visit(child)
+
+          visit(value)
+          assert value["raw_prompts_committed"] is False
+          assert value["raw_tool_outputs_committed"] is False
+          assert value["target_model_outputs_observed"] is False
+          PY
+
+      - name: Persist immutable safe Gate 0 result
+        if: always()
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email \
+            41898282+github-actions[bot]@users.noreply.github.com
+          git add -- "$SAFE_OUTPUT"
+          if git diff --cached --quiet; then
+            echo "No Gate 0 result change."
+          else
+            git diff --cached --check
+            git commit -m "Freeze programmatic AgentHarm Gate 0 inventory [skip ci]"
+            git push origin HEAD:agent/programmatic-agentharm-pivot
+          fi
+
+      - name: Publish Gate 0 summary
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          value = json.loads(Path(os.environ["SAFE_OUTPUT"]).read_text())
+          inventory = value["test_inventory"]
+          with Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a") as handle:
+              handle.write("# Programmatic AgentHarm Gate 0\n\n")
+              handle.write(f"- status: **{value['status']}**\n")
+              handle.write(
+                  f"- eligible base behaviors: **{inventory['eligible_base_behaviors']}**\n"
+              )
+              handle.write(f"- eligible rows: **{inventory['eligible_rows']}**\n")
+              handle.write(
+                  f"- eligible categories: **{inventory['eligible_categories']}**\n"
+              )
+              handle.write("- target outputs observed: **false**\n")
+          PY
+
+      - name: Upload safe Gate 0 manifest
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: programmatic-agentharm-gate0-safe
+          path: ${{ env.SAFE_OUTPUT }}
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Enforce source gate decision
+        if: always()
+        run: exit "${GATE0_EXIT:-1}"
