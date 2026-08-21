@@ -1,0 +1,15 @@
+{
+  "confirmatory_smoke_allowed": false,
+  "final_evaluation_30_observed": false,
+  "gate1_decision": "NOT_EVALUATED",
+  "gate2_heldout_10_used": false,
+  "raw_judge_outputs_committed": false,
+  "raw_prompts_committed": false,
+  "raw_responses_committed": false,
+  "schema_version": "gate1-step3b-wildguard-decision-v1",
+  "selected_evaluator": null,
+  "selection_pass": false,
+  "status": "WILDGUARD_SELECTION_FAIL",
+  "validation_pass": false,
+  "wrapper_stability_required": true
+}

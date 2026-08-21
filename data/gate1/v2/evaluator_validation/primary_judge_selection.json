@@ -1,0 +1,10 @@
+{
+  "confirmatory_smoke_allowed": false,
+  "final_evaluation_30_observed": false,
+  "gate2_heldout_10_used": false,
+  "schema_version": "gate1-step3b-primary-judge-selection-v1",
+  "selected_before_validation": null,
+  "selected_primary_evaluator": null,
+  "status": "NO_REPRODUCIBLE_CANDIDATE_PASSES_SELECTION",
+  "wrapper_stability_required": true
+}

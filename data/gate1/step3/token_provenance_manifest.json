@@ -1,0 +1,9 @@
+{
+  "boundary_crossing_record_count": 250,
+  "chat_template_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+  "raw_token_ids_committed": false,
+  "raw_token_text_committed": false,
+  "record_count": 250,
+  "schema_version": "gate1-token-provenance-manifest-v1",
+  "tokenizer_revision": "a09a35458c702b33eeacc393d103063234e8bc28"
+}

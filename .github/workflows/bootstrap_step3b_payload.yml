@@ -1,0 +1,63 @@
+name: bootstrap-gate1-step3b-payload
+
+on:
+  push:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - data/gate1/step3b_payload.b85
+      - scripts/bootstrap_step3b_payload.py
+      - .github/workflows/bootstrap_step3b_payload.yml
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/gate1-contract
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Materialize the pre-result Step 3B contract
+        run: python scripts/bootstrap_step3b_payload.py
+
+      - name: Validate generated source tree
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev,step3]'
+          python -m pip install 'pyyaml>=6,<7'
+          python - <<'PY'
+          from pathlib import Path
+          import yaml
+          yaml.safe_load(Path('.github/workflows/gate1_step3b_freeze.yml').read_text())
+          PY
+          ruff check --fix .
+          ruff check .
+          mypy src/jbspan
+          pytest
+          git diff --check
+
+      - name: Commit the frozen Step 3B source and remove temporary payload files
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add \
+            configs/gate1/gate1_step3b.json \
+            src/jbspan/gate1/step3b.py \
+            scripts/run_gate1_step3b.py \
+            tests/test_gate1_step3b.py \
+            docs/GATE1_STEP3B_PROTOCOL.md
+          git rm \
+            data/gate1/step3b_payload.b85 \
+            scripts/bootstrap_step3b_payload.py
+          git commit -m "Freeze Gate 1 Step 3B pre-result source contract"
+          git push origin HEAD:agent/gate1-contract

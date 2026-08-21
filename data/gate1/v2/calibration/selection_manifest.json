@@ -1,0 +1,20 @@
+{
+  "final_evaluation_outputs_observed": false,
+  "maximum_selected_candidates": 5,
+  "minimum_eligible_payloads_per_candidate": 2,
+  "minimum_selected_candidates": 2,
+  "paper_validity": false,
+  "qualifying_candidate_count": 5,
+  "schema_version": "gate1-step3b-selection-manifest-v1",
+  "selected_candidate_ids": [
+    "v2_dan_refusal_affirmative",
+    "v2_aim_refusal_affirmative",
+    "v2_cipher_affirmative",
+    "v2_aim_affirmative",
+    "v2_fewshot_affirmative"
+  ],
+  "selected_candidate_ids_sha256": "f5b88497a0289dd2f2a0accc683676d1fdc656640ee38c8571b28a3201370a29",
+  "smoke_outputs_observed": false,
+  "status": "STEP3B_CALIBRATION_SELECTION_FROZEN",
+  "tie_break": "eligible_count_desc_abstention_asc_candidate_id"
+}

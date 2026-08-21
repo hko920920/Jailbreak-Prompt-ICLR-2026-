@@ -1,0 +1,316 @@
+name: gate1-step3b6-wildguard-q8-wrapper-retry
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - .github/triggers/gate1_wrapper_q8.json
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: gate1-step3b6-wildguard-q8-wrapper-scientific
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      JBB_REVISION: d8d87b8fdcb7806e3b4e45fffb2bc24aa6b17f32
+      JBB_PATH: data/judge-comparison.csv
+      JBB_SHA256: dacaf76a1057785f11b0fc6aa07b9a73cdab588319ddfc5e8cef2909e5b112a5
+      LLAMA_REVISION: 0177dcc7300bad8914bb838baabce87899812491
+      LLAMA_RELEASE_TAG: b10441
+      LLAMA_ASSET: llama-b10441-bin-ubuntu-x64.tar.gz
+      SAFE_OUTPUT: /tmp/gate1-step3b6-wrapper-retry/safe
+      PRIVATE_OUTPUT: /tmp/gate1-step3b6-wrapper-retry/private
+      BASELINE_DIR: data/gate1/v2/wildguard_q8
+      PIP_NO_CACHE_DIR: "1"
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/gate1-contract
+          fetch-depth: 0
+
+      - name: Publish wrapper run marker
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr comment 3 --body \
+            "WildGuard Q8 wrapper-stability run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate wrapper implementation and authorization
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev,step3]'
+          ruff check scripts/run_gate1_step3b_wildguard_wrapper_stability.py \
+            tests/test_gate1_step3b_wildguard_wrapper_stability.py
+          mypy src/jbspan
+          pytest tests/test_gate1_step3b_wildguard_wrapper_stability.py
+          mkdir -p "$SAFE_OUTPUT" "$PRIVATE_OUTPUT"
+
+          decision="$BASELINE_DIR/wildguard_decision.json"
+          runtime="$BASELINE_DIR/wildguard_runtime.json"
+          test -f "$decision"
+          test -f "$runtime"
+          jq -e '
+            .status == "WILDGUARD_EXTERNAL_VALIDATION_PASS"
+            and .selection_pass == true
+            and .validation_pass == true
+            and .selected_evaluator == "official_wildguard_7b"
+          ' "$decision" >/dev/null
+          jq -e '.runtime_candidate == "Q8_0_DIRECT"' "$runtime" >/dev/null
+
+      - name: Download immutable JBB validation source and prepare wrapper inputs
+        run: |
+          source_csv="$RUNNER_TEMP/judge-comparison.csv"
+          url="https://huggingface.co/datasets/JailbreakBench/JBB-Behaviors/resolve/${JBB_REVISION}/${JBB_PATH}?download=true"
+          curl --fail --location --silent --show-error "$url" --output "$source_csv"
+          test "$(sha256sum "$source_csv" | cut -d' ' -f1)" = "$JBB_SHA256"
+          python scripts/run_gate1_step3b_wildguard_wrapper_stability.py prepare \
+            --root . \
+            --source-csv "$source_csv" \
+            --baseline-dir "$BASELINE_DIR" \
+            --private-output-dir "$PRIVATE_OUTPUT" \
+            --safe-output-dir "$SAFE_OUTPUT"
+
+      - name: Free hosted-runner disk
+        run: |
+          sudo rm -rf \
+            /usr/local/lib/android \
+            /usr/share/dotnet \
+            /opt/ghc \
+            /usr/local/.ghcup \
+            /opt/hostedtoolcache/CodeQL || true
+          df -h
+
+      - name: Install pinned llama.cpp runtime and converter
+        run: |
+          release_json="$RUNNER_TEMP/llama-release.json"
+          curl --fail --location --silent --show-error \
+            "https://api.github.com/repos/ggml-org/llama.cpp/releases/tags/${LLAMA_RELEASE_TAG}" \
+            --output "$release_json"
+          test "$(jq -r '.target_commitish' "$release_json")" = "$LLAMA_REVISION"
+          asset_url="$(jq -r --arg name "$LLAMA_ASSET" '.assets[] | select(.name == $name) | .browser_download_url' "$release_json")"
+          asset_digest="$(jq -r --arg name "$LLAMA_ASSET" '.assets[] | select(.name == $name) | .digest' "$release_json")"
+          archive="$RUNNER_TEMP/$LLAMA_ASSET"
+          curl --fail --location --silent --show-error "$asset_url" --output "$archive"
+          test "sha256:$(sha256sum "$archive" | cut -d' ' -f1)" = "$asset_digest"
+          mkdir -p "$RUNNER_TEMP/llama-bin"
+          tar -xzf "$archive" -C "$RUNNER_TEMP/llama-bin"
+          server="$(find "$RUNNER_TEMP/llama-bin" -type f -name llama-server | head -n1)"
+          test -x "$server"
+          echo "LLAMA_SERVER=$server" >> "$GITHUB_ENV"
+
+          source_dir="$RUNNER_TEMP/llama-src"
+          git init "$source_dir"
+          git -C "$source_dir" remote add origin https://github.com/ggml-org/llama.cpp.git
+          git -C "$source_dir" fetch --depth 1 origin "$LLAMA_REVISION"
+          git -C "$source_dir" checkout --detach FETCH_HEAD
+          test "$(git -C "$source_dir" rev-parse HEAD)" = "$LLAMA_REVISION"
+          echo "LLAMA_SOURCE=$source_dir" >> "$GITHUB_ENV"
+          python -m pip install -r "$source_dir/requirements/requirements-convert_hf_to_gguf.txt"
+
+      - name: Download and verify the frozen WildGuard model revision
+        run: |
+          export HF_HOME="$RUNNER_TEMP/hf-wildguard"
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          from huggingface_hub import snapshot_download
+
+          baseline = Path(os.environ["BASELINE_DIR"])
+          identity = json.loads((baseline / "wildguard_preflight.json").read_text())
+          snapshot = Path(
+              snapshot_download(
+                  repo_id=identity["official_model_repository"],
+                  revision=identity["model_revision"],
+                  token=os.environ["HF_TOKEN"],
+                  cache_dir=Path(os.environ["HF_HOME"]),
+              )
+          )
+
+          def digest(path: Path) -> str:
+              value = hashlib.sha256()
+              with path.open("rb") as handle:
+                  for block in iter(lambda: handle.read(1024 * 1024), b""):
+                      value.update(block)
+              return value.hexdigest()
+
+          for item in identity["files"]:
+              path = snapshot / item["filename"]
+              if not path.is_file():
+                  raise SystemExit(f"missing WildGuard file: {item['filename']}")
+              expected = item.get("sha256")
+              if expected and digest(path) != expected:
+                  raise SystemExit(f"WildGuard digest mismatch: {item['filename']}")
+          with Path(os.environ["GITHUB_ENV"]).open("a") as handle:
+              handle.write(f"WILDGUARD_MODEL_DIR={snapshot}\n")
+          PY
+
+      - name: Convert the same official model directly to Q8_0
+        run: |
+          q8="$RUNNER_TEMP/wildguard-q8_0.gguf"
+          python "$LLAMA_SOURCE/convert_hf_to_gguf.py" \
+            "$WILDGUARD_MODEL_DIR" \
+            --outfile "$q8" \
+            --outtype q8_0
+          rm -rf "$RUNNER_TEMP/hf-wildguard"
+          test -s "$q8"
+          test "$(sha256sum "$q8" | cut -d' ' -f1)" = \
+            "$(jq -r '.converted_gguf_sha256' "$BASELINE_DIR/wildguard_runtime.json")"
+          echo "WILDGUARD_GGUF=$q8" >> "$GITHUB_ENV"
+
+      - name: Run both frozen wrapper transformations
+        run: |
+          mkdir -p "$RUNNER_TEMP/wildguard-server"
+          nohup "$LLAMA_SERVER" \
+            -m "$WILDGUARD_GGUF" \
+            --host 127.0.0.1 \
+            --port 8080 \
+            -c 4096 \
+            -t 4 \
+            >"$RUNNER_TEMP/wildguard-server/server.log" 2>&1 &
+          pid=$!
+          cleanup() {
+            kill "$pid" 2>/dev/null || true
+            wait "$pid" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+          ready=0
+          for _ in $(seq 1 240); do
+            if ! kill -0 "$pid" 2>/dev/null; then
+              tail -n 100 "$RUNNER_TEMP/wildguard-server/server.log"
+              exit 1
+            fi
+            if [ "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/health || true)" = "200" ]; then
+              ready=1
+              break
+            fi
+            sleep 5
+          done
+          test "$ready" = "1"
+
+          timeout 105m python scripts/run_gate1_step3b_wildguard_wrapper_stability.py evaluate \
+            --root . \
+            --transform whitespace_only \
+            --private-output-dir "$PRIVATE_OUTPUT" \
+            --safe-output-dir "$SAFE_OUTPUT" \
+            --server-url http://127.0.0.1:8080
+          timeout 105m python scripts/run_gate1_step3b_wildguard_wrapper_stability.py evaluate \
+            --root . \
+            --transform neutral_delimiters \
+            --private-output-dir "$PRIVATE_OUTPUT" \
+            --safe-output-dir "$SAFE_OUTPUT" \
+            --server-url http://127.0.0.1:8080
+          python scripts/run_gate1_step3b_wildguard_wrapper_stability.py finalize \
+            --root . \
+            --safe-output-dir "$SAFE_OUTPUT"
+          cleanup
+          trap - EXIT
+
+      - name: Create and persist safe wrapper decision
+        if: always()
+        run: |
+          test -f "$SAFE_OUTPUT/wrapper_decision.json"
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          safe = Path(os.environ["SAFE_OUTPUT"])
+          value = json.loads((safe / "wrapper_decision.json").read_text())
+          rows = [
+              "# Gate 1 Step 3B.6 — WildGuard Q8 Wrapper Stability",
+              "",
+              "Date: 2026-08-20 (Asia/Seoul)",
+              "",
+              f"Status: **{value['status']}**",
+              "",
+              f"- wrapper stability pass: **{value['wrapper_stability_pass']}**",
+              f"- confirmatory smoke allowed: **{value['confirmatory_smoke_allowed']}**",
+              "- final evaluation 30 observed: **false**",
+              "- Gate 2 held-out 10 used: **false**",
+          ]
+          for name, result in value["transforms"].items():
+              metrics = result["metrics"]
+              rows.extend([
+                  "",
+                  f"## {name}",
+                  f"- parse coverage: **{metrics['parse_coverage']:.6f}**",
+                  f"- accuracy: **{metrics['accuracy']:.6f}**",
+                  f"- macro-F1: **{metrics['macro_f1']:.6f}**",
+                  f"- FNR: **{metrics['false_negative_rate']:.6f}**",
+                  f"- FPR: **{metrics['false_positive_rate']:.6f}**",
+                  f"- prediction agreement: **{result['prediction_agreement']:.6f}**",
+                  f"- pass: **{result['passes_all_thresholds']}**",
+              ])
+          report = Path(os.environ["RUNNER_TEMP"]) / "GATE1_STEP3B6_WILDGUARD_WRAPPER_STABILITY.md"
+          report.write_text("\n".join(rows) + "\n", encoding="utf-8")
+          PY
+
+          destination=data/gate1/v2/wildguard_wrapper_stability
+          report=docs/GATE1_STEP3B6_WILDGUARD_WRAPPER_STABILITY.md
+          generated_report="$RUNNER_TEMP/GATE1_STEP3B6_WILDGUARD_WRAPPER_STABILITY.md"
+          git fetch origin agent/gate1-contract
+          git checkout -B agent/gate1-contract origin/agent/gate1-contract
+          if [ -d "$destination" ]; then
+            diff -ru "$destination" "$SAFE_OUTPUT"
+            diff -u "$report" "$generated_report"
+          else
+            mkdir -p "$destination"
+            cp -a "$SAFE_OUTPUT"/. "$destination"/
+            cp "$generated_report" "$report"
+            git config user.name github-actions[bot]
+            git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+            git add "$destination" "$report"
+            git diff --cached --check
+            git commit -m "Freeze WildGuard Q8 wrapper-stability decision [skip ci]"
+            git push origin HEAD:agent/gate1-contract
+          fi
+
+      - name: Publish wrapper result
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          decision="$SAFE_OUTPUT/wrapper_decision.json"
+          status="$(jq -r '.status' "$decision")"
+          passed="$(jq -r '.wrapper_stability_pass' "$decision")"
+          gh pr comment 3 --body \
+            "WildGuard Q8 wrapper result: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID — status **$status**, pass **$passed**"
+
+      - name: Upload safe wrapper bundle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate1-step3b6-wildguard-q8-wrapper-retry-safe
+          path: ${{ env.SAFE_OUTPUT }}
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Cleanup private and model files
+        if: always()
+        run: |
+          if [ -d "$PRIVATE_OUTPUT" ]; then
+            find "$PRIVATE_OUTPUT" -type f -print0 | xargs -0 -r shred -u
+            rm -rf "$PRIVATE_OUTPUT"
+          fi
+          rm -rf "$RUNNER_TEMP/hf-wildguard" \
+            "$RUNNER_TEMP/wildguard-q8_0.gguf" \
+            "$RUNNER_TEMP/llama-src"

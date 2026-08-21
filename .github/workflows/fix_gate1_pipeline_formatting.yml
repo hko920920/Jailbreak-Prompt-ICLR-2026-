@@ -1,0 +1,106 @@
+name: fix-gate1-pipeline-formatting
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - .github/workflows/fix_gate1_pipeline_formatting.yml
+      - scripts/run_gate1_step3b_wildguard_wrapper_stability.py
+      - scripts/run_gate1_step3b_primary_judge_experiment.py
+      - scripts/run_gate1_step3b_final_shard.py
+      - scripts/run_gate1_exact_oracle.py
+      - tests/test_gate1_step3b_wildguard_wrapper_stability.py
+      - tests/test_gate1_step3b_primary_judge_experiment.py
+      - tests/test_gate1_exact_oracle.py
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: fix-gate1-pipeline-formatting
+  cancel-in-progress: true
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/gate1-contract
+          fetch-depth: 0
+      - name: Publish formatting-run marker
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr comment 3 --body \
+            "Gate 1 formatting run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install validation dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev,step3]'
+      - name: Apply deterministic Ruff fixes and formatting
+        run: |
+          files=(
+            scripts/run_gate1_step3b_wildguard_wrapper_stability.py
+            scripts/run_gate1_step3b_primary_judge_experiment.py
+            scripts/run_gate1_step3b_final_shard.py
+            scripts/run_gate1_exact_oracle.py
+            tests/test_gate1_step3b_wildguard_wrapper_stability.py
+            tests/test_gate1_step3b_primary_judge_experiment.py
+            tests/test_gate1_exact_oracle.py
+          )
+          ruff check --fix "${files[@]}" || true
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("scripts/run_gate1_step3b_primary_judge_experiment.py")
+          text = path.read_text(encoding="utf-8")
+          old = (
+              "def source_payloads_for_final(root: Path, source_csv: Path) "
+              "-> tuple[dict[str, JsonDict], list[str]]:\n"
+          )
+          new = (
+              "def source_payloads_for_final(\n"
+              "    root: Path, source_csv: Path\n"
+              ") -> tuple[dict[str, JsonDict], list[str]]:\n"
+          )
+          if old not in text and new not in text:
+              raise SystemExit("source_payloads_for_final signature not found")
+          path.write_text(text.replace(old, new, 1), encoding="utf-8")
+          PY
+          ruff format "${files[@]}"
+          ruff check "${files[@]}"
+          git diff --check
+      - name: Run focused and repository tests
+        run: |
+          pytest \
+            tests/test_gate1_step3b_wildguard_wrapper_stability.py \
+            tests/test_gate1_step3b_primary_judge_experiment.py \
+            tests/test_gate1_exact_oracle.py
+          mypy src/jbspan
+      - name: Commit validated formatting corrections
+        run: |
+          if git diff --quiet; then
+            echo "No formatting changes required."
+            exit 0
+          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -- \
+            scripts/run_gate1_step3b_wildguard_wrapper_stability.py \
+            scripts/run_gate1_step3b_primary_judge_experiment.py \
+            scripts/run_gate1_step3b_final_shard.py \
+            scripts/run_gate1_exact_oracle.py \
+            tests/test_gate1_step3b_wildguard_wrapper_stability.py \
+            tests/test_gate1_step3b_primary_judge_experiment.py \
+            tests/test_gate1_exact_oracle.py
+          git diff --cached --check
+          git commit -m "Format and validate Gate 1 execution pipeline [skip ci]"
+          git push origin HEAD:agent/gate1-contract

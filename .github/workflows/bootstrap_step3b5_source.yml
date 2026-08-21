@@ -1,0 +1,120 @@
+name: bootstrap-gate1-step3b5-source
+
+on:
+  push:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - .github/workflows/bootstrap_step3b5_source.yml
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/gate1-contract
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Materialize frozen Step 3B.5 source
+        run: python scripts/bootstrap_step3b5_judge_validation.py
+
+      - name: Apply strict-typing repair before any judge result is observed
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+
+          core_path = Path("src/jbspan/gate1/jbb_judge_validation_core.py")
+          core = core_path.read_text(encoding="utf-8")
+          marker = '''def as_boolean(value: object, where: str) -> bool:
+              if not isinstance(value, bool):
+                  raise RuntimeError(f"{where} must be a boolean")
+              return value
+
+
+          '''.replace("          ", "")
+          helper = marker + '''def as_number(value: object, where: str) -> float:
+              if not isinstance(value, (int, float)) or isinstance(value, bool):
+                  raise RuntimeError(f"{where} must be numeric")
+              return float(value)
+
+
+          '''.replace("          ", "")
+          if "def as_number(" not in core:
+              if marker not in core:
+                  raise SystemExit("as_boolean insertion point not found")
+              core = core.replace(marker, helper, 1)
+          replacements = {
+              'float(limits["parse_coverage"])':
+                  'as_number(limits["parse_coverage"], "parse_coverage")',
+              'float(limits["accuracy"])':
+                  'as_number(limits["accuracy"], "accuracy")',
+              'float(limits["macro_f1"])':
+                  'as_number(limits["macro_f1"], "macro_f1")',
+              'float(limits["false_negative_rate"])':
+                  'as_number(limits["false_negative_rate"], "false_negative_rate")',
+              'float(limits["false_positive_rate"])':
+                  'as_number(limits["false_positive_rate"], "false_positive_rate")',
+          }
+          for old, new in replacements.items():
+              if old in core:
+                  core = core.replace(old, new)
+          core_path.write_text(core, encoding="utf-8")
+
+          wrapper_path = Path("src/jbspan/gate1/jbb_judge_validation.py")
+          wrapper = wrapper_path.read_text(encoding="utf-8")
+          if "    as_number,\n" not in wrapper:
+              import_marker = "    as_array,\n"
+              if import_marker not in wrapper:
+                  raise SystemExit("as_number import point not found")
+              wrapper = wrapper.replace(import_marker, import_marker + "    as_number,\n", 1)
+          wrapper = re.sub(
+              r"float\(([^()\n]+)\)",
+              r'as_number(\1, "numeric")',
+              wrapper,
+          )
+          wrapper_path.write_text(wrapper, encoding="utf-8")
+          PY
+
+      - name: Validate generated source
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev]'
+          ruff format \
+            src/jbspan/gate1/jbb_judge_validation_core.py \
+            src/jbspan/gate1/jbb_judge_validation.py \
+            scripts/run_gate1_step3b_judge_validation.py \
+            tests/test_gate1_step3b_judge_validation.py
+          ruff check .
+          mypy src/jbspan
+          pytest
+          python -m json.tool \
+            configs/gate1/gate1_step3b_judge_validation.json >/dev/null
+          git diff --check
+
+      - name: Commit source and remove transport files
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add \
+            src/jbspan/gate1/jbb_judge_validation_core.py \
+            src/jbspan/gate1/jbb_judge_validation.py \
+            scripts/run_gate1_step3b_judge_validation.py \
+            tests/test_gate1_step3b_judge_validation.py \
+            docs/GATE1_STEP3B_JUDGE_COMPARISON_PROTOCOL.md
+          git rm \
+            data/gate1/step3b5_source.part01 \
+            data/gate1/step3b5_source.part02 \
+            scripts/bootstrap_step3b5_judge_validation.py
+          git commit -m "Freeze Gate 1 Step 3B.5 judge-validation source"
+          git push origin HEAD:agent/gate1-contract

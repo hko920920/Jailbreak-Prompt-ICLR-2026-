@@ -1,0 +1,16 @@
+{
+  "gate1_decision": "NOT_EVALUATED",
+  "paper_validity": false,
+  "safe_bundle_identity_sha256": "c74ba7b2dbcba08d04a4326602722df28a0f92f6ecb0b8036f76f8ba2192c371",
+  "safe_file_sha256": {
+    "smoke_records.safe.jsonl": "15cf100a0ad8c3603feb887e16bdda7548e0aef04ad2fb0c8afd7016a5e7ec66",
+    "smoke_selection.safe.json": "ce87f71ddddbef00748cae5f178008c5d2539fc432fc57d518de437087bf3ea9",
+    "smoke_summary.json": "d87027b8344f9cf4ad530910d34ac1080a3e232571da7c9cf797d427f5c08a1d",
+    "step3_contract_manifest.json": "468ced3bfdb77e08e7d444e80fc433a8c8006f4bbd0a4b9e876e7a365102a12b",
+    "step3_identity.json": "0f4990d43737346cfd715c787901deca97d8e9ecba294ae06a22bb7577f328d8",
+    "token_provenance.safe.jsonl": "96449bd134fecc6a5d4837279f67c5270a2bd6ee000e8836c5944cd4d1918a3b",
+    "token_provenance_manifest.json": "516555c3017be5213a062e2f4a52fd318cd45274b0217bfa2c6424944935943b"
+  },
+  "schema_version": "gate1-step3-manifest-v1",
+  "status": "STEP3_SMOKE_PIPELINE_PASS_NO_SIGNAL"
+}

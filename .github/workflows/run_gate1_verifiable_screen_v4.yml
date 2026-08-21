@@ -1,0 +1,220 @@
+name: run-verifiable-agent-gate1-screen-v4
+
+on:
+  push:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - .github/workflows/run_gate1_verifiable_screen_v4.yml
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: run-verifiable-agent-gate1-screen-v4
+  cancel-in-progress: true
+
+jobs:
+  screen:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      MODEL_REF: Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M
+      CONFIG: configs/gate1/gate1_verifiable_agent.json
+      SCREEN_OUTPUT: artifacts/gate1-verifiable-agent-screen-v4/screen.json
+      PIP_NO_CACHE_DIR: "1"
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/gate1-contract
+          fetch-depth: 1
+
+      - name: Record canonical run at start
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr comment 3 --body "Programmatically verifiable Gate 1 screen v4 started: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID — trigger $GITHUB_SHA. This run opens calibration and untouched confirmatory only; final/oracle remain sealed." || true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Materialize the frozen screen-v2 implementation
+        run: |
+          python - <<'PY'
+          import base64
+          import hashlib
+          import re
+          from pathlib import Path
+
+          source = Path(".github/workflows/bootstrap_and_run_gate1_verifiable_screen_v2.yml")
+          text = source.read_text(encoding="utf-8")
+          match = re.search(r"<<'PAYLOAD_B64'\n(.*?)\n\s*PAYLOAD_B64", text, flags=re.DOTALL)
+          if match is None:
+              raise SystemExit("frozen screen-v2 payload marker not found")
+          encoded = "".join(line.strip() for line in match.group(1).splitlines())
+          payload = base64.b64decode(encoded, validate=True)
+          observed = hashlib.sha256(payload).hexdigest()
+          expected = "461ae720c45f4bd0e20d2f8589de9428f07d6d75614890c09e97695b9825a189"
+          if observed != expected:
+              raise SystemExit(f"payload digest mismatch: observed={observed} expected={expected}")
+          Path("/tmp/gate1-verifiable-agent-screen-v2.tar.gz").write_bytes(payload)
+          PY
+          tar -xzf /tmp/gate1-verifiable-agent-screen-v2.tar.gz -C .
+
+      - name: Apply execution-only compatibility repairs
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          source = Path("src/jbspan/gate1/verifiable_agent.py")
+          text = source.read_text(encoding="utf-8")
+          text = text.replace(
+              "from dataclasses import asdict, dataclass\nfrom pathlib import Path\nfrom typing import Iterable, Protocol\n",
+              "from collections.abc import Iterable\nfrom dataclasses import asdict, dataclass\nfrom pathlib import Path\nfrom typing import Protocol\n",
+          )
+          source.write_text(text, encoding="utf-8")
+
+          runner = Path("scripts/run_verifiable_agent_gate1.py")
+          text = runner.read_text(encoding="utf-8")
+          text = text.replace(
+              "from dataclasses import asdict\nfrom pathlib import Path\nfrom typing import Iterable\n",
+              "from collections.abc import Iterable\nfrom dataclasses import asdict\nfrom pathlib import Path\n",
+          )
+          runner.write_text(text, encoding="utf-8")
+          PY
+
+      - name: Validate code, contract, mock branches, and physical seals
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev]' pyyaml
+          python -m json.tool "$CONFIG" >/dev/null
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          config = json.loads(Path("configs/gate1/gate1_verifiable_agent.json").read_text())
+          assert config["schema_version"] == "gate1-verifiable-agent-v2"
+          assert config["pipeline_revision"] == "screen-final-physical-separation-v1"
+          assert config["claim_boundary"]["final_split_physically_sealed_during_screen"] is True
+          assert config["claim_boundary"]["oracle_physically_sealed_during_screen"] is True
+          PY
+          ruff check --fix \
+            src/jbspan/gate1/verifiable_agent.py \
+            scripts/run_verifiable_agent_gate1.py \
+            tests/test_verifiable_agent_gate1.py
+          ruff check \
+            src/jbspan/gate1/verifiable_agent.py \
+            scripts/run_verifiable_agent_gate1.py \
+            tests/test_verifiable_agent_gate1.py
+          mypy src/jbspan
+          PYTHONPATH=. pytest tests/test_verifiable_agent_gate1.py
+
+      - name: Install official llama.cpp runtime
+        run: |
+          curl -LsSf https://llama.app/install.sh | \
+            SKIP_CUDA=1 SKIP_ROCM=1 SKIP_VULKAN=1 sh
+          ~/.llama-app/llama --version
+
+      - name: Start Qwen2.5-7B-Instruct sandbox model
+        run: |
+          export HF_HOME="$RUNNER_TEMP/huggingface"
+          mkdir -p "$HF_HOME" "$RUNNER_TEMP/llama-server"
+          nohup ~/.llama-app/llama serve \
+            -hf "$MODEL_REF" \
+            --host 127.0.0.1 \
+            --port 8080 \
+            -c 6144 \
+            -t 4 \
+            >"$RUNNER_TEMP/llama-server/server.log" 2>&1 &
+          echo "$!" >"$RUNNER_TEMP/llama-server/pid"
+          ready=0
+          for _ in $(seq 1 180); do
+            if ! kill -0 "$(cat "$RUNNER_TEMP/llama-server/pid")" 2>/dev/null; then
+              tail -n 120 "$RUNNER_TEMP/llama-server/server.log"
+              exit 1
+            fi
+            status="$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/health || true)"
+            if [ "$status" = "200" ]; then
+              ready=1
+              break
+            fi
+            sleep 10
+          done
+          test "$ready" = "1"
+
+      - name: Run actual calibration and untouched confirmatory screen only
+        run: |
+          mkdir -p "$(dirname "$SCREEN_OUTPUT")"
+          timeout 250m env PYTHONPATH=. python scripts/run_verifiable_agent_gate1.py screen \
+            --config "$CONFIG" \
+            --server-url http://127.0.0.1:8080 \
+            --output "$SCREEN_OUTPUT"
+
+      - name: Verify final and oracle outputs remain sealed
+        run: |
+          test "$(jq -r '.sealed_state.final_outputs_observed' "$SCREEN_OUTPUT")" = "false"
+          test "$(jq -r '.sealed_state.oracle_outputs_observed' "$SCREEN_OUTPUT")" = "false"
+          test "$(jq -r 'has("final_records")' "$SCREEN_OUTPUT")" = "false"
+          test "$(jq -r 'has("oracle_selected_keys")' "$SCREEN_OUTPUT")" = "false"
+
+      - name: Report safe result
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -f "$SCREEN_OUTPUT" ]; then
+            status="$(jq -r '.status' "$SCREEN_OUTPUT")"
+            selected="$(jq -c '.selected_programs' "$SCREEN_OUTPUT")"
+            eligible="$(jq -r '.confirmatory_summary.eligible_count' "$SCREEN_OUTPUT")"
+            programs="$(jq -r '.confirmatory_summary.eligible_programs | length' "$SCREEN_OUTPUT")"
+            baseline="$(jq -r '.confirmatory_summary.baseline_utility_count' "$SCREEN_OUTPUT")"
+            payload="$(jq -r '.confirmatory_summary.payload_only_safe_utility_count' "$SCREEN_OUTPUT")"
+            coverage="$(jq -r '.confirmatory_summary.parse_coverage' "$SCREEN_OUTPUT")"
+            calls="$(jq -r '.model_call_count' "$SCREEN_OUTPUT")"
+          else
+            status="OPERATIONAL_FAILURE"
+            selected="n/a"
+            eligible="n/a"
+            programs="n/a"
+            baseline="n/a"
+            payload="n/a"
+            coverage="n/a"
+            calls="n/a"
+          fi
+          {
+            echo '# Programmatically verifiable Gate 1 screen v4'
+            echo
+            echo "- status: **$status**"
+            echo "- selected programs: **$selected**"
+            echo "- confirmatory eligible: **$eligible/15**"
+            echo "- eligible programs: **$programs**"
+            echo "- baseline utility: **$baseline/15**"
+            echo "- payload-only safe utility: **$payload/15**"
+            echo "- parse coverage: **$coverage**"
+            echo "- model calls: **$calls**"
+            echo '- final/oracle observed: **false**'
+            echo '- human/LLM judge used: **false**'
+            echo '- real-world side effects: **false**'
+          } >> "$GITHUB_STEP_SUMMARY"
+          gh pr comment 3 --body "Programmatically verifiable Gate 1 screen v4 completed: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID — status **$status**, selected **$selected**, eligible **$eligible/15**, eligible programs **$programs**, baseline utility **$baseline/15**, payload-only safe utility **$payload/15**, parse coverage **$coverage**, model calls **$calls**. Final/oracle remained sealed; human/LLM judge used: false; real-world side effects: false." || true
+
+      - name: Upload immutable safe screen artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate1-verifiable-agent-screen-v4
+          path: ${{ env.SCREEN_OUTPUT }}
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Stop local model server
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/llama-server/pid" ]; then
+            kill "$(cat "$RUNNER_TEMP/llama-server/pid")" 2>/dev/null || true
+          fi
+          rm -rf "$RUNNER_TEMP/huggingface"

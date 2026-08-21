@@ -1,0 +1,10 @@
+{
+  "converted_gguf_sha256": null,
+  "github_run_id": "32357880091",
+  "github_sha": "32ff5bebe86e504c7ea6ee1c9ead7f6d5ffc2506",
+  "model_revision": "cbba4823f3e8020e5a74a5e29bf85072def6f2ff",
+  "runner_arch": "X64",
+  "runner_os": "Linux",
+  "runtime_candidate": "Q8_0_DIRECT",
+  "schema_version": "gate1-step3b-wildguard-runtime-v1"
+}

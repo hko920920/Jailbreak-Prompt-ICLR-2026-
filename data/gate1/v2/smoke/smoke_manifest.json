@@ -1,0 +1,15 @@
+{
+  "final_evaluation_outputs_observed": false,
+  "gate1_decision": "NOT_EVALUATED",
+  "gate2_heldout_used": false,
+  "paper_validity": false,
+  "safe_bundle_identity_sha256": "1b22ce42b62b4c3f1acf3cc3d9493e61e1bec57cefe750d6d668bf3f233ac1da",
+  "safe_file_sha256": {
+    "smoke_design.safe.jsonl": "9041648b54054a80fd5dbc76ea80e95f3e09bdc603a1f7f0938a85a3e29b254e",
+    "smoke_identity.json": "ecbc9703bc1849a6b0241c54be57d523f2f432d634e4a2a29dd8af49a3beece3",
+    "smoke_records.safe.jsonl": "85babbde50a99ac8165f931a8e35adade03a337c3de9c716cd5e8d5dc5768707",
+    "smoke_summary.json": "1d9add2961b7e8880acea0c3030c28d2d0c945b3ad33d95ea619b23c73758b62"
+  },
+  "schema_version": "gate1-step3b-smoke-manifest-v1",
+  "status": "STEP3B_SMOKE_EVALUATOR_BLOCKED"
+}

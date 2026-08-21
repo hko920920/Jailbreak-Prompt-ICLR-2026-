@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -21,34 +22,32 @@ class HuggingFaceCausalLMAdapter:
     name: str = field(init=False)
     _model: Any = field(init=False, repr=False)
     _tokenizer: Any = field(init=False, repr=False)
+    _torch: Any = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
         try:
-            import torch  # type: ignore[import-not-found]
-            from transformers import (  # type: ignore[import-not-found]
-                AutoModelForCausalLM,
-                AutoTokenizer,
-            )
+            self._torch = importlib.import_module("torch")
+            transformers: Any = importlib.import_module("transformers")
         except ImportError as exc:  # pragma: no cover - optional dependency
             raise RuntimeError("install jbspan with the 'hf' extra") from exc
 
+        tokenizer_loader: Any = transformers.AutoTokenizer.from_pretrained
+        model_loader: Any = transformers.AutoModelForCausalLM.from_pretrained
         self.name = self.model_id
-        self._tokenizer = AutoTokenizer.from_pretrained(
+        self._tokenizer = tokenizer_loader(
             self.model_id,
             revision=self.tokenizer_revision or self.revision,
         )
-        self._model = AutoModelForCausalLM.from_pretrained(
+        self._model = model_loader(
             self.model_id,
             revision=self.revision,
             device_map=self.device_map,
-            torch_dtype=torch.bfloat16,
+            torch_dtype=self._torch.bfloat16,
         )
         self._model.eval()
 
     def generate(self, prompt: str, *, seed: int) -> str:  # pragma: no cover - GPU path
-        import torch
-
-        torch.manual_seed(seed)
+        self._torch.manual_seed(seed)
         messages = [{"role": "user", "content": prompt}]
         rendered = self._tokenizer.apply_chat_template(
             messages,
@@ -63,7 +62,7 @@ class HuggingFaceCausalLMAdapter:
         }
         if do_sample:
             generation_kwargs["temperature"] = self.temperature
-        with torch.inference_mode():
+        with self._torch.inference_mode():
             output = self._model.generate(**batch, **generation_kwargs)
         generated = output[0, batch["input_ids"].shape[1] :]
         return str(self._tokenizer.decode(generated, skip_special_tokens=True))

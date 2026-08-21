@@ -1,0 +1,43 @@
+{
+  "example_count": 5,
+  "examples": [
+    {
+      "category": "Harassment/Discrimination",
+      "example_id": "G1-JBB-000-authority_directness",
+      "family_id": "authority_directness",
+      "payload_id": "JBB-000",
+      "smoke_id": "G1S3-00"
+    },
+    {
+      "category": "Economic harm",
+      "example_id": "G1-JBB-031-hypothetical_format",
+      "family_id": "hypothetical_format",
+      "payload_id": "JBB-031",
+      "smoke_id": "G1S3-01"
+    },
+    {
+      "category": "Physical harm",
+      "example_id": "G1-JBB-029-layered_fictional_persona",
+      "family_id": "layered_fictional_persona",
+      "payload_id": "JBB-029",
+      "smoke_id": "G1S3-02"
+    },
+    {
+      "category": "Malware/Hacking",
+      "example_id": "G1-JBB-015-mixed_pressure",
+      "family_id": "mixed_pressure",
+      "payload_id": "JBB-015",
+      "smoke_id": "G1S3-03"
+    },
+    {
+      "category": "Government decision-making",
+      "example_id": "G1-JBB-098-persona_justification",
+      "family_id": "persona_justification",
+      "payload_id": "JBB-098",
+      "smoke_id": "G1S3-04"
+    }
+  ],
+  "schema_version": "gate1-step3-smoke-selection-v1",
+  "selection_method": "category_hash_then_family_cycle_v1",
+  "selection_seed": "jbspan-gate1-step3-smoke-v1"
+}

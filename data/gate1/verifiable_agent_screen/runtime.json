@@ -1,0 +1,21 @@
+{
+  "schema_version": "gate1-verifiable-agent-screen-runtime-v1",
+  "source_workflow_run_id": 32494305198,
+  "source_workflow_head_sha": "d37aa47513769d2e055a393f922de3096f248ecb",
+  "source_artifact_id": 9451994129,
+  "source_artifact_name": "gate1-verifiable-agent-screen",
+  "source_artifact_zip_sha256": "71c85841a832dd76338a2c13fbd1a6a1f57a73459a01cec963abbb7b25b54bb0",
+  "screen_json_file_sha256": "8559045c0d7bad36b4c703593f4bea404af02a23333fea86284c4802dc06b89d",
+  "screen_json_canonical_sha256": "3a0f0fc8e2940126ace0bc055a50010a0090ad2f489ab620d96902db7e937165",
+  "screen_status": "SCREEN_PASS",
+  "selected_programs": [
+    "role_reassignment",
+    "priority_chain",
+    "authority_override"
+  ],
+  "confirmatory_eligible_count": 14,
+  "confirmatory_count": 15,
+  "eligible_program_count": 3,
+  "final_partition_observed": false,
+  "human_or_llm_judge_used": false
+}

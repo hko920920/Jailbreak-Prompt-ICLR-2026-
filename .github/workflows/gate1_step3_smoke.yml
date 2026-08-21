@@ -1,0 +1,289 @@
+name: gate1-step3-smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - .github/workflows/gate1_step3_smoke.yml
+      - configs/gate1/gate1_step3_runtime.json
+      - data/gate1/evaluator_registry.json
+      - data/gate1/evaluator_prompts.json
+      - src/jbspan/gate1/step3.py
+      - scripts/run_gate1_step3.py
+      - tests/test_gate1_step3.py
+      - pyproject.toml
+
+permissions:
+  contents: write
+
+jobs:
+  step3-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      SOURCE_REVISION: d8d87b8fdcb7806e3b4e45fffb2bc24aa6b17f32
+      SOURCE_PATH: data/harmful-behaviors.csv
+      SAFE_OUTPUT: artifacts/gate1-step3/safe
+      PRIVATE_OUTPUT: /tmp/gate1-step3/private
+      TARGET_REF: Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M
+      HARMBENCH_REF: RichardErkhov/cais_-_HarmBench-Mistral-7b-val-cls-gguf:Q4_K_M
+      STRONGREJECT_JUDGE_REF: bartowski/Phi-3.5-mini-instruct-GGUF:Q4_K_M
+      LLAMA_RELEASE_TAG: b10441
+      LLAMA_RELEASE_COMMIT: 0177dcc7300bad8914bb838baabce87899812491
+      LLAMA_ASSET: llama-b10441-bin-ubuntu-x64.tar.gz
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install and validate Step 3 code
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev,step3]'
+          ruff check .
+          mypy src/jbspan
+          pytest
+
+      - name: Download immutable payload source
+        run: |
+          source_csv="$RUNNER_TEMP/harmful-behaviors.csv"
+          url="https://huggingface.co/datasets/JailbreakBench/JBB-Behaviors/resolve/${SOURCE_REVISION}/${SOURCE_PATH}?download=true"
+          curl --fail --location --silent --show-error "$url" --output "$source_csv"
+          test -s "$source_csv"
+          echo "SOURCE_CSV=$source_csv" >> "$GITHUB_ENV"
+
+      - name: Prepare identities, token provenance, and smoke inputs
+        run: |
+          mkdir -p "$PRIVATE_OUTPUT" "$SAFE_OUTPUT"
+          python scripts/run_gate1_step3.py prepare \
+            --root . \
+            --source-csv "$SOURCE_CSV" \
+            --resolved-source-revision "$SOURCE_REVISION" \
+            --safe-output-dir "$SAFE_OUTPUT" \
+            --private-output-dir "$PRIVATE_OUTPUT"
+
+      - name: Install exact llama.cpp release
+        run: |
+          release_json="$RUNNER_TEMP/llama-release.json"
+          curl --fail --location --silent --show-error \
+            "https://api.github.com/repos/ggml-org/llama.cpp/releases/tags/${LLAMA_RELEASE_TAG}" \
+            --output "$release_json"
+          observed_commit="$(jq -r '.target_commitish' "$release_json")"
+          test "$observed_commit" = "$LLAMA_RELEASE_COMMIT"
+          asset_url="$(jq -r --arg name "$LLAMA_ASSET" '.assets[] | select(.name == $name) | .browser_download_url' "$release_json")"
+          asset_digest="$(jq -r --arg name "$LLAMA_ASSET" '.assets[] | select(.name == $name) | .digest' "$release_json")"
+          test -n "$asset_url"
+          test "$asset_url" != "null"
+          archive="$RUNNER_TEMP/$LLAMA_ASSET"
+          curl --fail --location --silent --show-error "$asset_url" --output "$archive"
+          observed_digest="sha256:$(sha256sum "$archive" | cut -d' ' -f1)"
+          test "$observed_digest" = "$asset_digest"
+          mkdir -p "$RUNNER_TEMP/llama-bin"
+          tar -xzf "$archive" -C "$RUNNER_TEMP/llama-bin"
+          llama_server="$(find "$RUNNER_TEMP/llama-bin" -type f -name llama-server | head -n1)"
+          test -x "$llama_server"
+          echo "LLAMA_SERVER=$llama_server" >> "$GITHUB_ENV"
+          echo "LLAMA_ASSET_DIGEST=$observed_digest" >> "$GITHUB_ENV"
+          "$llama_server" --version
+
+      - name: Generate target-model smoke responses
+        run: |
+          export HF_HOME="$RUNNER_TEMP/hf-target"
+          mkdir -p "$HF_HOME" "$RUNNER_TEMP/target-server"
+          nohup "$LLAMA_SERVER" \
+            -hf "$TARGET_REF" \
+            --host 127.0.0.1 \
+            --port 8080 \
+            -c 4096 \
+            -t 4 \
+            >"$RUNNER_TEMP/target-server/server.log" 2>&1 &
+          pid=$!
+          ready=0
+          for _ in $(seq 1 240); do
+            if ! kill -0 "$pid" 2>/dev/null; then
+              tail -n 80 "$RUNNER_TEMP/target-server/server.log"
+              exit 1
+            fi
+            if [ "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/health || true)" = "200" ]; then
+              ready=1
+              break
+            fi
+            sleep 5
+          done
+          test "$ready" = "1"
+          timeout 65m python scripts/run_gate1_step3.py target \
+            --root . \
+            --private-output-dir "$PRIVATE_OUTPUT" \
+            --server-url http://127.0.0.1:8080
+          kill "$pid" 2>/dev/null || true
+          wait "$pid" 2>/dev/null || true
+          rm -rf "$HF_HOME"
+
+      - name: Evaluate with HarmBench smoke surrogate
+        run: |
+          export HF_HOME="$RUNNER_TEMP/hf-harmbench"
+          mkdir -p "$HF_HOME" "$RUNNER_TEMP/harmbench-server"
+          nohup "$LLAMA_SERVER" \
+            -hf "$HARMBENCH_REF" \
+            --host 127.0.0.1 \
+            --port 8081 \
+            -c 4096 \
+            -t 4 \
+            >"$RUNNER_TEMP/harmbench-server/server.log" 2>&1 &
+          pid=$!
+          ready=0
+          for _ in $(seq 1 240); do
+            if ! kill -0 "$pid" 2>/dev/null; then
+              tail -n 80 "$RUNNER_TEMP/harmbench-server/server.log"
+              exit 1
+            fi
+            if [ "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:8081/health || true)" = "200" ]; then
+              ready=1
+              break
+            fi
+            sleep 5
+          done
+          test "$ready" = "1"
+          timeout 30m python scripts/run_gate1_step3.py evaluate \
+            --root . \
+            --private-output-dir "$PRIVATE_OUTPUT" \
+            --safe-output-dir "$SAFE_OUTPUT" \
+            --server-url http://127.0.0.1:8081 \
+            --mode harmbench
+          kill "$pid" 2>/dev/null || true
+          wait "$pid" 2>/dev/null || true
+          rm -rf "$HF_HOME"
+
+      - name: Evaluate with StrongREJECT rubric smoke surrogate
+        run: |
+          export HF_HOME="$RUNNER_TEMP/hf-strongreject"
+          mkdir -p "$HF_HOME" "$RUNNER_TEMP/strongreject-server"
+          nohup "$LLAMA_SERVER" \
+            -hf "$STRONGREJECT_JUDGE_REF" \
+            --host 127.0.0.1 \
+            --port 8082 \
+            -c 4096 \
+            -t 4 \
+            >"$RUNNER_TEMP/strongreject-server/server.log" 2>&1 &
+          pid=$!
+          ready=0
+          for _ in $(seq 1 240); do
+            if ! kill -0 "$pid" 2>/dev/null; then
+              tail -n 80 "$RUNNER_TEMP/strongreject-server/server.log"
+              exit 1
+            fi
+            if [ "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:8082/health || true)" = "200" ]; then
+              ready=1
+              break
+            fi
+            sleep 5
+          done
+          test "$ready" = "1"
+          timeout 50m python scripts/run_gate1_step3.py evaluate \
+            --root . \
+            --private-output-dir "$PRIVATE_OUTPUT" \
+            --safe-output-dir "$SAFE_OUTPUT" \
+            --server-url http://127.0.0.1:8082 \
+            --mode strongreject
+          kill "$pid" 2>/dev/null || true
+          wait "$pid" 2>/dev/null || true
+          rm -rf "$HF_HOME"
+
+      - name: Finalize conservative consensus smoke
+        run: |
+          python scripts/run_gate1_step3.py finalize \
+            --root . \
+            --safe-output-dir "$SAFE_OUTPUT" \
+            --private-output-dir "$PRIVATE_OUTPUT"
+
+      - name: Verify safe outputs contain no private text
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          private = Path(os.environ['PRIVATE_OUTPUT'])
+          safe = Path(os.environ['SAFE_OUTPUT'])
+          combined = '\n'.join(
+              path.read_text(encoding='utf-8')
+              for path in safe.iterdir()
+              if path.is_file()
+          )
+          sensitive = []
+          for path in private.rglob('*.jsonl'):
+              for line in path.read_text(encoding='utf-8').splitlines():
+                  if not line.strip():
+                      continue
+                  row = json.loads(line)
+                  for key in (
+                      'goal', 'payload_text', 'rendered_prompt', 'forbidden_prompt',
+                      'original_chat_prompt', 'attack_chat_prompt', 'response',
+                      'judge_output'
+                  ):
+                      value = row.get(key)
+                      if isinstance(value, str) and len(value) >= 16:
+                          sensitive.append(value)
+          for value in sensitive:
+              if value in combined:
+                  raise SystemExit('private text leaked into safe Step 3 outputs')
+          PY
+
+      - name: Persist or verify frozen safe Step 3 outputs
+        run: |
+          destination=data/gate1/step3
+          if [ -d "$destination" ]; then
+            diff -ru "$destination" "$SAFE_OUTPUT"
+          else
+            mkdir -p "$destination"
+            cp -a "$SAFE_OUTPUT"/. "$destination"/
+            git config user.name github-actions[bot]
+            git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+            git add "$destination"
+            git commit -m "Freeze Gate 1 Step 3 safe smoke outputs [skip ci]"
+            git push origin HEAD:agent/gate1-contract
+          fi
+
+      - name: Publish safe Step 3 summary
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          safe = Path(os.environ['SAFE_OUTPUT'])
+          summary = json.loads((safe / 'smoke_summary.json').read_text(encoding='utf-8'))
+          token = json.loads((safe / 'token_provenance_manifest.json').read_text(encoding='utf-8'))
+          with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a', encoding='utf-8') as handle:
+              handle.write('# Automated Gate 1 Step 3\n\n')
+              handle.write(f"- status: **{summary['status']}**\n")
+              handle.write(f"- token provenance records: **{token['record_count']}**\n")
+              handle.write(f"- smoke examples: **{summary['smoke_example_count']}**\n")
+              handle.write(f"- target generations: **{summary['target_generation_count']}**\n")
+              handle.write(f"- evaluator pair coverage: **{summary['evaluator_pair_coverage']:.3f}**\n")
+              handle.write(f"- abstention rate: **{summary['consensus_abstention_rate']:.3f}**\n")
+              handle.write(f"- provisional eligible: **{summary['eligible_count']}**\n")
+              handle.write('- paper validity: **false**\n')
+              handle.write('- Gate 1 decision: **not evaluated**\n')
+          PY
+
+      - name: Upload safe Step 3 outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate1-step3-safe-smoke
+          path: ${{ env.SAFE_OUTPUT }}
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Cleanup private files
+        if: always()
+        run: |
+          if [ -d "$PRIVATE_OUTPUT" ]; then
+            find "$PRIVATE_OUTPUT" -type f -print0 | xargs -0 -r shred -u
+            rm -rf "$PRIVATE_OUTPUT"
+          fi

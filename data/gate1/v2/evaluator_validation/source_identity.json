@@ -1,0 +1,9 @@
+{
+  "path": "data/judge-comparison.csv",
+  "repository": "JailbreakBench/JBB-Behaviors",
+  "revision": "d8d87b8fdcb7806e3b4e45fffb2bc24aa6b17f32",
+  "row_count": 300,
+  "schema_version": "gate1-step3b-jbb-source-identity-v1",
+  "source_file_sha256": "dacaf76a1057785f11b0fc6aa07b9a73cdab588319ddfc5e8cef2909e5b112a5",
+  "source_file_size_bytes": 363132
+}

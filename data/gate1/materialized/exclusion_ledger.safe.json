@@ -1,0 +1,6 @@
+{
+  "count": 0,
+  "exclusions": [],
+  "schema_version": "gate1-step2-exclusion-ledger-v1",
+  "stage": "pre_inference_materialization"
+}

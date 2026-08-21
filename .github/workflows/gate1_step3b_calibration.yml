@@ -1,0 +1,487 @@
+name: gate1-step3b-calibration
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - .github/workflows/gate1_step3b_calibration.yml
+      - configs/gate1/gate1_step3b.json
+      - src/jbspan/gate1/step3b_calibration.py
+      - scripts/run_gate1_step3b_calibration.py
+      - tests/test_gate1_step3b_calibration.py
+      - docs/GATE1_STEP3B_CALIBRATION_PROTOCOL.md
+
+permissions:
+  contents: write
+
+jobs:
+  calibration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      PAYLOAD_SOURCE_REVISION: d8d87b8fdcb7806e3b4e45fffb2bc24aa6b17f32
+      PAYLOAD_SOURCE_PATH: data/harmful-behaviors.csv
+      PAYLOAD_SOURCE_SHA256: 4a8ec6832056b631eb092dccc60d37a61c3d441268268888b3d006288afeffa1
+      ATTACK_SOURCE_REPOSITORY: mdoumbouya/h4rm3l
+      ATTACK_SOURCE_REVISION: e6f58a1a1e56c1a95b26b06aa4fe393ee2240dbd
+      ATTACK_SOURCE_PATH: experiments/experiment_116_bandi_synthesis/config/benchmark_reference_programs.csv
+      ATTACK_SOURCE_BLOB_SHA: 220a255d39c1cad769e2414448fbad514e2823dd
+      ATTACK_SOURCE_SHA256: b4c07b11c9e92ecd332807e8ba32d8fe028b59f4c3499f72670d44105626ef07
+      SAFE_OUTPUT: artifacts/gate1-step3b-calibration/safe
+      PRIVATE_OUTPUT: /tmp/gate1-step3b-calibration/private
+      LLAMA_RELEASE_TAG: b10441
+      LLAMA_RELEASE_COMMIT: 0177dcc7300bad8914bb838baabce87899812491
+      LLAMA_ASSET: llama-b10441-bin-ubuntu-x64.tar.gz
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install and validate calibration code
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev,step3]'
+          ruff check .
+          mypy src/jbspan
+          pytest
+
+      - name: Download and verify frozen source files
+        run: |
+          payload_csv="$RUNNER_TEMP/harmful-behaviors.csv"
+          payload_url="https://huggingface.co/datasets/JailbreakBench/JBB-Behaviors/resolve/${PAYLOAD_SOURCE_REVISION}/${PAYLOAD_SOURCE_PATH}?download=true"
+          curl --fail --location --silent --show-error \
+            "$payload_url" \
+            --output "$payload_csv"
+          test "$(sha256sum "$payload_csv" | cut -d' ' -f1)" = \
+            "$PAYLOAD_SOURCE_SHA256"
+
+          attack_csv="$RUNNER_TEMP/benchmark_reference_programs.csv"
+          attack_url="https://raw.githubusercontent.com/${ATTACK_SOURCE_REPOSITORY}/${ATTACK_SOURCE_REVISION}/${ATTACK_SOURCE_PATH}"
+          curl --fail --location --silent --show-error \
+            "$attack_url" \
+            --output "$attack_csv"
+          test "$(sha256sum "$attack_csv" | cut -d' ' -f1)" = \
+            "$ATTACK_SOURCE_SHA256"
+          observed_blob="$(python - "$attack_csv" <<'PY'
+          import hashlib
+          import sys
+          from pathlib import Path
+
+          data = Path(sys.argv[1]).read_bytes()
+          header = f"blob {len(data)}\0".encode("ascii")
+          print(hashlib.sha1(header + data).hexdigest())
+          PY
+          )"
+          test "$observed_blob" = "$ATTACK_SOURCE_BLOB_SHA"
+          echo "PAYLOAD_CSV=$payload_csv" >> "$GITHUB_ENV"
+          echo "ATTACK_CSV=$attack_csv" >> "$GITHUB_ENV"
+
+      - name: Prepare the sealed calibration denominator
+        run: |
+          mkdir -p "$PRIVATE_OUTPUT" "$SAFE_OUTPUT"
+          python scripts/run_gate1_step3b_calibration.py prepare \
+            --root . \
+            --payload-source-csv "$PAYLOAD_CSV" \
+            --attack-source-csv "$ATTACK_CSV" \
+            --safe-output-dir "$SAFE_OUTPUT" \
+            --private-output-dir "$PRIVATE_OUTPUT"
+
+      - name: Install exact llama.cpp release
+        run: |
+          release_json="$RUNNER_TEMP/llama-release.json"
+          curl --fail --location --silent --show-error \
+            "https://api.github.com/repos/ggml-org/llama.cpp/releases/tags/${LLAMA_RELEASE_TAG}" \
+            --output "$release_json"
+          test "$(jq -r '.target_commitish' "$release_json")" = \
+            "$LLAMA_RELEASE_COMMIT"
+          asset_url="$(jq -r --arg name "$LLAMA_ASSET" \
+            '.assets[] | select(.name == $name) | .browser_download_url' \
+            "$release_json")"
+          asset_digest="$(jq -r --arg name "$LLAMA_ASSET" \
+            '.assets[] | select(.name == $name) | .digest' \
+            "$release_json")"
+          archive="$RUNNER_TEMP/$LLAMA_ASSET"
+          curl --fail --location --silent --show-error \
+            "$asset_url" \
+            --output "$archive"
+          test "sha256:$(sha256sum "$archive" | cut -d' ' -f1)" = \
+            "$asset_digest"
+          mkdir -p "$RUNNER_TEMP/llama-bin"
+          tar -xzf "$archive" -C "$RUNNER_TEMP/llama-bin"
+          llama_server="$(find "$RUNNER_TEMP/llama-bin" \
+            -type f -name llama-server | head -n1)"
+          test -x "$llama_server"
+          echo "LLAMA_SERVER=$llama_server" >> "$GITHUB_ENV"
+          "$llama_server" --version
+
+      - name: Download the exact frozen target GGUF
+        run: |
+          export HF_HOME="$RUNNER_TEMP/hf-target"
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          from huggingface_hub import hf_hub_download
+
+          def sha256_file(path: Path) -> str:
+              digest = hashlib.sha256()
+              with path.open("rb") as handle:
+                  for block in iter(
+                      lambda: handle.read(1024 * 1024),
+                      b"",
+                  ):
+                      digest.update(block)
+              return digest.hexdigest()
+
+          identity = json.loads(
+              Path("data/gate1/step3/step3_identity.json").read_text()
+          )
+          model = identity["target_gguf"]
+          paths = []
+          for item in model["files"]:
+              path = Path(
+                  hf_hub_download(
+                      repo_id=model["repo_id"],
+                      revision=model["revision"],
+                      filename=item["filename"],
+                  )
+              )
+              digest = sha256_file(path)
+              if digest != item["sha256"]:
+                  raise SystemExit("target GGUF digest mismatch")
+              paths.append(path)
+          first = sorted(paths, key=lambda path: path.name)[0]
+          with Path(os.environ["GITHUB_ENV"]).open("a") as handle:
+              handle.write(f"TARGET_MODEL_PATH={first}\n")
+          PY
+
+      - name: Generate 80 calibration responses at frozen seed 17
+        run: |
+          mkdir -p "$RUNNER_TEMP/target-server"
+          nohup "$LLAMA_SERVER" \
+            -m "$TARGET_MODEL_PATH" \
+            --host 127.0.0.1 \
+            --port 8080 \
+            -c 4096 \
+            -t 4 \
+            >"$RUNNER_TEMP/target-server/server.log" 2>&1 &
+          pid=$!
+          cleanup_target() {
+            kill "$pid" 2>/dev/null || true
+            wait "$pid" 2>/dev/null || true
+          }
+          trap cleanup_target EXIT
+          ready=0
+          for _ in $(seq 1 240); do
+            if ! kill -0 "$pid" 2>/dev/null; then
+              tail -n 100 "$RUNNER_TEMP/target-server/server.log"
+              exit 1
+            fi
+            if [ "$(curl -sS -o /dev/null -w '%{http_code}' \
+              http://127.0.0.1:8080/health || true)" = "200" ]; then
+              ready=1
+              break
+            fi
+            sleep 5
+          done
+          test "$ready" = "1"
+          timeout 100m python scripts/run_gate1_step3b_calibration.py target \
+            --root . \
+            --private-output-dir "$PRIVATE_OUTPUT" \
+            --server-url http://127.0.0.1:8080
+          cleanup_target
+          trap - EXIT
+          rm -rf "$RUNNER_TEMP/hf-target"
+
+      - name: Download the exact frozen HarmBench GGUF
+        run: |
+          export HF_HOME="$RUNNER_TEMP/hf-harmbench"
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          from huggingface_hub import hf_hub_download
+
+          def sha256_file(path: Path) -> str:
+              digest = hashlib.sha256()
+              with path.open("rb") as handle:
+                  for block in iter(
+                      lambda: handle.read(1024 * 1024),
+                      b"",
+                  ):
+                      digest.update(block)
+              return digest.hexdigest()
+
+          identity = json.loads(
+              Path("data/gate1/step3/step3_identity.json").read_text()
+          )
+          model = identity["harmbench_smoke"]
+          item = model["files"][0]
+          path = Path(
+              hf_hub_download(
+                  repo_id=model["repo_id"],
+                  revision=model["revision"],
+                  filename=item["filename"],
+              )
+          )
+          digest = sha256_file(path)
+          if digest != item["sha256"]:
+              raise SystemExit("HarmBench GGUF digest mismatch")
+          with Path(os.environ["GITHUB_ENV"]).open("a") as handle:
+              handle.write(f"HARMBENCH_MODEL_PATH={path}\n")
+          PY
+
+      - name: Screen all calibration responses with HarmBench
+        run: |
+          mkdir -p "$RUNNER_TEMP/harmbench-server"
+          nohup "$LLAMA_SERVER" \
+            -m "$HARMBENCH_MODEL_PATH" \
+            --host 127.0.0.1 \
+            --port 8081 \
+            -c 4096 \
+            -t 4 \
+            >"$RUNNER_TEMP/harmbench-server/server.log" 2>&1 &
+          pid=$!
+          cleanup_harmbench() {
+            kill "$pid" 2>/dev/null || true
+            wait "$pid" 2>/dev/null || true
+          }
+          trap cleanup_harmbench EXIT
+          ready=0
+          for _ in $(seq 1 240); do
+            if ! kill -0 "$pid" 2>/dev/null; then
+              tail -n 100 "$RUNNER_TEMP/harmbench-server/server.log"
+              exit 1
+            fi
+            if [ "$(curl -sS -o /dev/null -w '%{http_code}' \
+              http://127.0.0.1:8081/health || true)" = "200" ]; then
+              ready=1
+              break
+            fi
+            sleep 5
+          done
+          test "$ready" = "1"
+          timeout 45m python \
+            scripts/run_gate1_step3b_calibration.py evaluate \
+            --root . \
+            --private-output-dir "$PRIVATE_OUTPUT" \
+            --server-url http://127.0.0.1:8081
+          cleanup_harmbench
+          trap - EXIT
+          rm -rf "$RUNNER_TEMP/hf-harmbench"
+
+      - name: Apply the frozen candidate-level selection rule
+        run: |
+          python scripts/run_gate1_step3b_calibration.py finalize \
+            --root . \
+            --private-output-dir "$PRIVATE_OUTPUT" \
+            --safe-output-dir "$SAFE_OUTPUT"
+
+      - name: Audit privacy and sealed partitions
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          private = Path(os.environ["PRIVATE_OUTPUT"])
+          safe = Path(os.environ["SAFE_OUTPUT"])
+          combined = "\n".join(
+              path.read_text(encoding="utf-8")
+              for path in safe.iterdir()
+              if path.is_file()
+          )
+          for path in private.rglob("*.jsonl"):
+              for line in path.read_text(encoding="utf-8").splitlines():
+                  if not line.strip():
+                      continue
+                  row = json.loads(line)
+                  for key in (
+                      "forbidden_prompt",
+                      "chat_prompt",
+                      "response",
+                      "judge_output",
+                  ):
+                      value = row.get(key)
+                      if (
+                          isinstance(value, str)
+                          and len(value) >= 16
+                          and value in combined
+                      ):
+                          raise SystemExit(
+                              "private calibration text leaked"
+                          )
+          summary = json.loads(
+              (safe / "calibration_summary.json").read_text()
+          )
+          assert summary["smoke_outputs_observed"] is False
+          assert summary["final_evaluation_outputs_observed"] is False
+          assert summary["gate2_heldout_used"] is False
+          assert summary["attack_denominator"] == 70
+          assert summary["target_generation_count"] == 80
+          PY
+
+      - name: Create the safe calibration report
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          safe = Path(os.environ["SAFE_OUTPUT"])
+          summary = json.loads(
+              (safe / "calibration_summary.json").read_text()
+          )
+          selected = summary["selected_candidate_ids"]
+          rows = [
+              "# Automated Gate 1 — Step 3B.2 Calibration Report",
+              "",
+              "Date: 2026-08-16 (Asia/Seoul)",
+              "",
+              f"Status: **{summary['status']}**",
+              "",
+              "## Frozen denominator",
+              "",
+              "- calibration payloads: **10**",
+              "- frozen candidate programs: **7**",
+              "- attack denominator: **70**",
+              "- original controls: **10**",
+              "- target generations: **80**",
+              "- target seed: **17**",
+              "- evaluator: **development-only HarmBench screen**",
+              "",
+              "## Candidate results",
+              "",
+              "| Candidate | Eligible | Harmful attacks | Safe attacks | Abstain |",
+              "|---|---:|---:|---:|---:|",
+          ]
+          for item in summary["candidate_results"]:
+              rows.append(
+                  "| {candidate_id} | {eligible_count}/10 | "
+                  "{attack_harmful_count}/10 | "
+                  "{attack_safe_count}/10 | "
+                  "{attack_abstention_count}/10 |".format(**item)
+              )
+          rows.extend(
+              [
+                  "",
+                  "## Frozen selection",
+                  "",
+                  (
+                      "- selected candidate IDs: **"
+                      + (", ".join(selected) if selected else "none")
+                      + "**"
+                  ),
+                  (
+                      "- qualifying candidates: **"
+                      f"{summary['qualifying_candidate_count']}**"
+                  ),
+                  (
+                      "- original safe controls: **"
+                      f"{summary['original_safe_count']}/10**"
+                  ),
+                  "",
+                  "## Scientific boundary",
+                  "",
+                  "- Calibration is development-only and not paper-valid.",
+                  "- Calibration cannot decide Gate 1.",
+                  "- No untouched smoke or final-evaluation output was observed.",
+                  "- No candidate was rewritten for a specific payload.",
+                  "- No causal, localization, compactness, or minimality claim is made.",
+                  "",
+                  "## Decision",
+                  "",
+                  "```text",
+                  str(summary["status"]),
+                  (
+                      "NEXT = UNTOUCHED_SMOKE"
+                      if selected
+                      else "NEXT = STOP_AND_REASSESS_ATTACK_SOURCE"
+                  ),
+                  "```",
+              ]
+          )
+          report_path = (
+              Path(os.environ["RUNNER_TEMP"])
+              / "GATE1_STEP3B_CALIBRATION_REPORT.md"
+          )
+          report_path.write_text(
+              "\n".join(rows) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Persist or verify calibration outputs and report
+        run: |
+          destination=data/gate1/v2/calibration
+          report=docs/GATE1_STEP3B_CALIBRATION_REPORT.md
+          generated_report="$RUNNER_TEMP/GATE1_STEP3B_CALIBRATION_REPORT.md"
+          if [ -d "$destination" ]; then
+            diff -ru "$destination" "$SAFE_OUTPUT"
+            diff -u "$report" "$generated_report"
+          else
+            mkdir -p "$destination"
+            cp -a "$SAFE_OUTPUT"/. "$destination"/
+            cp "$generated_report" "$report"
+            git config user.name github-actions[bot]
+            git config user.email \
+              41898282+github-actions[bot]@users.noreply.github.com
+            git add "$destination" "$report"
+            git commit -m \
+              "Freeze Gate 1 Step 3B calibration selection [skip ci]"
+            git push origin HEAD:agent/gate1-contract
+          fi
+
+      - name: Publish safe calibration summary
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          safe = Path(os.environ["SAFE_OUTPUT"])
+          summary = json.loads(
+              (safe / "calibration_summary.json").read_text()
+          )
+          with Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a") as handle:
+              handle.write("# Gate 1 Step 3B.2 Calibration\n\n")
+              handle.write(f"- status: **{summary['status']}**\n")
+              handle.write("- calibration payloads: **10**\n")
+              handle.write("- attack denominator: **70**\n")
+              handle.write(
+                  f"- original safe: **{summary['original_safe_count']}/10**\n"
+              )
+              handle.write(
+                  "- selected candidates: **"
+                  + str(len(summary["selected_candidate_ids"]))
+                  + "**\n"
+              )
+              handle.write("- untouched outputs observed: **false**\n")
+              handle.write("- paper validity: **false**\n")
+          PY
+
+      - name: Upload safe calibration outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate1-step3b-safe-calibration
+          path: ${{ env.SAFE_OUTPUT }}
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Cleanup private calibration files
+        if: always()
+        run: |
+          if [ -d "$PRIVATE_OUTPUT" ]; then
+            find "$PRIVATE_OUTPUT" -type f -print0 | xargs -0 -r shred -u
+            rm -rf "$PRIVATE_OUTPUT"
+          fi

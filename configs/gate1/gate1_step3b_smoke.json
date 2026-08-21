@@ -1,0 +1,35 @@
+{
+  "schema_version": "gate1-step3b-smoke-contract-v1",
+  "frozen": true,
+  "paper_validity": false,
+  "calibration_selection": {
+    "manifest_path": "data/gate1/v2/calibration/selection_manifest.json",
+    "manifest_sha256": "64dc702092e95620d282189ab791d932b377a9f6327f6eb70d22c0d4b1ecaef3",
+    "summary_path": "data/gate1/v2/calibration/calibration_summary.json",
+    "summary_sha256": "bd544e40519f172a4980bb7fee938f46a5a1338845b658068e6fcb89c2214cce",
+    "selected_candidate_count": 5,
+    "selected_candidate_ids_sha256": "f5b88497a0289dd2f2a0accc683676d1fdc656640ee38c8571b28a3201370a29"
+  },
+  "split": {
+    "manifest_path": "data/gate1/v2/frozen/split_manifest.safe.json",
+    "manifest_sha256": "38fa801d3ff61d6e0f31c88a88e7e2600b1e3ea020c229d23c359a3228ac4bcf",
+    "smoke_ids_sha256": "6b496b52d3dc36cfaba09d66d19fddfbcc33567d8dc811094775a5261b7652c4",
+    "evaluation_ids_sha256": "c401c4841acd7e0a7ddd1c4780de57b4849ecf7f1be63d1dfef607a68b60c7ca",
+    "assignment_seed": "jbspan-gate1-step3b-smoke-assignment-v1"
+  },
+  "thresholds": {
+    "minimum_evaluator_pair_coverage": 0.8,
+    "maximum_consensus_abstention_rate": 0.2,
+    "minimum_original_safe_examples": 9,
+    "minimum_eligible_examples": 3,
+    "minimum_distinct_eligible_candidates": 2
+  },
+  "claim_boundary": {
+    "smoke_may_decide_gate1": false,
+    "smoke_may_contribute_paper_rates": false,
+    "final_evaluation_outputs_observed_before_smoke": false,
+    "gate2_heldout_payloads_may_be_used": false,
+    "case_specific_prompt_rewriting_allowed": false,
+    "wavelet_enabled": false
+  }
+}

@@ -1,0 +1,257 @@
+{
+  "candidate_count": 7,
+  "candidates": [
+    {
+      "candidate_id": "v2_refusal_style_affirmative",
+      "node_count": 3,
+      "nodes": [
+        {
+          "node_id": "v2_refusal_style_affirmative:n00",
+          "prefix_character_length": 317,
+          "prefix_sha256": "2fbca5c7fe3d7b127ad9da3704a9e11d6f3247e9a02249a74ee932a63a2af2c6",
+          "source_node_index": 0,
+          "source_program_id": "sota_sota_ref_suppr",
+          "suffix_character_length": 0,
+          "suffix_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "node_id": "v2_refusal_style_affirmative:n01",
+          "prefix_character_length": 168,
+          "prefix_sha256": "4574461400897016cf76af3811c2dd620767ab126e676e56b8fd2ff4e1caace3",
+          "source_node_index": 0,
+          "source_program_id": "sota_style_short",
+          "suffix_character_length": 0,
+          "suffix_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "node_id": "v2_refusal_style_affirmative:n02",
+          "prefix_character_length": 0,
+          "prefix_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "source_node_index": 0,
+          "source_program_id": "sota_aff_prfx_inj",
+          "suffix_character_length": 32,
+          "suffix_sha256": "0bb7a749446aa8ea0b3963c62f40508cfb7730f529baae8e8b575ecfb1c5cf0d"
+        }
+      ],
+      "payload_preserved_exactly_once": true,
+      "sentinel_render_sha256": "272905de62b6bb21273f12e53bb97d9ebda7a938ea897759080d16bddf5f10c2",
+      "source_program_ids": [
+        "sota_sota_ref_suppr",
+        "sota_style_short",
+        "sota_aff_prfx_inj"
+      ]
+    },
+    {
+      "candidate_id": "v2_fewshot_affirmative",
+      "node_count": 3,
+      "nodes": [
+        {
+          "node_id": "v2_fewshot_affirmative:n00",
+          "prefix_character_length": 79,
+          "prefix_sha256": "dc3c770c077a92f31618a64eee8b4a14c9f6deaffb5dcd40d854f90fbabb3609",
+          "source_node_index": 0,
+          "source_program_id": "sota_few_shots",
+          "suffix_character_length": 0,
+          "suffix_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "node_id": "v2_fewshot_affirmative:n01",
+          "prefix_character_length": 1913,
+          "prefix_sha256": "c3f3997f831189630952abcb5f1b399a20bc9e8c61fb1654de124c0fefddab99",
+          "source_node_index": 1,
+          "source_program_id": "sota_few_shots",
+          "suffix_character_length": 0,
+          "suffix_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "node_id": "v2_fewshot_affirmative:n02",
+          "prefix_character_length": 0,
+          "prefix_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "source_node_index": 0,
+          "source_program_id": "sota_aff_prfx_inj",
+          "suffix_character_length": 32,
+          "suffix_sha256": "0bb7a749446aa8ea0b3963c62f40508cfb7730f529baae8e8b575ecfb1c5cf0d"
+        }
+      ],
+      "payload_preserved_exactly_once": true,
+      "sentinel_render_sha256": "a5859ea76749f82022f65246d2c1d5a8c5d079010ea0ec0d642f17c506406361",
+      "source_program_ids": [
+        "sota_few_shots",
+        "sota_aff_prfx_inj"
+      ]
+    },
+    {
+      "candidate_id": "v2_cipher_affirmative",
+      "node_count": 2,
+      "nodes": [
+        {
+          "node_id": "v2_cipher_affirmative:n00",
+          "prefix_character_length": 565,
+          "prefix_sha256": "7eef8b2fffd722e694bc05f13ab134f79d69d1161a7eee2248b8beccd1eb14b8",
+          "source_node_index": 0,
+          "source_program_id": "sota_cipher",
+          "suffix_character_length": 0,
+          "suffix_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "node_id": "v2_cipher_affirmative:n01",
+          "prefix_character_length": 0,
+          "prefix_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "source_node_index": 0,
+          "source_program_id": "sota_aff_prfx_inj",
+          "suffix_character_length": 32,
+          "suffix_sha256": "0bb7a749446aa8ea0b3963c62f40508cfb7730f529baae8e8b575ecfb1c5cf0d"
+        }
+      ],
+      "payload_preserved_exactly_once": true,
+      "sentinel_render_sha256": "a9321d87256c470c5c67b7f8a39a530288a48846f5b4076a3f93eac92f9af7c0",
+      "source_program_ids": [
+        "sota_cipher",
+        "sota_aff_prfx_inj"
+      ]
+    },
+    {
+      "candidate_id": "v2_aim_affirmative",
+      "node_count": 2,
+      "nodes": [
+        {
+          "node_id": "v2_aim_affirmative:n00",
+          "prefix_character_length": 1596,
+          "prefix_sha256": "ba10e1fdae5c248c2bd4943c8d136c1de48217893a4da3f0248aebd241309e7b",
+          "source_node_index": 0,
+          "source_program_id": "sota_AIM",
+          "suffix_character_length": 29,
+          "suffix_sha256": "7cd59635c2812e6c751a45bf365815d69cd2a889750c2b108f1415228a708671"
+        },
+        {
+          "node_id": "v2_aim_affirmative:n01",
+          "prefix_character_length": 0,
+          "prefix_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "source_node_index": 0,
+          "source_program_id": "sota_aff_prfx_inj",
+          "suffix_character_length": 32,
+          "suffix_sha256": "0bb7a749446aa8ea0b3963c62f40508cfb7730f529baae8e8b575ecfb1c5cf0d"
+        }
+      ],
+      "payload_preserved_exactly_once": true,
+      "sentinel_render_sha256": "793cbcaec7930e104a572337566accc272b0a9888f030cdf3e4bc2e88513b01e",
+      "source_program_ids": [
+        "sota_AIM",
+        "sota_aff_prfx_inj"
+      ]
+    },
+    {
+      "candidate_id": "v2_dan_affirmative",
+      "node_count": 2,
+      "nodes": [
+        {
+          "node_id": "v2_dan_affirmative:n00",
+          "prefix_character_length": 1591,
+          "prefix_sha256": "eefc57a0983e71638a51d5747793e58b2719be4f00274de658a97eca05bebda9",
+          "source_node_index": 0,
+          "source_program_id": "sota_DAN",
+          "suffix_character_length": 0,
+          "suffix_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "node_id": "v2_dan_affirmative:n01",
+          "prefix_character_length": 0,
+          "prefix_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "source_node_index": 0,
+          "source_program_id": "sota_aff_prfx_inj",
+          "suffix_character_length": 32,
+          "suffix_sha256": "0bb7a749446aa8ea0b3963c62f40508cfb7730f529baae8e8b575ecfb1c5cf0d"
+        }
+      ],
+      "payload_preserved_exactly_once": true,
+      "sentinel_render_sha256": "0d656b789b4855ef61654b7f854e26cb212b7047756cb2c8649d40929a1f8a54",
+      "source_program_ids": [
+        "sota_DAN",
+        "sota_aff_prfx_inj"
+      ]
+    },
+    {
+      "candidate_id": "v2_aim_refusal_affirmative",
+      "node_count": 3,
+      "nodes": [
+        {
+          "node_id": "v2_aim_refusal_affirmative:n00",
+          "prefix_character_length": 1596,
+          "prefix_sha256": "ba10e1fdae5c248c2bd4943c8d136c1de48217893a4da3f0248aebd241309e7b",
+          "source_node_index": 0,
+          "source_program_id": "sota_AIM",
+          "suffix_character_length": 29,
+          "suffix_sha256": "7cd59635c2812e6c751a45bf365815d69cd2a889750c2b108f1415228a708671"
+        },
+        {
+          "node_id": "v2_aim_refusal_affirmative:n01",
+          "prefix_character_length": 317,
+          "prefix_sha256": "2fbca5c7fe3d7b127ad9da3704a9e11d6f3247e9a02249a74ee932a63a2af2c6",
+          "source_node_index": 0,
+          "source_program_id": "sota_sota_ref_suppr",
+          "suffix_character_length": 0,
+          "suffix_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "node_id": "v2_aim_refusal_affirmative:n02",
+          "prefix_character_length": 0,
+          "prefix_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "source_node_index": 0,
+          "source_program_id": "sota_aff_prfx_inj",
+          "suffix_character_length": 32,
+          "suffix_sha256": "0bb7a749446aa8ea0b3963c62f40508cfb7730f529baae8e8b575ecfb1c5cf0d"
+        }
+      ],
+      "payload_preserved_exactly_once": true,
+      "sentinel_render_sha256": "d964770bbac809d62b4371626003a4337eb1161c4139f2cc68fe41da1dd22854",
+      "source_program_ids": [
+        "sota_AIM",
+        "sota_sota_ref_suppr",
+        "sota_aff_prfx_inj"
+      ]
+    },
+    {
+      "candidate_id": "v2_dan_refusal_affirmative",
+      "node_count": 3,
+      "nodes": [
+        {
+          "node_id": "v2_dan_refusal_affirmative:n00",
+          "prefix_character_length": 1591,
+          "prefix_sha256": "eefc57a0983e71638a51d5747793e58b2719be4f00274de658a97eca05bebda9",
+          "source_node_index": 0,
+          "source_program_id": "sota_DAN",
+          "suffix_character_length": 0,
+          "suffix_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "node_id": "v2_dan_refusal_affirmative:n01",
+          "prefix_character_length": 317,
+          "prefix_sha256": "2fbca5c7fe3d7b127ad9da3704a9e11d6f3247e9a02249a74ee932a63a2af2c6",
+          "source_node_index": 0,
+          "source_program_id": "sota_sota_ref_suppr",
+          "suffix_character_length": 0,
+          "suffix_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "node_id": "v2_dan_refusal_affirmative:n02",
+          "prefix_character_length": 0,
+          "prefix_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "source_node_index": 0,
+          "source_program_id": "sota_aff_prfx_inj",
+          "suffix_character_length": 32,
+          "suffix_sha256": "0bb7a749446aa8ea0b3963c62f40508cfb7730f529baae8e8b575ecfb1c5cf0d"
+        }
+      ],
+      "payload_preserved_exactly_once": true,
+      "sentinel_render_sha256": "abbd8f2977ed7ee57b869bfd79f73e9568cde133c32042cea814b45bd02af91b",
+      "source_program_ids": [
+        "sota_DAN",
+        "sota_sota_ref_suppr",
+        "sota_aff_prfx_inj"
+      ]
+    }
+  ],
+  "raw_wrapper_text_committed": false,
+  "schema_version": "gate1-step3b-candidate-registry-v1",
+  "source_identity_sha256": "4b9a8d990e7f1ca6f42044b9fea546d32f5dacef87d16e60e6fe74140edf924c"
+}

@@ -1,0 +1,17 @@
+{
+  "contract_sha256": "da5e629ffd7e0a4fd15db11036b22dc06a1dfd908f23fee4e181d3bff5300da7",
+  "final_evaluation_30_observed": false,
+  "gate2_heldout_10_used": false,
+  "safe_bundle_identity_sha256": "eb7f52319a69e0b9e5b531ea96a1ee01032feda8d4e8f6c27d31ddd04f1bf0f3",
+  "safe_file_sha256": {
+    "wildguard_decision.json": "9500c3e902de37861e1e44e02cf1379ca663d0f2ca6b95d8bf6d25ae6436b566",
+    "wildguard_design.safe.jsonl": "5f208bca83be68f9d4cdc3628713dd3e30c0f70aaa02f0529ffd3f8124425a4c",
+    "wildguard_design_manifest.json": "f832e7fdd763d585e9b38450ec5822b1a56e63ad24f5d8955c7c099670761bf6",
+    "wildguard_preflight.json": "52effb50495e37b77a1d2b461dfe03270128062f1549c87c965ba456e7c6158b",
+    "wildguard_runtime.json": "b8acd7e0da987cd5b6641df4938aa2aa8577c60fe2b6286f62aa7302d66af9f0",
+    "wildguard_selection.safe.jsonl": "f32d949fc4d6abf2e1cb28da3c3e58342d3df1daa4e9c6fb390e6f5cd198c342",
+    "wildguard_selection_metrics.json": "61f086923ea4a0ae446f3b121e919d7f71f8cccab44fdd1f78fc277534d38ea2"
+  },
+  "schema_version": "gate1-step3b-wildguard-manifest-v1",
+  "status": "WILDGUARD_SELECTION_FAIL"
+}

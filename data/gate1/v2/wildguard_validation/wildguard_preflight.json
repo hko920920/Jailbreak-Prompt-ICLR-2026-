@@ -1,0 +1,12 @@
+{
+  "access_ok": false,
+  "error_type": null,
+  "files": [],
+  "final_evaluation_30_observed": false,
+  "gate2_heldout_10_used": false,
+  "model_revision": null,
+  "official_model_repository": "allenai/wildguard",
+  "raw_model_content_committed": false,
+  "schema_version": "gate1-step3b-wildguard-preflight-v1",
+  "status": "WILDGUARD_ACCESS_BLOCKED_NO_HF_TOKEN"
+}
