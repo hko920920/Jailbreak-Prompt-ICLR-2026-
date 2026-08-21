@@ -41,6 +41,12 @@ jobs:
           python-version: "3.11"
           cache: pip
 
+      - name: Announce canonical screen run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr comment 3 --body "Verifiable-agent Gate 1 screen started: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID — head $GITHUB_SHA; final/oracle remain sealed."
+
       - name: Materialize pinned screen runtime bundle
         run: |
           test "$(sha256sum data/gate1/verifiable_agent_screen_runtime.zip | cut -d' ' -f1)" = \
