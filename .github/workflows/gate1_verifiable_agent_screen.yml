@@ -56,6 +56,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -e '.[dev]'
+          ruff --version
+          ruff check --fix \
+            src/jbspan/gate1/verifiable_agent.py \
+            scripts/run_verifiable_agent_screen.py \
+            tests/test_verifiable_agent_screen.py
           ruff check \
             src/jbspan/gate1/verifiable_agent.py \
             scripts/run_verifiable_agent_screen.py \
