@@ -3,7 +3,7 @@
 When ``scripts/run_programmatic_agentharm_smoke.py`` imports ``inspect_ai``,
 Python sees this module first. We load the real installed package after removing
 the scripts directory from the search path, normalize provider arguments for
-the installed Inspect version, and retain redacted TypeError diagnostics.
+the installed Inspect version, and retain redacted runtime diagnostics.
 """
 
 from __future__ import annotations
@@ -34,14 +34,15 @@ sys.modules[_MODULE_NAME] = _real
 _original_eval = _real.eval
 
 
-def _safe_message(exc: TypeError) -> str:
-    value = str(exc).replace("\n", " ")
+def _safe_message(exc: Exception) -> str:
+    value = str(exc).replace("\n", " | ")
     value = re.sub(
         r"(['\"])(.{80,}?)\1",
         lambda match: f"{match.group(1)}<REDACTED>{match.group(1)}",
         value,
     )
-    return value[:500]
+    value = re.sub(r"https?://\S+", "<REDACTED_URL>", value)
+    return value[:1200]
 
 
 def _normalize_provider_arguments(kwargs: dict[str, Any]) -> dict[str, Any]:
@@ -63,11 +64,12 @@ def _diagnostic_eval(*args: Any, **kwargs: Any) -> Any:
     normalized = _normalize_provider_arguments(kwargs)
     try:
         return _original_eval(*args, **normalized)
-    except TypeError as exc:
-        print("JBSPAN_SAFE_TYPEERROR_MESSAGE:", _safe_message(exc), flush=True)
-        for frame in traceback.extract_tb(exc.__traceback__)[-12:]:
+    except Exception as exc:
+        print("JBSPAN_SAFE_EXCEPTION_TYPE:", type(exc).__name__, flush=True)
+        print("JBSPAN_SAFE_EXCEPTION_MESSAGE:", _safe_message(exc), flush=True)
+        for frame in traceback.extract_tb(exc.__traceback__)[-16:]:
             print(
-                "JBSPAN_SAFE_TYPEERROR_FRAME:",
+                "JBSPAN_SAFE_EXCEPTION_FRAME:",
                 Path(frame.filename).name,
                 frame.name,
                 frame.lineno,
