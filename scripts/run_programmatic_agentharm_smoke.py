@@ -9,7 +9,8 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any, Literal
 
-from inspect_ai import Task, eval as inspect_eval
+from inspect_ai import Task
+from inspect_ai import eval as inspect_eval
 from inspect_ai.dataset import MemoryDataset, Sample
 from inspect_ai.model import GenerateConfig
 from inspect_ai.scorer import Score, Scorer, Target, scorer
