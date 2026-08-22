@@ -44,6 +44,8 @@ jobs:
       ATTACK_SOURCE: /tmp/h4rm3l-reference-programs.csv
       SAFE_OUTPUT: artifacts/programmatic-agentharm-candidate-sweep/safe_summary.json
       MODEL_DIR: /tmp/qwen2.5-7b-instruct-q4
+      LOCAL_API_KEY: local-runtime-only
+      LOCAL_BASE_URL: http://127.0.0.1:8080/v1
       HF_HOME: /tmp/huggingface
       HF_HUB_DISABLE_TELEMETRY: "1"
       TOKENIZERS_PARALLELISM: "false"
