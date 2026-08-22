@@ -1,9 +1,9 @@
-"""Temporary import shim for redacted Inspect runtime diagnostics.
+"""Temporary import shim for the AgentHarm runtime smoke.
 
 When ``scripts/run_programmatic_agentharm_smoke.py`` imports ``inspect_ai``,
-Python sees this module first. We then load the real installed package after
-removing the scripts directory from the search path, replace only its top-level
-``eval`` entry point with a safe diagnostic wrapper, and expose the real package.
+Python sees this module first. We load the real installed package after removing
+the scripts directory from the search path, normalize provider arguments for
+the installed Inspect version, and retain redacted TypeError diagnostics.
 """
 
 from __future__ import annotations
@@ -44,9 +44,25 @@ def _safe_message(exc: TypeError) -> str:
     return value[:500]
 
 
+def _normalize_provider_arguments(kwargs: dict[str, Any]) -> dict[str, Any]:
+    """Move eval-level provider arguments out of ``model_args`` exactly once."""
+
+    normalized = dict(kwargs)
+    raw_model_args = normalized.get("model_args")
+    model_args = dict(raw_model_args) if isinstance(raw_model_args, dict) else {}
+    for name in ("base_url", "api_key"):
+        if name in model_args:
+            if name not in normalized:
+                normalized[name] = model_args[name]
+            model_args.pop(name, None)
+    normalized["model_args"] = model_args
+    return normalized
+
+
 def _diagnostic_eval(*args: Any, **kwargs: Any) -> Any:
+    normalized = _normalize_provider_arguments(kwargs)
     try:
-        return _original_eval(*args, **kwargs)
+        return _original_eval(*args, **normalized)
     except TypeError as exc:
         print("JBSPAN_SAFE_TYPEERROR_MESSAGE:", _safe_message(exc), flush=True)
         for frame in traceback.extract_tb(exc.__traceback__)[-12:]:
