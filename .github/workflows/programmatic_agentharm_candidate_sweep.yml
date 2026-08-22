@@ -1,0 +1,293 @@
+name: programmatic-agentharm-candidate-sweep
+
+on:
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/programmatic_agentharm_candidate_sweep.yml
+      - scripts/run_programmatic_agentharm_candidate_sweep.py
+      - scripts/run_programmatic_agentharm_smoke.py
+      - scripts/inspect_ai.py
+      - configs/programmatic_agentharm/runtime_smoke.json
+      - data/programmatic_agentharm/gate0/gate0_manifest.json
+      - data/gate1/v2/frozen/**
+      - src/jbspan/programmatic_agentharm/runtime.py
+      - src/jbspan/gate1/step3b.py
+  pull_request:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - .github/workflows/programmatic_agentharm_candidate_sweep.yml
+      - scripts/run_programmatic_agentharm_candidate_sweep.py
+      - scripts/run_programmatic_agentharm_smoke.py
+      - scripts/inspect_ai.py
+      - configs/programmatic_agentharm/runtime_smoke.json
+      - data/programmatic_agentharm/gate0/gate0_manifest.json
+      - data/gate1/v2/frozen/**
+      - src/jbspan/programmatic_agentharm/runtime.py
+      - src/jbspan/gate1/step3b.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: programmatic-agentharm-candidate-sweep
+  cancel-in-progress: false
+
+jobs:
+  sweep:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    env:
+      ATTACK_SOURCE: /tmp/h4rm3l-reference-programs.csv
+      SAFE_OUTPUT: artifacts/programmatic-agentharm-candidate-sweep/safe_summary.json
+      MODEL_DIR: /tmp/qwen2.5-7b-instruct-q4
+      HF_HOME: /tmp/huggingface
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      TOKENIZERS_PARALLELISM: "false"
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install pinned experiment dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev]'
+          python -m pip install \
+            'openai>=1.75' \
+            'git+https://github.com/UKGovernmentBEIS/inspect_evals.git@928e3dd92aa926f7dd1746c753e171f9f717c964'
+
+      - name: Validate sweep implementation
+        run: |
+          ruff check \
+            scripts/run_programmatic_agentharm_candidate_sweep.py \
+            scripts/run_programmatic_agentharm_smoke.py \
+            src/jbspan/programmatic_agentharm/runtime.py
+          python -m py_compile \
+            scripts/run_programmatic_agentharm_candidate_sweep.py \
+            scripts/run_programmatic_agentharm_smoke.py
+          pytest tests/test_programmatic_agentharm_contract.py \
+            tests/test_programmatic_agentharm_runtime.py
+          git diff --check
+
+      - name: Fetch and verify pinned h4rm3l attack source
+        run: |
+          curl --fail --location --retry 5 --retry-delay 3 \
+            'https://raw.githubusercontent.com/mdoumbouya/h4rm3l/e6f58a1a1e56c1a95b26b06aa4fe393ee2240dbd/experiments/experiment_116_bandi_synthesis/config/benchmark_reference_programs.csv' \
+            --output "$ATTACK_SOURCE"
+          echo 'b4c07b11c9e92ecd332807e8ba32d8fe028b59f4c3499f72670d44105626ef07  /tmp/h4rm3l-reference-programs.csv' \
+            | sha256sum --check --strict
+
+      - name: Install pinned llama.cpp CPU runtime
+        run: |
+          archive="$RUNNER_TEMP/llama-b10441-bin-ubuntu-x64.tar.gz"
+          runtime_root="$RUNNER_TEMP/llama-b10441"
+          mkdir -p "$runtime_root"
+          curl --fail --location --retry 5 --retry-delay 5 \
+            'https://github.com/ggml-org/llama.cpp/releases/download/b10441/llama-b10441-bin-ubuntu-x64.tar.gz' \
+            --output "$archive"
+          tar -xzf "$archive" -C "$runtime_root"
+          server="$(find "$runtime_root" -type f -name 'llama-server' -print -quit)"
+          test -n "$server"
+          chmod +x "$server"
+          lib_dirs="$(find "$runtime_root" -type f -name '*.so*' -printf '%h\n' \
+            | sort -u | paste -sd: -)"
+          echo "LLAMA_SERVER=$server" >> "$GITHUB_ENV"
+          echo "LD_LIBRARY_PATH=$lib_dirs" >> "$GITHUB_ENV"
+          env LD_LIBRARY_PATH="$lib_dirs" "$server" --version
+
+      - name: Download and verify pinned Qwen2.5-7B Q4 model
+        run: |
+          mkdir -p "$MODEL_DIR"
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          from huggingface_hub import hf_hub_download
+
+          config = json.loads(
+              Path('configs/programmatic_agentharm/runtime_smoke.json').read_text()
+          )
+          target = config['target']
+          model_dir = Path(os.environ['MODEL_DIR'])
+          paths = []
+          for item in target['gguf_files']:
+              path = Path(
+                  hf_hub_download(
+                      repo_id=target['gguf_repo_id'],
+                      revision=target['gguf_revision'],
+                      filename=item['filename'],
+                      local_dir=model_dir,
+                  )
+              )
+              digest = hashlib.sha256()
+              with path.open('rb') as handle:
+                  for block in iter(lambda: handle.read(1024 * 1024), b''):
+                      digest.update(block)
+              if digest.hexdigest() != item['sha256']:
+                  raise SystemExit(f'model SHA-256 mismatch: {item["filename"]}')
+              if path.stat().st_size != item['size']:
+                  raise SystemExit(f'model size mismatch: {item["filename"]}')
+              paths.append(path)
+          with Path(os.environ['GITHUB_ENV']).open('a') as handle:
+              handle.write(f'MODEL_PATH={paths[0]}\n')
+          print('verified model shards:', len(paths))
+          PY
+
+      - name: Start pinned local target server
+        run: |
+          mkdir -p "$RUNNER_TEMP/llama-server"
+          nohup "$LLAMA_SERVER" \
+            -m "$MODEL_PATH" \
+            --alias qwen2.5-7b-instruct \
+            --host 127.0.0.1 \
+            --port 8080 \
+            -c 8192 \
+            -t 4 \
+            -np 1 \
+            >"$RUNNER_TEMP/llama-server/server.log" 2>&1 &
+          echo "$!" >"$RUNNER_TEMP/llama-server/pid"
+
+          ready=0
+          for _ in $(seq 1 180); do
+            if ! kill -0 "$(cat "$RUNNER_TEMP/llama-server/pid")" 2>/dev/null; then
+              echo 'llama-server exited before readiness'
+              head -n 80 "$RUNNER_TEMP/llama-server/server.log"
+              exit 1
+            fi
+            status="$(curl -sS -o /dev/null -w '%{http_code}' \
+              http://127.0.0.1:8080/health || true)"
+            if [ "$status" = '200' ]; then
+              ready=1
+              break
+            fi
+            sleep 5
+          done
+          if [ "$ready" != '1' ]; then
+            echo 'llama-server did not become ready'
+            head -n 80 "$RUNNER_TEMP/llama-server/server.log"
+            exit 1
+          fi
+
+      - name: Run development-only five-candidate sweep
+        run: |
+          set +e
+          timeout 150m python scripts/run_programmatic_agentharm_candidate_sweep.py \
+            --root . \
+            --config configs/programmatic_agentharm/runtime_smoke.json \
+            --attack-source-csv "$ATTACK_SOURCE" \
+            --safe-output "$SAFE_OUTPUT"
+          sweep_exit=$?
+          set -e
+          echo "SWEEP_EXIT=$sweep_exit" >> "$GITHUB_ENV"
+
+      - name: Verify safe artifact boundary
+        if: always()
+        run: |
+          test -f "$SAFE_OUTPUT"
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          value = json.loads(Path(os.environ['SAFE_OUTPUT']).read_text())
+          forbidden_keys = {
+              'prompt',
+              'response',
+              'raw_output',
+              'tool_output',
+              'generation',
+              'arguments',
+          }
+
+          def visit(node):
+              if isinstance(node, dict):
+                  leaked = forbidden_keys.intersection(node)
+                  if leaked:
+                      raise SystemExit(f'unsafe artifact keys: {sorted(leaked)}')
+                  for child in node.values():
+                      visit(child)
+              elif isinstance(node, list):
+                  for child in node:
+                      visit(child)
+
+          visit(value)
+          assert value['paper_validity'] is False
+          assert value['development_only'] is True
+          assert value['human_judge_used'] is False
+          assert value['llm_judge_used'] is False
+          assert value['assistant_free_text_scored'] is False
+          assert value['raw_prompts_committed'] is False
+          assert value['raw_responses_committed'] is False
+          assert value['raw_tool_arguments_committed'] is False
+          assert value['raw_tool_responses_committed'] is False
+          assert value['confirmatory_outputs_observed'] is False
+          assert value['final_outputs_observed'] is False
+          assert value['causal_oracle_opened'] is False
+          assert value['wavelet_used'] is False
+          PY
+
+      - name: Publish safe sweep summary
+        if: always()
+        run: |
+          if [ -f "$SAFE_OUTPUT" ]; then
+            python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          value = json.loads(Path(os.environ['SAFE_OUTPUT']).read_text())
+          with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a') as handle:
+              handle.write('# Programmatic AgentHarm candidate sweep\n\n')
+              handle.write(f"- runtime status: **{value['status']}**\n")
+              handle.write(f"- scientific signal: **{value['scientific_signal']}**\n")
+              handle.write(
+                  f"- completed episodes: **{value['completed_episodes']}/"
+                  f"{value['expected_episodes']}**\n"
+              )
+              handle.write(
+                  '- original programmatic success: '
+                  f"**{value['original_programmatic_success']}**\n"
+              )
+              handle.write(
+                  '- successful candidates: **'
+                  f"{len(value['successful_candidate_ids'])}/"
+                  f"{value['candidate_count']}**\n"
+              )
+              handle.write('- human/LLM judge used: **false**\n')
+              handle.write('- paper-valid result: **false**\n')
+          PY
+          else
+            echo 'Safe output was not produced.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload safe sweep artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: programmatic-agentharm-candidate-sweep-safe
+          path: ${{ env.SAFE_OUTPUT }}
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Stop local target server
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/llama-server/pid" ]; then
+            kill "$(cat "$RUNNER_TEMP/llama-server/pid")" 2>/dev/null || true
+          fi
+
+      - name: Enforce operational completeness
+        if: always()
+        run: exit "${SWEEP_EXIT:-1}"
