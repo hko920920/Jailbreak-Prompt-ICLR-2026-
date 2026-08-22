@@ -9,6 +9,7 @@ the installed Inspect version, and retain redacted runtime diagnostics.
 from __future__ import annotations
 
 import importlib
+import os
 import re
 import sys
 import traceback
@@ -46,16 +47,19 @@ def _safe_message(exc: Exception) -> str:
 
 
 def _normalize_provider_arguments(kwargs: dict[str, Any]) -> dict[str, Any]:
-    """Move eval-level provider arguments out of ``model_args`` exactly once."""
+    """Move OpenAI-compatible endpoint settings into provider environment."""
 
     normalized = dict(kwargs)
     raw_model_args = normalized.get("model_args")
     model_args = dict(raw_model_args) if isinstance(raw_model_args, dict) else {}
-    for name in ("base_url", "api_key"):
-        if name in model_args:
-            if name not in normalized:
-                normalized[name] = model_args[name]
-            model_args.pop(name, None)
+    environment_names = {
+        "base_url": "OPENAI_BASE_URL",
+        "api_key": "OPENAI_API_KEY",
+    }
+    for argument_name, environment_name in environment_names.items():
+        value = model_args.pop(argument_name, None)
+        if isinstance(value, str) and value:
+            os.environ[environment_name] = value
     normalized["model_args"] = model_args
     return normalized
 
