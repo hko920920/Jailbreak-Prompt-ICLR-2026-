@@ -77,6 +77,7 @@ mkdir -p "$RUNNER_TEMP/llama-server"
 nohup "$LLAMA_SERVER" \
   -m "$MODEL_PATH" \
   --alias meta-llama-3.1-8b-instruct \
+  --jinja \
   --host 127.0.0.1 \
   --port 8080 \
   -c 8192 \
