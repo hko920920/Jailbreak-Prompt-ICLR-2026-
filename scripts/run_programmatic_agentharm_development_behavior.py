@@ -10,11 +10,6 @@ from pathlib import Path
 from inspect_ai.dataset import Sample
 from inspect_evals.agentharm.utils import load_dataset
 
-from jbspan.programmatic_agentharm.development_sweep import (
-    DevelopmentBehaviorSpec,
-    find_behavior_spec,
-    parse_behavior_specs,
-)
 from run_programmatic_agentharm_smoke import (
     as_array,
     as_object,
@@ -25,6 +20,12 @@ from run_programmatic_agentharm_smoke import (
     safe_episode,
     sha256_text,
     validate_contract,
+)
+
+from jbspan.programmatic_agentharm.development_sweep import (
+    DevelopmentBehaviorSpec,
+    find_behavior_spec,
+    parse_behavior_specs,
 )
 
 
