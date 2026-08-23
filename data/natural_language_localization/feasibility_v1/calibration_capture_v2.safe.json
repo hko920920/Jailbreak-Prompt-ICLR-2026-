@@ -1,0 +1,55 @@
+{
+  "schema_version": "natural-language-calibration-capture-v2",
+  "status": "CALIBRATION_PACKET_V2_FROZEN_FOR_BLINDED_ANNOTATION",
+  "frozen_at": "2026-08-24T00:45:01+09:00",
+  "paper_validity": false,
+  "scientific_contract_changed": false,
+  "measurement_thresholds_changed": false,
+  "labels_observed_before_freeze": false,
+  "original_capture": {
+    "workflow_run_id": 32638752347,
+    "artifact_id": 9493282660,
+    "artifact_digest": "sha256:2ca98873824d3cedd47dbe617cc54dfff82ece8a6030f7faeb03fd2458ab7e36",
+    "status": "ABANDONED_UNOPENABLE_TRANSPORT",
+    "reason": "matching private key unavailable",
+    "decrypted": false,
+    "human_labels_created": false,
+    "response_set_sha256": "915480598b864bf9f95810ef04b57bbf48598b9fb235531e7ae6671e0f982186",
+    "annotation_ids_sha256": "5f66648b48e973ad75ac47f20485c15bf3d6ba8999ee8ac6f3d2dd1faecb4980",
+    "packet_order_sha256": "d3002c8fedd46c6480c7011dffd305fb8fbb3bb250b73cff4b712111efd7154a"
+  },
+  "active_capture": {
+    "workflow_run_id": 32648286046,
+    "artifact_id": 9495782653,
+    "artifact_digest": "sha256:5054b3463b2a5f6471c8d037fcfac776a08cb4f39ed66e09572b8d8d59850db7",
+    "source_commit": "7541d608acae9ffa60621ba7954b69e099154c0c",
+    "item_count": 30,
+    "direct_count": 10,
+    "attacked_count": 20,
+    "payload_count": 10,
+    "category_count": 10,
+    "contract_identity_sha256": "5388f918c3781ac09770b9613e73cd9e5971475d29886e8c60ac9aedf96ebe06",
+    "plan_identity_sha256": "156ca37ecc826b25de1cd75c35ecde2feb5730f18a1dc54f91407505498ff261",
+    "safe_inputs_sha256": "77c39445eab4d7fef18668d1f055c0dba187674e4b5643bef5f9015abaa999f0",
+    "inputs_match_original_capture": true,
+    "response_set_sha256": "3b0e604f02cd9fb1636c1661ee0cc617f97595d32cb5f4a88f6971621bf61e49",
+    "randomization_seed_sha256": "38a953a18598a158bdad6f913219e72fd4beb30cef136519a0cf0a110a3ffa81",
+    "annotation_ids_sha256": "32c90dd0f175d2f98e7acbe9bdc88d7f861bcbc4ad85d1b2d64239db1cc31a29",
+    "packet_order_sha256": "83df6f466fce2f8e6db6283c13e16281dcc319dedeb0029d102a58fdcdb7a31a"
+  },
+  "protocol_interpretation": {
+    "annotation_ids_and_packet_order_expected_to_change": true,
+    "reason": "the packet builder samples a fresh private 256-bit randomization seed for each capture",
+    "response_set_is_new_stochastic_capture": true,
+    "reason_response_set": "temperature is 0.6; the abandoned packet had no observed labels and cannot be decrypted, so the accessible capture is frozen as a new calibration draw before annotation",
+    "post_label_selection": false
+  },
+  "sealed_boundaries": {
+    "decision_packet_opened": false,
+    "gate1_evaluation_30_opened": false,
+    "gate2_heldout_opened": false,
+    "causal_oracle_opened": false,
+    "wavelet_used": false
+  },
+  "next_authorized_operation": "TWO_INDEPENDENT_BLINDED_PRIMARY_ANNOTATIONS"
+}

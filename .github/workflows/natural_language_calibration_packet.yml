@@ -1,0 +1,378 @@
+name: natural-language-calibration-packet
+
+on:
+  pull_request:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - .github/workflows/natural_language_calibration_packet.yml
+      - configs/natural_language_localization/feasibility_v1.json
+      - data/natural_language_localization/feasibility_v1/plan.safe.json
+      - data/gate1/step3/step3_identity.json
+      - data/gate1/v2/frozen/**
+      - security/phase1_audit_recipient_cert.pem
+      - scripts/run_natural_language_calibration_packet.py
+      - scripts/validate_natural_language_feasibility.py
+      - src/jbspan/natural_language_calibration.py
+      - src/jbspan/natural_language_feasibility.py
+      - src/jbspan/gate1/step3b.py
+      - tests/test_natural_language_calibration.py
+      - tests/test_natural_language_feasibility.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: natural-language-calibration-packet
+  cancel-in-progress: true
+
+jobs:
+  calibration-packet:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    env:
+      CONTRACT: configs/natural_language_localization/feasibility_v1.json
+      PLAN: data/natural_language_localization/feasibility_v1/plan.safe.json
+      PAYLOAD_SOURCE_REVISION: d8d87b8fdcb7806e3b4e45fffb2bc24aa6b17f32
+      PAYLOAD_SOURCE_PATH: data/harmful-behaviors.csv
+      PAYLOAD_SOURCE_SHA256: 4a8ec6832056b631eb092dccc60d37a61c3d441268268888b3d006288afeffa1
+      ATTACK_SOURCE_REPOSITORY: mdoumbouya/h4rm3l
+      ATTACK_SOURCE_REVISION: e6f58a1a1e56c1a95b26b06aa4fe393ee2240dbd
+      ATTACK_SOURCE_PATH: experiments/experiment_116_bandi_synthesis/config/benchmark_reference_programs.csv
+      ATTACK_SOURCE_BLOB_SHA: 220a255d39c1cad769e2414448fbad514e2823dd
+      ATTACK_SOURCE_SHA256: b4c07b11c9e92ecd332807e8ba32d8fe028b59f4c3499f72670d44105626ef07
+      PRIVATE_OUTPUT: /tmp/natural-language-calibration/private
+      SAFE_OUTPUT: artifacts/natural-language-calibration/safe
+      ENCRYPTED_OUTPUT: artifacts/natural-language-calibration/calibration_packet.cms
+      RECIPIENT_CERT: security/phase1_audit_recipient_cert.pem
+      MODEL_DIR: /tmp/qwen2.5-7b-instruct-q4
+      HF_HOME: /tmp/huggingface
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      TOKENIZERS_PARALLELISM: "false"
+      LLAMA_RELEASE_TAG: b10441
+      LLAMA_RELEASE_COMMIT: 0177dcc7300bad8914bb838baabce87899812491
+      LLAMA_ASSET: llama-b10441-bin-ubuntu-x64.tar.gz
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install and validate calibration code
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev,step3]'
+          ruff check \
+            scripts/run_natural_language_calibration_packet.py \
+            scripts/validate_natural_language_feasibility.py \
+            src/jbspan/natural_language_calibration.py \
+            src/jbspan/natural_language_feasibility.py \
+            tests/test_natural_language_calibration.py \
+            tests/test_natural_language_feasibility.py
+          mypy src/jbspan
+          pytest \
+            tests/test_natural_language_calibration.py \
+            tests/test_natural_language_feasibility.py
+          python scripts/validate_natural_language_feasibility.py
+          git diff --check
+
+      - name: Download and verify frozen public sources
+        run: |
+          payload_csv="$RUNNER_TEMP/harmful-behaviors.csv"
+          payload_url="https://huggingface.co/datasets/JailbreakBench/JBB-Behaviors/resolve/${PAYLOAD_SOURCE_REVISION}/${PAYLOAD_SOURCE_PATH}?download=true"
+          curl --fail --location --retry 5 --retry-delay 3 \
+            "$payload_url" \
+            --output "$payload_csv"
+          test "$(sha256sum "$payload_csv" | cut -d' ' -f1)" = \
+            "$PAYLOAD_SOURCE_SHA256"
+
+          attack_csv="$RUNNER_TEMP/benchmark_reference_programs.csv"
+          attack_url="https://raw.githubusercontent.com/${ATTACK_SOURCE_REPOSITORY}/${ATTACK_SOURCE_REVISION}/${ATTACK_SOURCE_PATH}"
+          curl --fail --location --retry 5 --retry-delay 3 \
+            "$attack_url" \
+            --output "$attack_csv"
+          test "$(sha256sum "$attack_csv" | cut -d' ' -f1)" = \
+            "$ATTACK_SOURCE_SHA256"
+          observed_blob="$(python - "$attack_csv" <<'PY'
+          import hashlib
+          import sys
+          from pathlib import Path
+
+          data = Path(sys.argv[1]).read_bytes()
+          header = f"blob {len(data)}\0".encode("ascii")
+          print(hashlib.sha1(header + data).hexdigest())
+          PY
+          )"
+          test "$observed_blob" = "$ATTACK_SOURCE_BLOB_SHA"
+          echo "PAYLOAD_CSV=$payload_csv" >> "$GITHUB_ENV"
+          echo "ATTACK_CSV=$attack_csv" >> "$GITHUB_ENV"
+
+      - name: Prepare frozen 30-item calibration denominator
+        run: |
+          mkdir -p "$PRIVATE_OUTPUT" "$SAFE_OUTPUT"
+          python scripts/run_natural_language_calibration_packet.py prepare \
+            --root . \
+            --contract "$CONTRACT" \
+            --plan "$PLAN" \
+            --payload-source-csv "$PAYLOAD_CSV" \
+            --attack-source-csv "$ATTACK_CSV" \
+            --private-output-dir "$PRIVATE_OUTPUT" \
+            --safe-output-dir "$SAFE_OUTPUT"
+
+      - name: Install exact llama.cpp runtime
+        run: |
+          release_json="$RUNNER_TEMP/llama-release.json"
+          curl --fail --location --retry 5 --retry-delay 3 \
+            "https://api.github.com/repos/ggml-org/llama.cpp/releases/tags/${LLAMA_RELEASE_TAG}" \
+            --output "$release_json"
+          test "$(jq -r '.target_commitish' "$release_json")" = \
+            "$LLAMA_RELEASE_COMMIT"
+          asset_url="$(jq -r --arg name "$LLAMA_ASSET" \
+            '.assets[] | select(.name == $name) | .browser_download_url' \
+            "$release_json")"
+          asset_digest="$(jq -r --arg name "$LLAMA_ASSET" \
+            '.assets[] | select(.name == $name) | .digest' \
+            "$release_json")"
+          archive="$RUNNER_TEMP/$LLAMA_ASSET"
+          curl --fail --location --retry 5 --retry-delay 5 \
+            "$asset_url" \
+            --output "$archive"
+          test "sha256:$(sha256sum "$archive" | cut -d' ' -f1)" = \
+            "$asset_digest"
+          runtime_root="$RUNNER_TEMP/llama-${LLAMA_RELEASE_TAG}"
+          mkdir -p "$runtime_root"
+          tar -xzf "$archive" -C "$runtime_root"
+          llama_server="$(find "$runtime_root" -type f -name llama-server -print -quit)"
+          test -n "$llama_server"
+          chmod +x "$llama_server"
+          lib_dirs="$(find "$runtime_root" -type f -name '*.so*' -printf '%h\n' \
+            | sort -u | paste -sd: -)"
+          echo "LLAMA_SERVER=$llama_server" >> "$GITHUB_ENV"
+          echo "LD_LIBRARY_PATH=$lib_dirs" >> "$GITHUB_ENV"
+          env LD_LIBRARY_PATH="$lib_dirs" "$llama_server" --version
+
+      - name: Download and verify exact target GGUF
+        run: |
+          mkdir -p "$MODEL_DIR"
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          from huggingface_hub import hf_hub_download
+
+          identity = json.loads(
+              Path("data/gate1/step3/step3_identity.json").read_text()
+          )
+          model = identity["target_gguf"]
+          model_dir = Path(os.environ["MODEL_DIR"])
+          paths = []
+          for item in model["files"]:
+              path = Path(
+                  hf_hub_download(
+                      repo_id=model["repo_id"],
+                      revision=model["revision"],
+                      filename=item["filename"],
+                      local_dir=model_dir,
+                  )
+              )
+              digest = hashlib.sha256()
+              with path.open("rb") as handle:
+                  for block in iter(lambda: handle.read(1024 * 1024), b""):
+                      digest.update(block)
+              if digest.hexdigest() != item["sha256"]:
+                  raise SystemExit(f"target GGUF digest mismatch: {item['filename']}")
+              if path.stat().st_size != item["size"]:
+                  raise SystemExit(f"target GGUF size mismatch: {item['filename']}")
+              paths.append(path)
+          first = sorted(paths, key=lambda path: path.name)[0]
+          with Path(os.environ["GITHUB_ENV"]).open("a") as handle:
+              handle.write(f"TARGET_MODEL_PATH={first}\n")
+          print("verified target model shards:", len(paths))
+          PY
+
+      - name: Start pinned local target server
+        run: |
+          mkdir -p "$RUNNER_TEMP/llama-server"
+          nohup "$LLAMA_SERVER" \
+            -m "$TARGET_MODEL_PATH" \
+            --alias qwen2.5-7b-instruct \
+            --host 127.0.0.1 \
+            --port 8080 \
+            -c 4096 \
+            -t 4 \
+            -np 1 \
+            >"$RUNNER_TEMP/llama-server/server.log" 2>&1 &
+          echo "$!" >"$RUNNER_TEMP/llama-server/pid"
+
+          ready=0
+          for _ in $(seq 1 240); do
+            if ! kill -0 "$(cat "$RUNNER_TEMP/llama-server/pid")" 2>/dev/null; then
+              echo "llama-server exited before readiness"
+              tail -n 100 "$RUNNER_TEMP/llama-server/server.log"
+              exit 1
+            fi
+            status="$(curl -sS -o /dev/null -w '%{http_code}' \
+              http://127.0.0.1:8080/health || true)"
+            if [ "$status" = "200" ]; then
+              ready=1
+              break
+            fi
+            sleep 5
+          done
+          if [ "$ready" != "1" ]; then
+            echo "llama-server did not become ready"
+            tail -n 100 "$RUNNER_TEMP/llama-server/server.log"
+            exit 1
+          fi
+
+      - name: Generate 30 frozen calibration responses
+        run: |
+          timeout 150m python scripts/run_natural_language_calibration_packet.py target \
+            --contract "$CONTRACT" \
+            --private-output-dir "$PRIVATE_OUTPUT" \
+            --server-url http://127.0.0.1:8080
+
+      - name: Build blinded annotation packet
+        run: |
+          python scripts/run_natural_language_calibration_packet.py package \
+            --contract "$CONTRACT" \
+            --plan "$PLAN" \
+            --private-output-dir "$PRIVATE_OUTPUT" \
+            --safe-output-dir "$SAFE_OUTPUT"
+
+      - name: Verify safe artifact boundary and frozen claim limits
+        run: |
+          test -f "$SAFE_OUTPUT/preparation_summary.json"
+          test -f "$SAFE_OUTPUT/packet_summary.json"
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          safe_dir = Path(os.environ["SAFE_OUTPUT"])
+          preparation = json.loads(
+              (safe_dir / "preparation_summary.json").read_text()
+          )
+          packet = json.loads((safe_dir / "packet_summary.json").read_text())
+
+          assert preparation["status"] == (
+              "NATURAL_LANGUAGE_CALIBRATION_INPUTS_PREPARED"
+          )
+          assert preparation["item_count"] == 30
+          assert preparation["direct_count"] == 10
+          assert preparation["attacked_count"] == 20
+          assert packet["status"] == "NATURAL_LANGUAGE_CALIBRATION_PACKET_READY"
+          assert packet["item_count"] == 30
+          assert packet["direct_count"] == 10
+          assert packet["attacked_count"] == 20
+          assert packet["payload_count"] == 10
+          assert packet["category_count"] == 10
+          assert packet["raw_prompts_committed"] is False
+          assert packet["raw_responses_committed"] is False
+          assert packet["private_packet_encryption_required"] is True
+          assert packet["decision_packet_opened"] is False
+          assert packet["gate1_evaluation_30_opened"] is False
+          assert packet["gate2_heldout_opened"] is False
+          assert packet["causal_oracle_opened"] is False
+          assert packet["wavelet_used"] is False
+
+          forbidden = {
+              "prompt",
+              "response",
+              "model_response",
+              "original_harmful_goal",
+              "generation",
+              "raw_output",
+          }
+
+          def visit(value):
+              if isinstance(value, dict):
+                  leaked = forbidden.intersection(value)
+                  if leaked:
+                      raise SystemExit(f"unsafe safe-artifact keys: {sorted(leaked)}")
+                  for child in value.values():
+                      visit(child)
+              elif isinstance(value, list):
+                  for child in value:
+                      visit(child)
+
+          visit(preparation)
+          visit(packet)
+          PY
+
+      - name: Encrypt private calibration packet and remove plaintext
+        run: |
+          test -f "$RECIPIENT_CERT"
+          mkdir -p "$(dirname "$ENCRYPTED_OUTPUT")"
+          archive="$RUNNER_TEMP/natural-language-calibration-private.tar.gz"
+          tar -C "$(dirname "$PRIVATE_OUTPUT")" -czf "$archive" \
+            "$(basename "$PRIVATE_OUTPUT")"
+          openssl cms -encrypt -binary -aes256 \
+            -in "$archive" \
+            -out "$ENCRYPTED_OUTPUT" \
+            -outform DER \
+            "$RECIPIENT_CERT"
+          openssl cms -cmsout -inform DER \
+            -in "$ENCRYPTED_OUTPUT" \
+            -noout
+          openssl dgst -sha256 "$ENCRYPTED_OUTPUT"
+          find "$PRIVATE_OUTPUT" -type f -exec shred -u {} +
+          rm -rf "$PRIVATE_OUTPUT"
+          shred -u "$archive"
+          test ! -e "$PRIVATE_OUTPUT"
+          test ! -e "$archive"
+
+      - name: Publish safe calibration summary
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          packet = json.loads(
+              (Path(os.environ["SAFE_OUTPUT"]) / "packet_summary.json").read_text()
+          )
+          with Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a") as handle:
+              handle.write("# Natural-language calibration packet\n\n")
+              handle.write(f"- status: **{packet['status']}**\n")
+              handle.write(f"- blinded items: **{packet['item_count']}**\n")
+              handle.write(f"- direct / attacked: **{packet['direct_count']} / {packet['attacked_count']}**\n")
+              handle.write(f"- payloads / categories: **{packet['payload_count']} / {packet['category_count']}**\n")
+              handle.write(
+                  "- randomization commitment: `"
+                  f"{packet['randomization_seed_sha256']}`\n"
+              )
+              handle.write(
+                  "- response-set identity: `"
+                  f"{packet['response_set_sha256']}`\n"
+              )
+              handle.write("- raw prompts/responses uploaded: **false**\n")
+              handle.write("- encrypted private packet uploaded: **true**\n")
+              handle.write("- decision packet opened: **false**\n")
+              handle.write("- causal oracle / wavelet: **closed / closed**\n")
+          PY
+
+      - name: Upload encrypted packet and safe summaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: natural-language-calibration-packet
+          path: |
+            ${{ env.ENCRYPTED_OUTPUT }}
+            ${{ env.SAFE_OUTPUT }}
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Stop local target server
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/llama-server/pid" ]; then
+            kill "$(cat "$RUNNER_TEMP/llama-server/pid")" 2>/dev/null || true
+          fi
