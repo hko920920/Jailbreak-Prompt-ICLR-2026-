@@ -10,12 +10,6 @@ from pathlib import Path
 
 from inspect_ai.dataset import Sample
 from inspect_evals.agentharm.utils import load_dataset
-
-from jbspan.programmatic_agentharm.development import (
-    DevelopmentAssignment,
-    decide_development_sweep,
-    validate_development_overlay,
-)
 from run_programmatic_agentharm_smoke import (
     as_array,
     as_bool,
@@ -30,10 +24,16 @@ from run_programmatic_agentharm_smoke import (
     validate_contract,
 )
 
+from jbspan.programmatic_agentharm.development import (
+    DevelopmentAssignment,
+    decide_development_sweep,
+    validate_development_overlay,
+)
+
 
 def git_blob_sha(path: Path) -> str:
     payload = path.read_bytes()
-    header = f"blob {len(payload)}\0".encode("utf-8")
+    header = f"blob {len(payload)}\0".encode()
     return hashlib.sha1(header + payload).hexdigest()  # noqa: S324
 
 
