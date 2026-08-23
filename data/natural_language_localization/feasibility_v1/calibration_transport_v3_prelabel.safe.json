@@ -1,0 +1,31 @@
+{
+  "schema_version": "natural-language-calibration-transport-v3-prelabel",
+  "status": "TRANSPORT_V3_ROTATED_BEFORE_LABEL_OBSERVATION",
+  "frozen_at": "2026-08-24T02:19:30+09:00",
+  "paper_validity": false,
+  "scientific_contract_changed": false,
+  "measurement_thresholds_changed": false,
+  "v2_primary_labels_observed": false,
+  "v2_adjudicator_labels_observed": false,
+  "v2_capture_record_path": "data/natural_language_localization/feasibility_v1/calibration_capture_v2.safe.json",
+  "v2_handoff_record_path": "data/natural_language_localization/feasibility_v1/annotation_handoff_v2.safe.json",
+  "rotation_reason": "decrypted v2 offline annotator packages unavailable in active execution workspace",
+  "active_certificate": {
+    "path": "security/phase1_audit_recipient_cert.pem",
+    "file_sha256": "7e8a4ebf64572415869d8b976c6b861c1ba8dfb8ba410f3d25bce25194f77150",
+    "x509_sha256_fingerprint": "08:E0:F9:68:E5:C1:97:92:96:E3:06:D4:7E:27:F5:3C:86:FA:1D:4F:01:C8:CF:30:AC:32:D2:21:D5:C6:02:63",
+    "public_key_sha256": "54b6ea5502d8f1db5e68298aad85da4ca15d257d11f52849031256b4c9c86a19"
+  },
+  "private_key_committed": false,
+  "v3_raw_responses_observed": false,
+  "v3_primary_labels_observed": false,
+  "v3_adjudicator_labels_observed": false,
+  "sealed_boundaries": {
+    "decision_packet_opened": false,
+    "gate1_evaluation_30_opened": false,
+    "gate2_heldout_opened": false,
+    "causal_oracle_opened": false,
+    "wavelet_used": false
+  },
+  "next_authorized_operation": "GENERATE_AND_FREEZE_V3_SAFE_CAPTURE_IDENTITIES"
+}
