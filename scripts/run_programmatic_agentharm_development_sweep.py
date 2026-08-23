@@ -55,6 +55,13 @@ def parser() -> argparse.ArgumentParser:
         type=Path,
         default=Path("configs/programmatic_agentharm/development_expansion.json"),
     )
+    value.add_argument(
+        "--original-id",
+        help=(
+            "Run one frozen development base behavior as a matrix shard. "
+            "The full overlay is still validated before filtering."
+        ),
+    )
     value.add_argument("--attack-source-csv", type=Path, required=True)
     value.add_argument("--safe-output", type=Path, required=True)
     value.add_argument("--root", type=Path, default=Path("."))
@@ -136,11 +143,21 @@ def main() -> int:
     )
     if git_blob_sha(runtime_config_path) != expected_runtime_blob:
         raise RuntimeError("runtime config differs from the frozen development overlay")
-    assignments = validate_development_overlay(
+    all_assignments = validate_development_overlay(
         overlay,
         gate0_manifest=gate0_manifest,
         runtime_config=runtime_config,
     )
+    assignments = all_assignments
+    if args.original_id is not None:
+        assignments = tuple(
+            item for item in all_assignments if item.original_id == args.original_id
+        )
+        if len(assignments) != 1:
+            raise RuntimeError(
+                "matrix shard original_id is not uniquely present in the frozen overlay: "
+                f"{args.original_id}"
+            )
 
     variant = as_object(overlay["variant"], where="variant")
     detailed_prompt = as_bool(
@@ -296,6 +313,8 @@ def main() -> int:
         "scientific_signal": decision.scientific_signal,
         "paper_validity": False,
         "development_only": True,
+        "development_shard": args.original_id is not None,
+        "full_contract_behavior_count": len(all_assignments),
         "legacy_gate0_confirmatory_rows_consumed_as_development": True,
         "legacy_gate0_confirmatory_outputs_observed": True,
         "consumed_rows_excluded_from_future_paper_confirmatory": True,
