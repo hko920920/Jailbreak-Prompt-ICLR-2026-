@@ -24,6 +24,9 @@ jobs:
       - name: Validate frozen Automated Gate 1 contract
         if: matrix.python-version == '3.11'
         run: python scripts/validate_gate1_contract.py
+      - name: Validate natural-language localization feasibility contract
+        if: matrix.python-version == '3.11'
+        run: python scripts/validate_natural_language_feasibility.py
       - name: Report safe Gate 1 contract identity
         if: matrix.python-version == '3.11'
         run: |
