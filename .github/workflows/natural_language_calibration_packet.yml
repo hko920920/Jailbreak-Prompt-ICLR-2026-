@@ -1,9 +1,9 @@
 name: natural-language-calibration-packet
 
 on:
-  push:
+  pull_request:
     branches:
-      - agent/programmatic-agentharm-pivot
+      - agent/gate1-contract
     paths:
       - .github/workflows/natural_language_calibration_packet.yml
       - configs/natural_language_localization/feasibility_v1.json
@@ -25,7 +25,7 @@ permissions:
 
 concurrency:
   group: natural-language-calibration-packet
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   calibration-packet:
