@@ -9,7 +9,6 @@ from pathlib import Path
 
 from inspect_ai.dataset import Sample
 from inspect_evals.agentharm.utils import load_dataset
-
 from run_programmatic_agentharm_smoke import (
     as_array,
     as_object,
