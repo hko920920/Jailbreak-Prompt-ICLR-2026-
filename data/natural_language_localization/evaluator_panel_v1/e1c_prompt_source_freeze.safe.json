@@ -1,0 +1,135 @@
+{
+  "causal_oracle_opened": false,
+  "checks": {
+    "all_cached_cls_binary": true,
+    "all_validation_behavior_ids_in_csv": false,
+    "classifier_path_matches": false,
+    "effective_prompt_family_matches": false,
+    "loaded_model_argument_matches": false,
+    "max_tokens_matches": true,
+    "model_prompt_family_mismatch_matches": false,
+    "no_live_predictions": true,
+    "no_model_inference": true,
+    "no_model_weight_download": true,
+    "notebook_and_production_prompt_families_are_distinct": false,
+    "source_file_blobs_match": true,
+    "source_tree_matches": true,
+    "temperature_matches": true,
+    "test_classifier_path_matches": false,
+    "val_classifier_path_matches": true
+  },
+  "contract_sha256": "60761987773b177efd285475b5f6416fb9d364fa126ef0a33c481c11d618340f",
+  "cross_regime_stage_a_opened": false,
+  "dataset": {
+    "behavior_csv_row_count": 400,
+    "cached_cls_invalid_count": 0,
+    "cached_cls_label_counts": {
+      "0": 292,
+      "1": 310
+    },
+    "cached_cls_present_count": 602,
+    "raw_test_case_or_generation_recorded": false,
+    "validation_behavior_count": 301,
+    "validation_behaviors_missing_from_csv_count": 3,
+    "validation_behaviors_missing_from_csv_hash": "5ebd5260d7bf8b477452747e480b654f10a363166e9d8b75ad43848a34ea01d6",
+    "validation_record_count": 602
+  },
+  "evidence_class": "DEVELOPMENT",
+  "harmbench_live_predictions_generated": false,
+  "keep_only_oracle_opened": false,
+  "model_inference_performed": false,
+  "model_weight_downloaded": false,
+  "new_harmful_attack_outputs_generated": false,
+  "next_authorized_operation": "STOP_E1C_AND_RESOLVE_OFFICIAL_SOURCE_AMBIGUITY_BEFORE_LIVE_OUTPUTS",
+  "notebook_effective_execution": {
+    "classifier_path": "cais/HarmBench-Llama-2-13b-cls-multimodal-behaviors",
+    "effective_prompt": {
+      "canonical_family_sha256": "546845e7bda3eb6cfcde87d880067e38f1ec6ffcce9360aea594995cad1538f7",
+      "field_names": [
+        "description",
+        "prompt",
+        "prompt_contextual"
+      ],
+      "prompt_contextual_length": 1401,
+      "prompt_contextual_sha256": "5d6bb9e3cf4d1e5f3f7620093113222ee115af75b0b2913f00e4c7225ec9f219",
+      "prompt_length": 897,
+      "prompt_sha256": "4016eb2e1758f37cfbf37f0e1540f15f26857e048c28e69796c23337ae0a285a",
+      "raw_prompt_recorded": false
+    },
+    "effective_prompt_family": "LLAMA2_CLS_PROMPT",
+    "loaded_model_argument": "cais/HarmBench-Llama-2-13b-cls-multimodal-behaviors",
+    "max_tokens": 1,
+    "model_prompt_family_mismatch": false,
+    "temperature": 0.0,
+    "test_classifier_path": "cais/HarmBench-Llama-2-13b-cls-multimodal-behaviors",
+    "val_classifier_path": "cais/HarmBench-Mistral-7b-val-cls"
+  },
+  "operational_pass": false,
+  "paper_validity": false,
+  "production_execution": {
+    "max_tokens": 1,
+    "prompt": {
+      "canonical_family_sha256": "3dea5cd9ab408e5fc39ae6a0614eeb9441dee552a5e52224d064d0a3b66d4d65",
+      "field_names": [
+        "description",
+        "prompt",
+        "prompt_contextual"
+      ],
+      "prompt_contextual_length": 1401,
+      "prompt_contextual_sha256": "5d6bb9e3cf4d1e5f3f7620093113222ee115af75b0b2913f00e4c7225ec9f219",
+      "prompt_length": 1359,
+      "prompt_sha256": "788f4f6aa1491c433c4da76c9140cfc30966cea3ff3875c4d0fcb336d92f60e0",
+      "raw_prompt_recorded": false
+    },
+    "prompt_family": "LLAMA2_CLS_PROMPT",
+    "temperature": 0.0
+  },
+  "schema_version": "evaluator-panel-e1c-prompt-source-freeze-result-v1",
+  "semantic_only_stage_a_opened": false,
+  "source": {
+    "expected_tree_sha": "e28303aa064b3a4fdbe5698bc323e43306b7ab74",
+    "files": [
+      {
+        "exists": true,
+        "expected_git_blob_sha": "8a6b423d85e9acdc168c57a6a957755cfa86c4cb",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "8a6b423d85e9acdc168c57a6a957755cfa86c4cb",
+        "path": "data/behavior_datasets/harmbench_behaviors_text_all.csv",
+        "sha256": "8d81accedd38eaaf8b760618622bb888417d1fd0c86eba65c427a16f1cbb4afc",
+        "size_bytes": 198850
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "3d7d0a98742a36b5c7824aadcea433e42a045022",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "3d7d0a98742a36b5c7824aadcea433e42a045022",
+        "path": "data/classifier_val_sets/text_behaviors_val_set.json",
+        "sha256": "e740727b6874e492063e097122a9916833d57f9bd2ce3e86713ec188741a41c8",
+        "size_bytes": 1875939
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "be95edd9523de0cde2a7823217b26983d57c496b",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "be95edd9523de0cde2a7823217b26983d57c496b",
+        "path": "eval_utils.py",
+        "sha256": "46f1db751866848834d45d5128a18d4cc0a820828e89796ab51bc605d10c7058",
+        "size_bytes": 16658
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "f6b3cf674ec940d2384e277d77867f2293489595",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "f6b3cf674ec940d2384e277d77867f2293489595",
+        "path": "notebooks/run_classifier_val_set.ipynb",
+        "sha256": "2f3dab25208e0a06c7d415c80fbae7405f2d529eaef7ade510ac8fe2723dbd4c",
+        "size_bytes": 18617
+      }
+    ],
+    "observed_tree_sha": "e28303aa064b3a4fdbe5698bc323e43306b7ab74",
+    "repository": "centerforaisafety/HarmBench",
+    "revision": "8e1604d1171fe8a48d8febecd22f600e462bdcdd"
+  },
+  "status": "E1C_PROMPT_SOURCE_FREEZE_FAIL",
+  "wavelet_used": false
+}
