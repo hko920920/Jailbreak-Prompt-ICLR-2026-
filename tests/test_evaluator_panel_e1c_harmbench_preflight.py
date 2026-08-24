@@ -87,6 +87,7 @@ def test_model_file_filter_includes_weights_and_required_configs() -> None:
 
 def test_contract_is_frozen_after_e1b_and_before_live_outputs() -> None:
     contract = cast(dict[str, object], json.loads(CONFIG.read_text(encoding="utf-8")))
+    assert contract["schema_version"] == "evaluator-panel-e1c-harmbench-preflight-v1.1"
     assert contract["status"] == "FROZEN_BEFORE_E1C_HARMBENCH_PREFLIGHT"
     assert contract["frozen"] is True
     assert contract["paper_validity"] is False
@@ -95,6 +96,24 @@ def test_contract_is_frozen_after_e1b_and_before_live_outputs() -> None:
     assert predecessor["required_next_operation"] == (
         "E1C_HARMBENCH_COMPONENT_REPRODUCTION_AND_CANARIES"
     )
+    source = cast(dict[str, object], contract["harmbench_source"])
+    files = cast(dict[str, object], source["files"])
+    assert source["revision"] == "8e1604d1171fe8a48d8febecd22f600e462bdcdd"
+    assert source["tree_sha"] == "e28303aa064b3a4fdbe5698bc323e43306b7ab74"
+    assert files["eval_utils.py"] == "be95edd9523de0cde2a7823217b26983d57c496b"
+    assert files["configs/model_configs/models.yaml"] == (
+        "024dc7fd61233c6efcd8234bea648e0735d67b72"
+    )
+    assert files["data/classifier_val_sets/text_behaviors_val_set.json"] == (
+        "3d7d0a98742a36b5c7824aadcea433e42a045022"
+    )
+    correction = cast(dict[str, object], contract["source_identity_correction"])
+    assert correction["trigger_run_id"] == 32740398974
+    assert correction["scientific_contract_changed"] is False
+    assert correction["live_predictions_observed_before_correction"] is False
+    assert correction["new_attack_outputs_observed_before_correction"] is False
+    assert correction["selection_changed"] is False
+    assert correction["threshold_changed"] is False
     classifier = cast(dict[str, object], contract["official_classifier"])
     assert classifier["repository"] == "cais/HarmBench-Llama-2-13b-cls"
     assert classifier["silent_model_substitution_allowed"] is False

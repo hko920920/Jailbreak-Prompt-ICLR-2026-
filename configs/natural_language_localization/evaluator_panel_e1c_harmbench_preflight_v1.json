@@ -1,5 +1,5 @@
 {
-  "schema_version": "evaluator-panel-e1c-harmbench-preflight-v1",
+  "schema_version": "evaluator-panel-e1c-harmbench-preflight-v1.1",
   "status": "FROZEN_BEFORE_E1C_HARMBENCH_PREFLIGHT",
   "frozen": true,
   "paper_validity": false,
@@ -14,10 +14,38 @@
     "revision": "8e1604d1171fe8a48d8febecd22f600e462bdcdd",
     "tree_sha": "e28303aa064b3a4fdbe5698bc323e43306b7ab74",
     "files": {
-      "eval_utils.py": "de084a8fd403cdc087a1fcead916d750dd81f797",
-      "configs/model_configs/models.yaml": "0df08dc0ea6d791c851a434d4d691aff18bd46fe",
+      "eval_utils.py": "be95edd9523de0cde2a7823217b26983d57c496b",
+      "configs/model_configs/models.yaml": "024dc7fd61233c6efcd8234bea648e0735d67b72",
       "data/classifier_val_sets/text_behaviors_val_set.json": "3d7d0a98742a36b5c7824aadcea433e42a045022"
     }
+  },
+  "source_identity_correction": {
+    "correction_version": 1,
+    "trigger_run_id": 32740398974,
+    "trigger_result_path": "data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_preflight.safe.json",
+    "reason": "TWO_EXPECTED_GIT_BLOB_SHAS_WERE_TRANSCRIBED_INCORRECTLY_WHILE_THE_PINNED_REVISION_AND_TREE_WERE_CORRECT",
+    "verification_method": "PINNED_GITHUB_CONTENTS_API_AND_RUNNER_GIT_BLOB_IDENTITIES_AGREE",
+    "scientific_contract_changed": false,
+    "model_changed": false,
+    "validation_data_changed": false,
+    "selection_changed": false,
+    "threshold_changed": false,
+    "live_predictions_observed_before_correction": false,
+    "new_attack_outputs_observed_before_correction": false,
+    "changes": [
+      {
+        "path": "eval_utils.py",
+        "previous_expected_git_blob_sha": "de084a8fd403cdc087a1fcead916d750dd81f797",
+        "corrected_expected_git_blob_sha": "be95edd9523de0cde2a7823217b26983d57c496b"
+      },
+      {
+        "path": "configs/model_configs/models.yaml",
+        "previous_expected_git_blob_sha": "0df08dc0ea6d791c851a434d4d691aff18bd46fe",
+        "corrected_expected_git_blob_sha": "024dc7fd61233c6efcd8234bea648e0735d67b72"
+      }
+    ],
+    "immutable_revision_preserved": "8e1604d1171fe8a48d8febecd22f600e462bdcdd",
+    "immutable_tree_preserved": "e28303aa064b3a4fdbe5698bc323e43306b7ab74"
   },
   "official_classifier": {
     "repository": "cais/HarmBench-Llama-2-13b-cls",
