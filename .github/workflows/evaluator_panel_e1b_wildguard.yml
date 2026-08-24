@@ -1,13 +1,31 @@
 name: evaluator-panel-e1b-wildguard
 
-# Execute only when the active E1B files change on the research branch. The
-# former pull_request trigger re-ran every expensive historical workflow on
-# each synchronization because the PR carries a large cumulative diff.
-# Terminal-path workflows were archived in commit 4c5f427 before this run.
+# Isolated E1B execution. Terminal-path workflows were archived in commit
+# 4c5f427. The pull_request trigger is retained only for traceable run metadata
+# during this experiment and will be archived after the E1B decision is frozen.
 on:
   push:
     branches:
       - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/evaluator_panel_e1b_wildguard.yml
+      - configs/natural_language_localization/evaluator_panel_e1b_wildguard_v1.json
+      - configs/gate1/gate1_step3b_wildguard_validation.json
+      - docs/EVALUATOR_PANEL_E1B_WILDGUARD.md
+      - scripts/run_evaluator_panel_e1b_ci.sh
+      - scripts/run_evaluator_panel_e1b.py
+      - scripts/run_gate1_step3b_wildguard_validation.py
+      - src/jbspan/evaluator_panel.py
+      - tests/conftest.py
+      - tests/test_evaluator_panel.py
+      - tests/test_evaluator_panel_e1b.py
+      - tests/test_gate1_step3b_wildguard_validation.py
+      - data/natural_language_localization/evaluator_panel_v1/e1a_static_hardening.safe.json
+      - data/gate1/v2/wildguard_q8/wildguard_selection.safe.jsonl
+      - data/gate1/v2/wildguard_q8/wildguard_selection_metrics.json
+  pull_request:
+    branches:
+      - agent/gate1-contract
     paths:
       - .github/workflows/evaluator_panel_e1b_wildguard.yml
       - configs/natural_language_localization/evaluator_panel_e1b_wildguard_v1.json
