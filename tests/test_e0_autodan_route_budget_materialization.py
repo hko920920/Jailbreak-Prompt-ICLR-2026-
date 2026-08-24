@@ -1,24 +1,29 @@
 from __future__ import annotations
 
 import ast
+import importlib.util
 import random
+import types
+from pathlib import Path
 
 import pytest
 
-from scripts.run_e0_autodan_route_budget_materialization import (
-    argparse_defaults,
-    assignment_literal,
-    crossover,
-    exact_materialize,
-    guard_candidate,
-    has_exact_placeholder,
-    select_valid_pool,
-    simulate_once,
-)
-
-
+ROOT = Path(__file__).resolve().parents[1]
+SCRIPT = ROOT / "scripts" / "run_e0_autodan_route_budget_materialization.py"
 PLACEHOLDER = "[REPLACE]"
 PAYLOAD = "JBSPAN_SAFE_PAYLOAD_9D7C"
+
+
+def load_script() -> types.ModuleType:
+    spec = importlib.util.spec_from_file_location(
+        "run_e0_autodan_route_budget_materialization",
+        SCRIPT,
+    )
+    if spec is None or spec.loader is None:
+        raise RuntimeError("unable to load AutoDAN route-budget smoke script")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def candidate(prefix: str, suffix: str) -> str:
@@ -29,13 +34,14 @@ def candidate(prefix: str, suffix: str) -> str:
 
 
 def test_guard_replaces_missing_or_duplicated_placeholder() -> None:
+    module = load_script()
     fallback = candidate("Fallback", "Done")
-    guarded_missing, changed_missing = guard_candidate(
+    guarded_missing, changed_missing = module.guard_candidate(
         "No placeholder here.",
         placeholder=PLACEHOLDER,
         fallback=fallback,
     )
-    guarded_duplicate, changed_duplicate = guard_candidate(
+    guarded_duplicate, changed_duplicate = module.guard_candidate(
         f"{PLACEHOLDER} and {PLACEHOLDER}",
         placeholder=PLACEHOLDER,
         fallback=fallback,
@@ -44,18 +50,19 @@ def test_guard_replaces_missing_or_duplicated_placeholder() -> None:
     assert changed_duplicate is True
     assert guarded_missing == fallback
     assert guarded_duplicate == fallback
-    assert has_exact_placeholder(guarded_missing, PLACEHOLDER)
+    assert module.has_exact_placeholder(guarded_missing, PLACEHOLDER)
 
 
 def test_guard_keeps_valid_candidate_and_materializes_exactly_once() -> None:
+    module = load_script()
     value = candidate("Valid", "Complete")
-    guarded, changed = guard_candidate(
+    guarded, changed = module.guard_candidate(
         value,
         placeholder=PLACEHOLDER,
         fallback=candidate("Fallback", "Complete"),
     )
     assert changed is False
-    materialized = exact_materialize(
+    materialized = module.exact_materialize(
         guarded,
         placeholder=PLACEHOLDER,
         payload=PAYLOAD,
@@ -66,8 +73,9 @@ def test_guard_keeps_valid_candidate_and_materializes_exactly_once() -> None:
 
 
 def test_exact_materialize_rejects_invalid_candidate() -> None:
+    module = load_script()
     with pytest.raises(ValueError):
-        exact_materialize(
+        module.exact_materialize(
             "missing placeholder",
             placeholder=PLACEHOLDER,
             payload=PAYLOAD,
@@ -75,15 +83,16 @@ def test_exact_materialize_rejects_invalid_candidate() -> None:
 
 
 def test_crossover_is_deterministic_for_fixed_rng() -> None:
+    module = load_script()
     left = candidate("Left", "First")
     right = candidate("Right", "Second")
-    observed_a = crossover(
+    observed_a = module.crossover(
         left,
         right,
         num_points=5,
         rng=random.Random(20),
     )
-    observed_b = crossover(
+    observed_b = module.crossover(
         left,
         right,
         num_points=5,
@@ -93,13 +102,14 @@ def test_crossover_is_deterministic_for_fixed_rng() -> None:
 
 
 def test_pool_selection_excludes_invalid_references() -> None:
+    module = load_script()
     pool = [
         candidate("A", "One"),
         candidate("B", "Two"),
         "invalid",
         f"duplicate {PLACEHOLDER} {PLACEHOLDER}",
     ]
-    selected, summary = select_valid_pool(
+    selected, summary = module.select_valid_pool(
         pool,
         placeholder=PLACEHOLDER,
         sample_count=2,
@@ -107,15 +117,16 @@ def test_pool_selection_excludes_invalid_references() -> None:
     assert len(selected) == 2
     assert summary["valid_exact_placeholder_count"] == 2
     assert summary["invalid_placeholder_count"] == 2
-    assert all(has_exact_placeholder(item, PLACEHOLDER) for item in selected)
+    assert all(module.has_exact_placeholder(item, PLACEHOLDER) for item in selected)
 
 
 def test_simulation_guards_all_enabled_routes() -> None:
+    module = load_script()
     references = [
         candidate(f"Reference {index}", f"Ending {index}")
         for index in range(8)
     ]
-    first = simulate_once(
+    first = module.simulate_once(
         references,
         placeholder=PLACEHOLDER,
         payload=PAYLOAD,
@@ -124,7 +135,7 @@ def test_simulation_guards_all_enabled_routes() -> None:
         seed=20,
         num_points=5,
     )
-    second = simulate_once(
+    second = module.simulate_once(
         references,
         placeholder=PLACEHOLDER,
         payload=PAYLOAD,
@@ -141,6 +152,7 @@ def test_simulation_guards_all_enabled_routes() -> None:
 
 
 def test_official_default_parser() -> None:
+    script = load_script()
     module = ast.parse(
         """
 seed = 20
@@ -152,8 +164,8 @@ parser.add_argument('--num_points', default=5)
 parser.add_argument('--mutation', default=0.01)
 """
     )
-    defaults = argparse_defaults(module)
-    assert assignment_literal(module, "seed") == 20
+    defaults = script.argparse_defaults(module)
+    assert script.assignment_literal(module, "seed") == 20
     assert defaults == {
         "num_steps": 100,
         "batch_size": 256,
