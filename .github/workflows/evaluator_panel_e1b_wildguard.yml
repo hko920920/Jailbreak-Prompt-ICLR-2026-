@@ -1,37 +1,22 @@
 name: evaluator-panel-e1b-wildguard
 
-# Isolated, traceable E1B execution. Terminal-path workflows were archived in
-# commit 4c5f427. PR-only triggering avoids duplicate push/PR runs while the
-# E1B decision is generated; this workflow will be archived after the result is
-# frozen.
+# Immutable execution branch. The workflow is scoped to a dedicated PR whose
+# head is never updated during the run. It checks out the exact PR head SHA,
+# not a moving test-merge commit.
 on:
   pull_request:
     branches:
-      - agent/gate1-contract
+      - agent/programmatic-agentharm-pivot
     paths:
       - .github/workflows/evaluator_panel_e1b_wildguard.yml
-      - configs/natural_language_localization/evaluator_panel_e1b_wildguard_v1.json
-      - configs/gate1/gate1_step3b_wildguard_validation.json
-      - docs/EVALUATOR_PANEL_E1B_WILDGUARD.md
-      - scripts/run_evaluator_panel_e1b_ci.sh
-      - scripts/run_evaluator_panel_e1b.py
-      - scripts/run_gate1_step3b_wildguard_validation.py
-      - src/jbspan/evaluator_panel.py
-      - tests/conftest.py
-      - tests/test_evaluator_panel.py
-      - tests/test_evaluator_panel_e1b.py
-      - tests/test_gate1_step3b_wildguard_validation.py
-      - data/natural_language_localization/evaluator_panel_v1/e1a_static_hardening.safe.json
-      - data/gate1/v2/wildguard_q8/wildguard_selection.safe.jsonl
-      - data/gate1/v2/wildguard_q8/wildguard_selection_metrics.json
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: evaluator-panel-e1b-wildguard
-  cancel-in-progress: true
+  group: evaluator-panel-e1b-wildguard-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
 
 jobs:
   e1b:
@@ -58,11 +43,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 1
+          persist-credentials: false
 
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
+      - name: Record immutable execution identity
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha }}"
+          printf 'execution_head=%s\n' "$(git rev-parse HEAD)"
+          printf 'execution_branch=%s\n' "${{ github.head_ref }}"
 
       - name: Validate E1B harness syntax
         run: |
