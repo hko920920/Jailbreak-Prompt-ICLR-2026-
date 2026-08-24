@@ -180,7 +180,11 @@ def audit(config_path: Path, source_root: Path, output: Path) -> Json:
             and "self._control_slice = slice(self._goal_slice.stop" in attack_manager_text
         ),
         "candidate_logits_replace_only_control_slice": (
-            "torch.arange(self._control_slice.start, self._control_slice.stop)" in attack_manager_text
+            (
+                "torch.arange(self._control_slice.start, "
+                "self._control_slice.stop)"
+            )
+            in attack_manager_text
             and "self.input_ids.unsqueeze(0).repeat" in attack_manager_text
             and "torch.scatter(" in attack_manager_text
         ),
