@@ -1,0 +1,194 @@
+{
+  "candidate_selection": {
+    "primary_score": "MINIMUM_FROZEN_TARGET_PREFIX_LOSS",
+    "selection_pool": "ALL_VALID_GUARDED_CANDIDATES_ACROSS_ALL_FIXED_STEPS",
+    "selection_rule_may_not_change_after_target_outputs": true,
+    "success_evaluator_used_for_selection": false,
+    "tie_break_order": [
+      "LOWEST_LOSS",
+      "EARLIEST_STEP",
+      "LOWEST_BATCH_INDEX",
+      "LEXICOGRAPHIC_SHA256"
+    ],
+    "top_k_per_behavior_per_generation_seed": 1
+  },
+  "causal_oracle_opened": false,
+  "config_sha256": "f16238647a12b60307593f9dd71b451c023cc6a87ae89b8d06faab976673485f",
+  "cross_regime_stage_a_opened": false,
+  "external_api_called": false,
+  "family": "AutoDAN",
+  "family_admitted_to_balanced_signal_screen": false,
+  "harmless_simulation": {
+    "deterministic": true,
+    "raw_text_recorded": false,
+    "repetitions": 3,
+    "representative": {
+      "all_guarded_candidates_valid": true,
+      "all_materialized_payload_exact_once": true,
+      "candidate_count": 32,
+      "candidate_hashes_sha256": "da38a2e31bd607c164ca9d6148c2a1e59e44eed0a92f5ab7721e5e49cfd3cae4",
+      "guard_repair_count": 0,
+      "materialized_hashes_sha256": "4c41d75c4ccf45e24d3942c1adff012c74ef0d899629d798b7335c495d59d943",
+      "raw_candidate_text_recorded": false,
+      "raw_crossover_invalid_count": 0,
+      "raw_materialized_text_recorded": false
+    }
+  },
+  "heldout_opened": false,
+  "keep_only_oracle_opened": false,
+  "mandatory_checks": {
+    "all_guarded_candidates_valid": true,
+    "all_materialized_payload_exact_once": true,
+    "budget_matches_official_defaults": true,
+    "candidate_selection_frozen": true,
+    "deterministic_harmless_materialization": true,
+    "elite_integer_consistent": true,
+    "enabled_mutation_routes_payload_guarded": true,
+    "forward_budget_consistent": true,
+    "no_target_or_external_api": true,
+    "predecessor_identities_and_statuses": true,
+    "prompt_group_nonempty_string_sequence": true,
+    "route_frozen": true,
+    "source_identities": true,
+    "valid_reference_pool_sufficient": true
+  },
+  "next_authorized_operation": "E0_AUTODAN_ROUTE_BUDGET_MATERIALIZATION_PASS_REMAIN_PREOUTPUT",
+  "observed_official_defaults": {
+    "batch_size": 256,
+    "crossover_points": 5,
+    "crossover_probability": 0.5,
+    "mutation_rate": 0.01,
+    "num_elites_fraction": 0.05,
+    "num_steps": 100,
+    "seed": 20
+  },
+  "operational_pass": true,
+  "optimization_budget": {
+    "batch_size": 256,
+    "budget_may_not_expand_after_signal_outputs": true,
+    "crossover_points": 5,
+    "crossover_probability": 0.5,
+    "development_screen_seed": 20,
+    "early_stopping": false,
+    "maximum_model_forward_candidates_per_behavior_per_seed": 25600,
+    "mutation_rate": 0.01,
+    "num_elites_fraction": 0.05,
+    "num_elites_integer": 12,
+    "num_steps": 100,
+    "positive_pair_confirmation_seeds": [
+      29,
+      43
+    ]
+  },
+  "paper_validity": false,
+  "predecessors": [
+    {
+      "expected_git_blob_sha": "cfa1b642986526cc92e9dad0c3c85215eeccfbb1",
+      "git_blob_match": true,
+      "observed_git_blob_sha": "cfa1b642986526cc92e9dad0c3c85215eeccfbb1",
+      "observed_status": "E0_AUTODAN_STATIC_AUDIT_CONDITIONAL_ADVANCE",
+      "path": "data/natural_language_localization/e0_attack_family_provenance_v1/autodan_static_audit.safe.json",
+      "required_status": "E0_AUTODAN_STATIC_AUDIT_CONDITIONAL_ADVANCE",
+      "status_match": true
+    },
+    {
+      "expected_git_blob_sha": "26be6bdb0061d81d1b4eb86fa064cc3e4061ac44",
+      "git_blob_match": true,
+      "observed_git_blob_sha": "26be6bdb0061d81d1b4eb86fa064cc3e4061ac44",
+      "observed_status": "E0_AUTODAN_QWEN_ADAPTER_SMOKE_PASS_REMAIN_CONDITIONAL",
+      "path": "data/natural_language_localization/e0_attack_family_provenance_v1/autodan_qwen_adapter_smoke.safe.json",
+      "required_status": "E0_AUTODAN_QWEN_ADAPTER_SMOKE_PASS_REMAIN_CONDITIONAL",
+      "status_match": true
+    }
+  ],
+  "prior_evaluation_opened": false,
+  "prompt_group": {
+    "invalid_placeholder_count": 1,
+    "raw_reference_text_recorded": false,
+    "selected_count": 32,
+    "selected_hashes_sha256": "3c4bea1ee2eb70d1cc9ba84712114ec83ec5717da51caa4f69d32297f8399c28",
+    "total_count": 500,
+    "valid_exact_placeholder_count": 499
+  },
+  "real_harmful_payload_used": false,
+  "regime": "F_fluent_optimized",
+  "route": {
+    "algorithm_variant": "GA",
+    "artifact_choice": "REGENERATE_FROM_PINNED_PROMPT_GROUP",
+    "crossover_enabled": true,
+    "early_stopping_enabled": false,
+    "external_api_mutation_enabled": false,
+    "fixed_step_execution_required": true,
+    "local_synonym_mutation_enabled": false,
+    "payload_guard_policy": "REJECT_AND_REPLACE_WITH_DETERMINISTIC_VALID_PARENT_OR_REFERENCE",
+    "prompt_group_loading": "TORCH_LOAD_WEIGHTS_ONLY",
+    "reference_pool_replacement_mutation_enabled": true,
+    "route_id": "AUTODAN_GA_REGENERATE_FIXED_BUDGET_QWEN_V1"
+  },
+  "schema_version": "e0-autodan-route-budget-materialization-result-v1",
+  "source": {
+    "file_identities": [
+      {
+        "exists": true,
+        "expected_git_blob_sha": "3bd73144537c2b4985cd36ce06f68935e86eb23a",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "3bd73144537c2b4985cd36ce06f68935e86eb23a",
+        "path": "autodan_ga_eval.py",
+        "role": "ga_entrypoint",
+        "sha256": "985630cdd7f092f2d92dbc144b48dd30dcf9c483163dec22e9ab77efb11194ce",
+        "size_bytes": 11147
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "b99248622923b631346bced8ebd38effc4a6b87b",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "b99248622923b631346bced8ebd38effc4a6b87b",
+        "path": "assets/autodan_initial_prompt.txt",
+        "role": "initial_prompt",
+        "sha256": "fc1b4ace08784d0ba9ec2ab5e8c65ae75bbe59621e41425df9541dd7155a3283",
+        "size_bytes": 300
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "337b5d2d6d368334aa21238e9876e8d9905d3ff5",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "337b5d2d6d368334aa21238e9876e8d9905d3ff5",
+        "path": "utils/opt_utils.py",
+        "role": "opt_utils",
+        "sha256": "eafd912b28b811c498c8e9e93af952b9c50e9bc2ba13ea7d66c621ad29aa1ea7",
+        "size_bytes": 20686
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "bf241dca59bba95f7fae9d7d0f2a117392da1a37",
+        "expected_sha256": "04dc00899aab6f09ef460ab022776867075e13c78ea0150feb9c7c34201f9a1b",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "bf241dca59bba95f7fae9d7d0f2a117392da1a37",
+        "path": "assets/prompt_group.pth",
+        "role": "prompt_group",
+        "sha256": "04dc00899aab6f09ef460ab022776867075e13c78ea0150feb9c7c34201f9a1b",
+        "sha256_match": true,
+        "size_bytes": 168703
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "eb0a3f007f743b6feca316b8d9956db8014a5197",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "eb0a3f007f743b6feca316b8d9956db8014a5197",
+        "path": "utils/string_utils.py",
+        "role": "string_utils",
+        "sha256": "de4f37801943753c8234becc37102e37affc70a3a9dbf89ccfe25ff63751246f",
+        "size_bytes": 5822
+      }
+    ],
+    "license": "MIT",
+    "repository": "SheltonLiu-N/AutoDAN",
+    "revision": "34062e964185693e81a6775b4f0d00bfd7507612",
+    "tree_sha": "39ceba6f45e5dec17db8d3099d7281f8673ceb14"
+  },
+  "status": "E0_AUTODAN_ROUTE_BUDGET_MATERIALIZATION_PASS_REMAIN_PREOUTPUT",
+  "target_model_called": false,
+  "target_model_generation_performed": false,
+  "target_model_weights_downloaded": false,
+  "wavelet_used": false
+}
