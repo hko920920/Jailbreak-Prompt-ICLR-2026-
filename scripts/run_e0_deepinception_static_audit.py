@@ -273,7 +273,11 @@ def audit_row(
         unit_names=unit_names,
         anchors=anchors,
     )
-    unit_ids = [str(fragment["owner"]) for fragment in fragments if fragment["kind"] == "attack_unit"]
+    unit_ids = [
+        str(fragment["owner"])
+        for fragment in fragments
+        if fragment["kind"] == "attack_unit"
+    ]
     subsets = all_nonempty_subsets(unit_ids)
     variants: list[JsonObject] = []
     for subset in subsets:
