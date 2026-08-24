@@ -1,0 +1,46 @@
+{
+  "schema_version": "e0-autodan-qwen-adapter-operational-failure-v1",
+  "status": "E0_AUTODAN_QWEN_ADAPTER_SMOKE_OPERATIONAL_FAILURE",
+  "recorded_at": "2026-08-24T18:40:11+09:00",
+  "paper_validity": false,
+  "workflow": "e0-autodan-qwen-adapter-smoke",
+  "workflow_run_id": 32712732866,
+  "workflow_run_number": 2,
+  "workflow_run_attempt": 1,
+  "job_id": 97387431607,
+  "source_head_sha": "7820a191d99a94113ad75ded3ba98e28411ac129",
+  "failure_stage": "RUN_SYNTHETIC_EXACT_PLACEHOLDER_AND_QWEN_CHAT_TEMPLATE_SMOKE",
+  "failure_class": "MISSING_PINNED_JINJA2_RUNTIME_DEPENDENCY",
+  "exception_type": "ImportError",
+  "exception_summary": "transformers.apply_chat_template requires jinja2, but jinja2 was not installed in the workflow environment",
+  "completed_before_failure": {
+    "active_run_checkpoint": true,
+    "lint": true,
+    "unit_tests": true,
+    "frozen_contract_validation": true,
+    "pinned_autodan_source_identity": true,
+    "pinned_qwen_tokenizer_identity": true,
+    "qwen_tokenizer_only_snapshot_download": true,
+    "target_model_weights_downloaded": false,
+    "target_model_generation_performed": false
+  },
+  "decision_relevant_output_observed": false,
+  "scientific_contract_changed": false,
+  "source_revision_changed": false,
+  "payload_changed": false,
+  "threshold_or_gate_changed": false,
+  "authorized_runtime_remediation": {
+    "operation": "INSTALL_PINNED_JINJA2_AND_RERUN_UNCHANGED_CONTRACT",
+    "jinja2_version": "3.1.6"
+  },
+  "sealed_boundaries": {
+    "real_harmful_payload_used": false,
+    "target_model_weights_downloaded": false,
+    "target_model_called": false,
+    "target_model_generation_performed": false,
+    "cross_regime_stage_a_opened": false,
+    "causal_oracle_opened": false,
+    "wavelet_used": false
+  },
+  "next_authorized_operation": "ADD_PINNED_JINJA2_RUNTIME_DEPENDENCY_AND_RERUN_IDENTICAL_SMOKE_CONTRACT"
+}
