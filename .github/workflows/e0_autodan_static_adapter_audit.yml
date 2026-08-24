@@ -13,11 +13,11 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: e0-autodan-static-adapter-audit
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   audit:
@@ -26,6 +26,7 @@ jobs:
     env:
       CONFIG: configs/natural_language_localization/e0_autodan_static_audit_v1.json
       OUTPUT: artifacts/e0-autodan-static/safe/autodan_static_audit.safe.json
+      DATA_DIR: data/natural_language_localization/e0_attack_family_provenance_v1
       AUTODAN_REPOSITORY: https://github.com/SheltonLiu-N/AutoDAN.git
       AUTODAN_REVISION: 34062e964185693e81a6775b4f0d00bfd7507612
       AUTODAN_TREE: 39ceba6f45e5dec17db8d3099d7281f8673ceb14
@@ -33,7 +34,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          ref: agent/programmatic-agentharm-pivot
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -89,33 +91,83 @@ jobs:
             "$OUTPUT")" = "true"
 
       - name: Publish safe summary
-        if: always()
         run: |
-          if [ -f "$OUTPUT" ]; then
-            {
-              echo "# E0 AutoDAN static adapter audit"
-              echo
-              echo "- status: **$(jq -r '.status' "$OUTPUT")**"
-              echo "- audit pass: **$(jq -r '.operational_pass' "$OUTPUT")**"
-              echo "- admitted to signal screen: **false**"
-              echo "- official byte-invariant payload route: **false**"
-              echo "- exact-placeholder adapter string test: **$(jq -r \
-                '.materialization.exact_placeholder_adapter.payload_preserved' \
-                "$OUTPUT")**"
-              echo "- blocker count: **$(jq '.blockers_before_admission | length' \
-                "$OUTPUT")**"
-              echo "- target model called: **false**"
-              echo "- Stage A / causal oracle / wavelet: **closed / closed / closed**"
-            } >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "Safe audit result was not produced." >> "$GITHUB_STEP_SUMMARY"
-          fi
+          {
+            echo "# E0 AutoDAN static adapter audit"
+            echo
+            echo "- status: **$(jq -r '.status' "$OUTPUT")**"
+            echo "- audit pass: **$(jq -r '.operational_pass' "$OUTPUT")**"
+            echo "- admitted to signal screen: **false**"
+            echo "- official byte-invariant payload route: **false**"
+            echo "- exact-placeholder adapter string test: **$(jq -r \
+              '.materialization.exact_placeholder_adapter.payload_preserved' \
+              "$OUTPUT")**"
+            echo "- blocker count: **$(jq '.blockers_before_admission | length' \
+              "$OUTPUT")**"
+            echo "- target model called: **false**"
+            echo "- Stage A / causal oracle / wavelet: **closed / closed / closed**"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload safe audit artifact
-        if: always()
+        id: upload
         uses: actions/upload-artifact@v4
         with:
           name: e0-autodan-static-adapter-audit-safe
           path: artifacts/e0-autodan-static/safe
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 30
+
+      - name: Commit immutable safe result and execution record
+        env:
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+          ARTIFACT_DIGEST: ${{ steps.upload.outputs.artifact-digest }}
+          ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
+        run: |
+          mkdir -p "$DATA_DIR"
+          cp "$OUTPUT" "$DATA_DIR/autodan_static_audit.safe.json"
+          result_sha="$(sha256sum "$OUTPUT" | cut -d' ' -f1)"
+          jq -n \
+            --arg source_head "$GITHUB_SHA" \
+            --arg workflow "$GITHUB_WORKFLOW" \
+            --argjson run_id "$GITHUB_RUN_ID" \
+            --argjson run_number "$GITHUB_RUN_NUMBER" \
+            --argjson run_attempt "$GITHUB_RUN_ATTEMPT" \
+            --arg artifact_id "$ARTIFACT_ID" \
+            --arg artifact_digest "$ARTIFACT_DIGEST" \
+            --arg artifact_url "$ARTIFACT_URL" \
+            --arg result_sha256 "$result_sha" \
+            '{
+              schema_version: "e0-autodan-static-audit-execution-v1",
+              status: "E0_AUTODAN_STATIC_AUDIT_EXECUTION_RECORDED",
+              paper_validity: false,
+              source_head_sha: $source_head,
+              workflow: $workflow,
+              workflow_run_id: $run_id,
+              workflow_run_number: $run_number,
+              workflow_run_attempt: $run_attempt,
+              artifact_id: $artifact_id,
+              artifact_digest: $artifact_digest,
+              artifact_url: $artifact_url,
+              safe_result_sha256: $result_sha256,
+              decision: "E0_AUTODAN_STATIC_AUDIT_CONDITIONAL_ADVANCE",
+              family_admitted_to_balanced_signal_screen: false,
+              real_harmful_payload_used: false,
+              target_model_called: false,
+              cross_regime_stage_a_opened: false,
+              causal_oracle_opened: false,
+              wavelet_used: false,
+              next_authorized_operation: "EXACT_PLACEHOLDER_AND_TARGET_ADAPTER_SYNTHETIC_SMOKE"
+            }' > "$DATA_DIR/autodan_static_audit_execution.safe.json"
+
+          git config user.name 'Taewook-git'
+          git config user.email 'lkhd3329@naver.com'
+          git add \
+            "$DATA_DIR/autodan_static_audit.safe.json" \
+            "$DATA_DIR/autodan_static_audit_execution.safe.json"
+          if git diff --cached --quiet; then
+            echo 'Safe AutoDAN audit records already match.'
+            exit 0
+          fi
+          git commit -m 'Record AutoDAN E0 static audit result'
+          git pull --rebase origin agent/programmatic-agentharm-pivot
+          git push origin HEAD:agent/programmatic-agentharm-pivot
