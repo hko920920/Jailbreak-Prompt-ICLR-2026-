@@ -1,0 +1,245 @@
+{
+  "artifact": {
+    "artifact_id": 9511655110,
+    "artifact_sha256": "73ae13754162b9727b0e41097bf2e2a45214ca525a5fd18a8ada50df86f00461",
+    "job_id": 97361967922,
+    "run_id": 32704273253
+  },
+  "causal_oracle_opened": false,
+  "config_sha256": "f2645ae5ee8b5e1653e0165593f21beeac46e4e0b1cd23705cda6d97268704d3",
+  "cross_regime_stage_a_opened": false,
+  "decorators_sha256": "875cdbd3d41b0d06af6f3e7fee6c91f8e227b45402325264cd36ccbc8471ac91",
+  "full_result_sha256": "6405343e23df8ae57e4f06e82e0a0ccd7b181fe246d6a51802814b31847af2ae",
+  "keep_only_oracle_opened": false,
+  "model_prompting_attempted": false,
+  "next_authorized_operation": "E0_H4RM3L_TYPED_UNITS_PASS_ADVANCE_TO_REAL_TEMPLATE_PAYLOAD_INVARIANCE_AUDIT",
+  "operational_pass": true,
+  "paper_validity": false,
+  "predecessor_result_sha256": "f89e68ab5a1eae9c86a89029f545167567439fd5c962bc436a72233625e95a25",
+  "program_count": 3,
+  "program_pass_count": 3,
+  "programs": [
+    {
+      "component_count": 3,
+      "components": [
+        "RoleplayingDecorator",
+        "RefusalSuppressionDecorator",
+        "AffirmativePrefixInjectionDecorator"
+      ],
+      "expression_sha256": "6de4daff329f71608c909b169035511ce3f944b2ca474eb983cc0899bd9e3d01",
+      "fragment_count": 5,
+      "fragment_manifest_sha256": "e8e2f36415603bd569b53183ce03e0e3fb6bc2c5efa3691e061c147a75374c84",
+      "full_output_character_length": 144,
+      "full_output_sha256": "ad4f6bd2e3cc7420c6c5170d40d95c5175400ec2161118afd2c79dde31adc38a",
+      "id": "semantic_chain_three",
+      "manifest_partition_pass": true,
+      "neutralized_variant_count": 14,
+      "neutralized_variant_pass_count": 14,
+      "neutralizers": {
+        "delete_component_fragments": {
+          "all_length_rules_pass": true,
+          "all_payload_occurrence_one": true,
+          "max_output_character_length": 115,
+          "min_output_character_length": 44,
+          "pass_count": 7,
+          "variant_count": 7
+        },
+        "layout_preserving_blank": {
+          "all_length_rules_pass": true,
+          "all_payload_occurrence_one": true,
+          "max_output_character_length": 144,
+          "min_output_character_length": 144,
+          "pass_count": 7,
+          "variant_count": 7
+        }
+      },
+      "operational_pass": true,
+      "raw_text_recorded": false,
+      "subset_count": 7,
+      "unit_manifest_sha256": "470b031e3fb8c2f81aff0b8bb05a6b37e113da737cc81d55234b5025ccf61b6d",
+      "units": [
+        {
+          "component": "RoleplayingDecorator",
+          "component_expression_sha256": "5b302be342d68b825cac1792369ddf5630aeea9ea0141d0e9f5fb94f75e2ee85",
+          "fragment_count": 2,
+          "fragment_ids": [
+            "u01_RoleplayingDecorator:prefix",
+            "u01_RoleplayingDecorator:suffix"
+          ],
+          "id": "u01_RoleplayingDecorator",
+          "input_occurrence_count_in_output": 1,
+          "input_sha256": "fb6368f1014a0bb5dca4d1ad20de78a8637dc06e24132017e4ebf883a7f2dc99",
+          "output_sha256": "002d2aff45c0ced94d3fa1ac3c29b8467b280b088ee294405982c74d1e0a4249"
+        },
+        {
+          "component": "RefusalSuppressionDecorator",
+          "component_expression_sha256": "b10f67af96238c29f29dce63cbd8c78fdf5db218174a064c46802f676c3ecfe1",
+          "fragment_count": 1,
+          "fragment_ids": [
+            "u02_RefusalSuppressionDecorator:prefix"
+          ],
+          "id": "u02_RefusalSuppressionDecorator",
+          "input_occurrence_count_in_output": 1,
+          "input_sha256": "002d2aff45c0ced94d3fa1ac3c29b8467b280b088ee294405982c74d1e0a4249",
+          "output_sha256": "3b2991c03f22ccd6ead6708e437e044afeecc79d35b99eaede42e754e852cb95"
+        },
+        {
+          "component": "AffirmativePrefixInjectionDecorator",
+          "component_expression_sha256": "9126a15da773465a411e264efac971594d25fe27db6a2f2f638ca9db38694d12",
+          "fragment_count": 1,
+          "fragment_ids": [
+            "u03_AffirmativePrefixInjectionDecorator:suffix"
+          ],
+          "id": "u03_AffirmativePrefixInjectionDecorator",
+          "input_occurrence_count_in_output": 1,
+          "input_sha256": "3b2991c03f22ccd6ead6708e437e044afeecc79d35b99eaede42e754e852cb95",
+          "output_sha256": "ad4f6bd2e3cc7420c6c5170d40d95c5175400ec2161118afd2c79dde31adc38a"
+        }
+      ],
+      "variant_manifest_sha256": "78d7bbf5689189e4c18f57934ff50a2181d033fbc943805c2156725c2e01cd93"
+    },
+    {
+      "component_count": 2,
+      "components": [
+        "WikipediaDecorator",
+        "StyleInjectionJSONDecorator"
+      ],
+      "expression_sha256": "4be179519c7e2e6889a962ab6e11964ef7720633d3715af86a4d8580a264e9fd",
+      "fragment_count": 3,
+      "fragment_manifest_sha256": "551d82ec249e697b3d3e017e5a1fd14d95bb3fb529057e586176b14285e0d30d",
+      "full_output_character_length": 114,
+      "full_output_sha256": "18181a828aa92210c3cdba416b13e4b4e8ed3db4a4ac5cb2a489b515dcc81436",
+      "id": "format_chain_two",
+      "manifest_partition_pass": true,
+      "neutralized_variant_count": 6,
+      "neutralized_variant_pass_count": 6,
+      "neutralizers": {
+        "delete_component_fragments": {
+          "all_length_rules_pass": true,
+          "all_payload_occurrence_one": true,
+          "max_output_character_length": 82,
+          "min_output_character_length": 44,
+          "pass_count": 3,
+          "variant_count": 3
+        },
+        "layout_preserving_blank": {
+          "all_length_rules_pass": true,
+          "all_payload_occurrence_one": true,
+          "max_output_character_length": 114,
+          "min_output_character_length": 114,
+          "pass_count": 3,
+          "variant_count": 3
+        }
+      },
+      "operational_pass": true,
+      "raw_text_recorded": false,
+      "subset_count": 3,
+      "unit_manifest_sha256": "d55e4bce3f5d83b6082ca6b433dd50553782496a8a7ea7ed2f41f0e87b155052",
+      "units": [
+        {
+          "component": "WikipediaDecorator",
+          "component_expression_sha256": "ff0b39da5887b909e66138f213cceebdb53885cbb24c3a0aa7d62155f39da94e",
+          "fragment_count": 1,
+          "fragment_ids": [
+            "u01_WikipediaDecorator:prefix"
+          ],
+          "id": "u01_WikipediaDecorator",
+          "input_occurrence_count_in_output": 1,
+          "input_sha256": "fb6368f1014a0bb5dca4d1ad20de78a8637dc06e24132017e4ebf883a7f2dc99",
+          "output_sha256": "4ffb67f4b50e771d8080059a4ad24f7682443c463ba194c3dcad8714ab7c7c49"
+        },
+        {
+          "component": "StyleInjectionJSONDecorator",
+          "component_expression_sha256": "cdb89270a095cffbd948802e43e5953a4c5cd1f00c048b0a4434eba02369dcf6",
+          "fragment_count": 1,
+          "fragment_ids": [
+            "u02_StyleInjectionJSONDecorator:prefix"
+          ],
+          "id": "u02_StyleInjectionJSONDecorator",
+          "input_occurrence_count_in_output": 1,
+          "input_sha256": "4ffb67f4b50e771d8080059a4ad24f7682443c463ba194c3dcad8714ab7c7c49",
+          "output_sha256": "18181a828aa92210c3cdba416b13e4b4e8ed3db4a4ac5cb2a489b515dcc81436"
+        }
+      ],
+      "variant_manifest_sha256": "e902aecc3af5f914d618ac5b11173c7478e427300e7f2400a396bf5944ddbd8f"
+    },
+    {
+      "component_count": 2,
+      "components": [
+        "DistractorDecorator",
+        "QuestionIdentificationDecorator"
+      ],
+      "expression_sha256": "6a3a9ea0a6c182f49785ecde81229053d0c66b370ef267f2ec48a1f0b300c774",
+      "fragment_count": 4,
+      "fragment_manifest_sha256": "d207778271f26895a08646b831858f49ab44d5c48158d9e9cdbc23fef4cfe479",
+      "full_output_character_length": 190,
+      "full_output_sha256": "a0c148971160e3a774eaf19127a9438aec22b46a8c6474d7f609e4c6e3f1c925",
+      "id": "distractor_chain_two",
+      "manifest_partition_pass": true,
+      "neutralized_variant_count": 6,
+      "neutralized_variant_pass_count": 6,
+      "neutralizers": {
+        "delete_component_fragments": {
+          "all_length_rules_pass": true,
+          "all_payload_occurrence_one": true,
+          "max_output_character_length": 141,
+          "min_output_character_length": 44,
+          "pass_count": 3,
+          "variant_count": 3
+        },
+        "layout_preserving_blank": {
+          "all_length_rules_pass": true,
+          "all_payload_occurrence_one": true,
+          "max_output_character_length": 190,
+          "min_output_character_length": 190,
+          "pass_count": 3,
+          "variant_count": 3
+        }
+      },
+      "operational_pass": true,
+      "raw_text_recorded": false,
+      "subset_count": 3,
+      "unit_manifest_sha256": "f52d11365a6c0aef4483f41de52734f535b8bf9490e8f4fe0e9638a459a12e37",
+      "units": [
+        {
+          "component": "DistractorDecorator",
+          "component_expression_sha256": "e274b39bbe8fdf3261563b142db4b684596da8cef3c2565f787607c4e75143d6",
+          "fragment_count": 2,
+          "fragment_ids": [
+            "u01_DistractorDecorator:prefix",
+            "u01_DistractorDecorator:suffix"
+          ],
+          "id": "u01_DistractorDecorator",
+          "input_occurrence_count_in_output": 1,
+          "input_sha256": "fb6368f1014a0bb5dca4d1ad20de78a8637dc06e24132017e4ebf883a7f2dc99",
+          "output_sha256": "bccee55aa3a9f4d4d21042b2a43e8d80582a5ee387419dce7411e9a1bcd9fee5"
+        },
+        {
+          "component": "QuestionIdentificationDecorator",
+          "component_expression_sha256": "a027ae502b1ef65c39eb65a38124debed55906e59475187765c172d38b9cca91",
+          "fragment_count": 1,
+          "fragment_ids": [
+            "u02_QuestionIdentificationDecorator:suffix"
+          ],
+          "id": "u02_QuestionIdentificationDecorator",
+          "input_occurrence_count_in_output": 1,
+          "input_sha256": "bccee55aa3a9f4d4d21042b2a43e8d80582a5ee387419dce7411e9a1bcd9fee5",
+          "output_sha256": "a0c148971160e3a774eaf19127a9438aec22b46a8c6474d7f609e4c6e3f1c925"
+        }
+      ],
+      "variant_manifest_sha256": "248e3300b1448317f1e36f70741216a1643f06303ea005eaa9ee93956b972cb7"
+    }
+  ],
+  "raw_fragment_or_prompt_text_committed": false,
+  "real_harmful_payload_used": false,
+  "schema_version": "e0-h4rm3l-typed-units-result-v1",
+  "source_revision": "e6f58a1a1e56c1a95b26b06aa4fe393ee2240dbd",
+  "status": "E0_H4RM3L_TYPED_UNITS_PASS_ADVANCE_TO_REAL_TEMPLATE_PAYLOAD_INVARIANCE_AUDIT",
+  "synthetic_payload_sha256": "fb6368f1014a0bb5dca4d1ad20de78a8637dc06e24132017e4ebf883a7f2dc99",
+  "target_model_called": false,
+  "total_component_count": 7,
+  "total_neutralized_variant_count": 26,
+  "total_neutralized_variant_pass_count": 26,
+  "total_subset_count": 13,
+  "wavelet_used": false
+}
