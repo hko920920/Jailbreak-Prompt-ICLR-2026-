@@ -1,17 +1,19 @@
 name: temporary-e1b-ruff-autofix
 
 on:
-  push:
+  pull_request:
     branches:
-      - agent/programmatic-agentharm-pivot
+      - agent/gate1-contract
     paths:
       - .github/workflows/_temporary_e1b_ruff_autofix.yml
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
   fix:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
