@@ -49,7 +49,7 @@ def canonical_sha256(value: object) -> str:
 
 def git_blob_sha(path: Path) -> str:
     payload = path.read_bytes()
-    framed = f"blob {len(payload)}\0".encode("utf-8") + payload
+    framed = f"blob {len(payload)}\0".encode() + payload
     return hashlib.sha1(framed).hexdigest()  # noqa: S324 - Git object identity.
 
 

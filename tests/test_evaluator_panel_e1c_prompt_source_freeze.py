@@ -28,8 +28,14 @@ def load_script() -> types.ModuleType:
 
 def synthetic_notebook_assignments(module: types.ModuleType) -> dict[str, ast.AST]:
     source = '''
-LLAMA2_CLS_PROMPT = {"prompt": "llama {behavior} {generation}", "prompt_contextual": "llama contextual"}
-MISTRAL_CLS_PROMPT = {"prompt": "mistral {behavior} {generation}", "prompt_contextual": "mistral contextual"}
+LLAMA2_CLS_PROMPT = {
+    "prompt": "llama {behavior} {generation}",
+    "prompt_contextual": "llama contextual",
+}
+MISTRAL_CLS_PROMPT = {
+    "prompt": "mistral {behavior} {generation}",
+    "prompt_contextual": "mistral contextual",
+}
 test_classifier_path = "cais/HarmBench-Llama-2-13b-cls"
 val_classifier_path = "cais/HarmBench-Mistral-7b-val-cls"
 classifier_path = val_classifier_path
