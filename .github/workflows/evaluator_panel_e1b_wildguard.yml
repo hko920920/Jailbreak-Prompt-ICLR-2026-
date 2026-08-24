@@ -1,10 +1,12 @@
 name: evaluator-panel-e1b-wildguard
 
-# Execution wrapper stabilized after E1B preflight/safe-boundary repair.
+# Execute only when the active E1B files change on the research branch.  The
+# former pull_request trigger re-ran every expensive historical workflow on
+# each synchronization because the PR carries a large cumulative diff.
 on:
-  pull_request:
+  push:
     branches:
-      - agent/gate1-contract
+      - agent/programmatic-agentharm-pivot
     paths:
       - .github/workflows/evaluator_panel_e1b_wildguard.yml
       - configs/natural_language_localization/evaluator_panel_e1b_wildguard_v1.json
@@ -28,7 +30,7 @@ permissions:
 
 concurrency:
   group: evaluator-panel-e1b-wildguard
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   e1b:
