@@ -1,0 +1,23 @@
+{
+  "schema_version": "e1b-status-probe-safe-v1",
+  "recorded_at": "2026-08-24T08:24:59Z",
+  "expected_trigger_sha": "bdf26570ff835498cb9dc85b40eaf379a1080a12",
+  "run": {
+    "id": 32704859942,
+    "workflow_name": "evaluator-panel-e1b-wildguard",
+    "event": "push",
+    "head_sha": "bdf26570ff835498cb9dc85b40eaf379a1080a12",
+    "status": "pending",
+    "conclusion": null,
+    "created_at": "2026-08-24T08:09:20Z",
+    "updated_at": "2026-08-24T08:09:21Z",
+    "html_url": "https://github.com/hko920920/Jailbreak-Prompt-ICLR-2026-/actions/runs/32704859942",
+    "run_number": 43,
+    "run_attempt": 1
+  },
+  "jobs": [],
+  "scientific_contract_changed": false,
+  "target_outputs_opened_by_probe": false,
+  "causal_oracle_opened_by_probe": false,
+  "wavelet_used_by_probe": false
+}
