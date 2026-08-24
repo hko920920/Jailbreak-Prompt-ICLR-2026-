@@ -6,9 +6,15 @@ import json
 import os
 import string
 from pathlib import Path
-from typing import cast
+from typing import Protocol, cast
 
 JsonObject = dict[str, object]
+
+
+class RepoSibling(Protocol):
+    rfilename: str
+    size: int | None
+    lfs: object
 
 
 def load_object(path: Path) -> JsonObject:
@@ -41,10 +47,11 @@ def immutable_revision(value: object) -> bool:
 
 
 def sibling_metadata(sibling: object) -> JsonObject:
-    filename = str(getattr(sibling, "rfilename"))
-    size = getattr(sibling, "size", None)
+    entry = cast(RepoSibling, sibling)
+    filename = str(entry.rfilename)
+    size = entry.size
     sha256 = None
-    lfs = getattr(sibling, "lfs", None)
+    lfs = entry.lfs
     if isinstance(lfs, dict):
         digest = lfs.get("sha256")
         if isinstance(digest, str):
@@ -82,7 +89,10 @@ def run(root: Path, config_path: Path, safe_output: Path) -> JsonObject:
         raise ValueError("E1C preflight predecessor status mismatch")
     if predecessor_result.get("operational_pass") is not predecessor["required_operational_pass"]:
         raise ValueError("E1C preflight predecessor operational gate mismatch")
-    if predecessor_result.get("next_authorized_operation") != predecessor["required_next_operation"]:
+    if (
+        predecessor_result.get("next_authorized_operation")
+        != predecessor["required_next_operation"]
+    ):
         raise ValueError("E1C preflight predecessor authorization mismatch")
 
     candidate = as_object(
