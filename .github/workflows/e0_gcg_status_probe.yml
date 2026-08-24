@@ -1,5 +1,6 @@
 name: e0-gcg-status-probe
 
+# Refreshed after the formatting-only repair; this probe changes no experiment.
 on:
   pull_request:
     branches:
@@ -23,7 +24,7 @@ jobs:
     env:
       ACTIVE_BRANCH: agent/programmatic-agentharm-pivot
       TARGET_WORKFLOW: e0-gcg-static-adapter-audit
-      TARGET_HEAD_SHA: 0774e8a83bce41c73630353b73f1c806ff09a220
+      TARGET_HEAD_SHA: c422029815e2e92c7f9c901a844471b418734064
     steps:
       - name: Query latest GCG audit run
         env:
