@@ -1,0 +1,18 @@
+{
+  "conclusion_at_record": "failure",
+  "created_at": "2026-08-24T15:15:33Z",
+  "event": "push",
+  "head_branch": "agent/programmatic-agentharm-pivot",
+  "head_sha": "3627d08e8ff103d7bf0350b06f4ca8932eb1994c",
+  "html_url": "https://github.com/hko920920/Jailbreak-Prompt-ICLR-2026-/actions/runs/32743755034",
+  "model_inference_performed_by_probe": false,
+  "model_weight_downloaded_by_probe": false,
+  "paper_validity": false,
+  "run_id": 32743755034,
+  "run_number": 1,
+  "schema_version": "evaluator-panel-e1c-prompt-source-run-safe-v1",
+  "status_at_record": "completed",
+  "updated_at": "2026-08-24T15:15:57Z",
+  "workflow": "evaluator-panel-e1c-prompt-source-freeze",
+  "workflow_id": 341342743
+}
