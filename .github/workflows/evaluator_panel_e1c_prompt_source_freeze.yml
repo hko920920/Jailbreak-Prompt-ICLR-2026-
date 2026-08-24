@@ -1,6 +1,7 @@
 name: evaluator-panel-e1c-prompt-source-freeze
 
 # Static source extraction only. No weights, inference, or attack outcomes are opened.
+# Explicit retrigger after lint-only correction: 2026-08-24 KST.
 on:
   push:
     branches:
