@@ -1,5 +1,6 @@
 name: temporary-deepinception-status-probe
 
+# Refreshed after the DeepInception audit workflow was admitted.
 on:
   push:
     branches:
@@ -12,31 +13,32 @@ permissions:
   actions: read
   contents: write
 
+concurrency:
+  group: temporary-deepinception-status-probe
+  cancel-in-progress: true
+
 jobs:
   probe:
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      TARGET_BRANCH: agent/programmatic-agentharm-pivot
+      OUTPUT: data/natural_language_localization/e0_attack_family_provenance_v1/deepinception_run_probe.safe.json
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: agent/programmatic-agentharm-pivot
-          fetch-depth: 1
-
-      - name: Query and freeze DeepInception workflow status
+      - name: Query and persist DeepInception workflow status
         env:
           GH_TOKEN: ${{ github.token }}
-          OUTPUT: data/natural_language_localization/e0_attack_family_provenance_v1/deepinception_run_probe.safe.json
         run: |
           set -euo pipefail
-          mkdir -p "$(dirname "$OUTPUT")"
           runs="$(gh api --method GET \
             -H 'Accept: application/vnd.github+json' \
             -H 'X-GitHub-Api-Version: 2022-11-28' \
-            "repos/${GITHUB_REPOSITORY}/actions/runs?branch=agent/programmatic-agentharm-pivot&per_page=100")"
-          jq -n \
+            "repos/${GITHUB_REPOSITORY}/actions/runs?branch=${TARGET_BRANCH}&per_page=100")"
+          safe="$(jq -n \
             --arg recorded_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
             --argjson runs "$runs" '
             {
-              schema_version: "deepinception-run-probe-safe-v1",
+              schema_version: "deepinception-run-probe-safe-v2",
               recorded_at: $recorded_at,
               runs: [
                 $runs.workflow_runs[]
@@ -62,11 +64,26 @@ jobs:
               causal_oracle_opened: false,
               wavelet_used: false
             }
-          ' > "$OUTPUT"
-          test "$(jq '.runs | length' "$OUTPUT")" -ge 1
+          ')"
+          test "$(jq '.runs | length' <<<"$safe")" -ge 1
 
-          git config user.name 'Taewook-git'
-          git config user.email 'lkhd3329@naver.com'
-          git add "$OUTPUT"
-          git commit -m 'Record DeepInception E0 workflow status'
-          git push origin HEAD:agent/programmatic-agentharm-pivot
+          encoded="$(printf '%s\n' "$safe" | base64 -w0)"
+          current_sha="$(gh api \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "repos/${GITHUB_REPOSITORY}/contents/${OUTPUT}?ref=${TARGET_BRANCH}" \
+            --jq '.sha' 2>/dev/null || true)"
+          args=(
+            --method PUT
+            -H 'Accept: application/vnd.github+json'
+            -H 'X-GitHub-Api-Version: 2022-11-28'
+            "repos/${GITHUB_REPOSITORY}/contents/${OUTPUT}"
+            -f message='Record DeepInception E0 workflow status v2'
+            -f content="$encoded"
+            -f branch="$TARGET_BRANCH"
+          )
+          if [[ -n "$current_sha" ]]; then
+            args+=( -f sha="$current_sha" )
+          fi
+          gh api "${args[@]}" >/dev/null
+          jq -r '.runs[] | "- run \(.id): \(.status) / \(.conclusion // "pending"), head=\(.head_sha)"' <<<"$safe" >> "$GITHUB_STEP_SUMMARY"
