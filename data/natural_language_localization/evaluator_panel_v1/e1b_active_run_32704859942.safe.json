@@ -1,0 +1,39 @@
+{
+  "schema_version": "evaluator-panel-e1b-active-run-checkpoint-v1",
+  "status": "E1B_WILDGUARD_LIVE_QUALIFICATION_IN_PROGRESS",
+  "recorded_at": "2026-08-24T18:08:35+09:00",
+  "paper_validity": false,
+  "repository": "hko920920/Jailbreak-Prompt-ICLR-2026-",
+  "branch": "agent/programmatic-agentharm-pivot",
+  "workflow_name": "evaluator-panel-e1b-wildguard",
+  "workflow_run_id": 32704859942,
+  "workflow_run_number": 43,
+  "workflow_event": "push",
+  "run_head_sha": "bdf26570ff835498cb9dc85b40eaf379a1080a12",
+  "job_id": 97372967617,
+  "observed_steps": {
+    "checkout": "success",
+    "python_setup": "success",
+    "runtime_only_server_startup_hardening": "success",
+    "harness_syntax_validation": "success",
+    "frozen_e1b_harness": "in_progress",
+    "safe_artifact_upload": "pending"
+  },
+  "scientific_contract_changed": false,
+  "thresholds_changed": false,
+  "dataset_or_split_changed": false,
+  "model_or_revision_changed": false,
+  "parser_or_decision_rule_changed": false,
+  "decision_relevant_result_available": false,
+  "sealed_boundaries": {
+    "next_evaluator_component_opened": false,
+    "legacy_semantic_stage_a_opened": false,
+    "cross_regime_stage_a_opened": false,
+    "prior_evaluation_opened": false,
+    "heldout_opened": false,
+    "causal_oracle_opened": false,
+    "keep_only_sufficiency_opened": false,
+    "wavelet_used": false
+  },
+  "next_authorized_operation": "ADJUDICATE_RUN_32704859942_AFTER_COMPLETION_AND_RECORD_ARTIFACT_DIGEST_AND_FROZEN_BRANCH_DECISION"
+}
