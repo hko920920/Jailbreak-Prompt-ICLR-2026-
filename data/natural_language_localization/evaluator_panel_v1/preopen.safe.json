@@ -1,0 +1,20 @@
+{
+  "schema_version": "standards-derived-abstaining-evaluator-panel-preopen-v1",
+  "status": "PANEL_V1_FROZEN_BEFORE_STAGE_A",
+  "frozen_at": "2026-08-24T12:00:00+09:00",
+  "paper_validity": false,
+  "human_primary_v1_rewritten": false,
+  "persona_sensitivity_used_as_human_ground_truth": false,
+  "persona_sensitivity_used_as_production_panel_vote": false,
+  "external_human_labeled_validation_completed": false,
+  "new_in_domain_human_audit_completed": false,
+  "stage_a_opened": false,
+  "gate1_evaluation_30_opened": false,
+  "gate2_heldout_opened": false,
+  "causal_oracle_opened": false,
+  "wavelet_used": false,
+  "frozen_contract_path": "configs/natural_language_localization/evaluator_panel_v1.json",
+  "design_document_path": "docs/STANDARDS_DERIVED_ABSTAINING_EVALUATOR_PANEL_V1.md",
+  "predecessor_persona_result_path": "data/natural_language_localization/feasibility_v1/model_persona_sensitivity_v3.safe.json",
+  "next_authorized_operation": "E1_COMPONENT_REPRODUCTION_AND_JUDGE_INJECTION_CANARY_IMPLEMENTATION"
+}
