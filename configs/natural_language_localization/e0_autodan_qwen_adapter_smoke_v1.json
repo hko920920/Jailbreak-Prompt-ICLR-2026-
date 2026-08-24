@@ -1,0 +1,93 @@
+{
+  "schema_version": "e0-autodan-qwen-adapter-smoke-v1",
+  "status": "FROZEN_BEFORE_AUTODAN_QWEN_ADAPTER_SMOKE",
+  "frozen": true,
+  "paper_validity": false,
+  "predecessor": {
+    "path": "data/natural_language_localization/e0_attack_family_provenance_v1/autodan_static_audit.safe.json",
+    "git_blob_sha": "cfa1b642986526cc92e9dad0c3c85215eeccfbb1",
+    "required_status": "E0_AUTODAN_STATIC_AUDIT_CONDITIONAL_ADVANCE",
+    "required_next_operation": "E0_AUTODAN_STATIC_AUDIT_CONDITIONAL_ADVANCE_TO_EXACT_PLACEHOLDER_AND_TARGET_ADAPTER_SMOKE"
+  },
+  "autodan": {
+    "repository": "SheltonLiu-N/AutoDAN",
+    "revision": "34062e964185693e81a6775b4f0d00bfd7507612",
+    "tree_sha": "39ceba6f45e5dec17db8d3099d7281f8673ceb14",
+    "initial_prompt_path": "assets/autodan_initial_prompt.txt",
+    "initial_prompt_git_blob_sha": "b99248622923b631346bced8ebd38effc4a6b87b",
+    "placeholder": "[REPLACE]"
+  },
+  "target_tokenizer": {
+    "repository": "Qwen/Qwen2.5-7B-Instruct",
+    "revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+    "license": "apache-2.0",
+    "transformers_version": "4.57.6",
+    "huggingface_hub_version": "0.36.2",
+    "allow_patterns": [
+      "config.json",
+      "merges.txt",
+      "tokenizer.json",
+      "tokenizer_config.json",
+      "vocab.json"
+    ],
+    "use_fast": true,
+    "add_generation_prompt": true,
+    "add_special_tokens_when_encoding_rendered_chat": false,
+    "messages": [
+      {
+        "role": "user",
+        "content_source": "exact_autodan_materialization"
+      }
+    ]
+  },
+  "synthetic_payload": "JBSPAN_AutoDAN_Qwen_SafePayload_MiXeD_7F3A",
+  "fresh_render_repetitions": 3,
+  "rules": {
+    "real_harmful_payload_allowed": false,
+    "target_model_weights_allowed": false,
+    "target_model_generation_allowed": false,
+    "placeholder_occurrence_count_in_source": 1,
+    "payload_occurrence_count_in_materialized_attack": 1,
+    "payload_occurrence_count_in_rendered_chat": 1,
+    "payload_bytes_must_be_identical": true,
+    "placeholder_must_be_absent_after_materialization": true,
+    "rendering_must_be_deterministic": true,
+    "tokenizer_must_be_fast": true,
+    "payload_token_interval_must_be_nonempty_and_contiguous": true,
+    "payload_character_span_must_be_covered_by_token_offsets": true,
+    "raw_attack_or_chat_text_may_enter_safe_artifact": false,
+    "intervention_domain_must_exclude_payload": true
+  },
+  "unit_manifest": [
+    "AUTODAN_PREFIX_BEFORE_PAYLOAD",
+    "IMMUTABLE_SYNTHETIC_PAYLOAD",
+    "AUTODAN_SUFFIX_AFTER_PAYLOAD"
+  ],
+  "admission": {
+    "family": "AutoDAN",
+    "regime": "F_fluent_optimized",
+    "balanced_signal_screen_admission_on_this_step": false,
+    "resolved_if_pass": [
+      "EXACT_PLACEHOLDER_ADAPTER_SYNTHETIC_SMOKE",
+      "TARGET_CHAT_TEMPLATE_AND_TOKENIZER_ADAPTER_SMOKE"
+    ],
+    "remaining_required_before_admission": [
+      "FREEZE_REGENERATION_OR_FROZEN_ARTIFACT_ROUTE",
+      "FREEZE_COMPUTE_AND_CANDIDATE_SELECTION_BUDGET",
+      "PROTECT_PAYLOAD_PLACEHOLDER_ACROSS_ALL_ENABLED_MUTATION_ROUTES",
+      "RUN_HARMLESS_END_TO_END_CANDIDATE_MATERIALIZATION_WITHOUT_TARGET_GENERATION"
+    ]
+  },
+  "decision_gate": {
+    "on_pass": "E0_AUTODAN_QWEN_ADAPTER_SMOKE_PASS_REMAIN_CONDITIONAL",
+    "on_fail": "REPAIR_OR_REPLACE_AUTODAN_ADAPTER_WITHOUT_OPENING_TARGET_OUTCOMES"
+  },
+  "sealed_boundaries": {
+    "real_harmful_payload_used": false,
+    "target_model_weights_downloaded": false,
+    "target_model_called": false,
+    "cross_regime_stage_a_opened": false,
+    "causal_oracle_opened": false,
+    "wavelet_used": false
+  }
+}
