@@ -1,0 +1,145 @@
+name: evaluator-panel-e1c-prompt-source-freeze-v2
+
+# Section-aware static replay only. No weights, inference, or attack outcomes are opened.
+on:
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/evaluator_panel_e1c_prompt_source_freeze_v2.yml
+      - configs/natural_language_localization/evaluator_panel_e1c_prompt_source_freeze_v2.json
+      - scripts/run_evaluator_panel_e1c_prompt_source_freeze_v2.py
+      - tests/test_evaluator_panel_e1c_prompt_source_freeze_v2.py
+      - data/natural_language_localization/evaluator_panel_v1/e1c_prompt_source_freeze.safe.json
+      - data/natural_language_localization/evaluator_panel_v1/e1c_runtime_artifact_probe_v2.safe.json
+      - data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_selection.safe.jsonl
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: evaluator-panel-e1c-prompt-source-freeze-v2
+  cancel-in-progress: false
+
+jobs:
+  freeze:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      HARM_BENCH_REVISION: 8e1604d1171fe8a48d8febecd22f600e462bdcdd
+      SOURCE_ROOT: upstream/HarmBench
+      CONFIG: configs/natural_language_localization/evaluator_panel_e1c_prompt_source_freeze_v2.json
+      SAFE_DIR: artifacts/evaluator-panel-e1c-prompt-source-freeze-v2/safe
+      SAFE_RESULT: artifacts/evaluator-panel-e1c-prompt-source-freeze-v2/safe/e1c_prompt_source_freeze_v2.safe.json
+      RECORD_RESULT: data/natural_language_localization/evaluator_panel_v1/e1c_prompt_source_freeze_v2.safe.json
+      PIP_NO_CACHE_DIR: "1"
+
+    steps:
+      - name: Check out research repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check out immutable HarmBench source
+        uses: actions/checkout@v4
+        with:
+          repository: centerforaisafety/HarmBench
+          ref: ${{ env.HARM_BENCH_REVISION }}
+          path: ${{ env.SOURCE_ROOT }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install source-freeze v2 dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'pytest>=8.2' 'ruff>=0.6'
+
+      - name: Validate section-aware implementation
+        run: |
+          ruff check \
+            scripts/run_evaluator_panel_e1c_prompt_source_freeze_v2.py \
+            tests/test_evaluator_panel_e1c_prompt_source_freeze_v2.py
+          python -m pytest -q tests/test_evaluator_panel_e1c_prompt_source_freeze_v2.py
+
+      - name: Verify immutable upstream checkout
+        run: |
+          test "$(git -C "$SOURCE_ROOT" rev-parse HEAD)" = "$HARM_BENCH_REVISION"
+
+      - name: Replay text-section source state and registry
+        id: freeze
+        shell: bash
+        run: |
+          mkdir -p "$SAFE_DIR"
+          set +e
+          python scripts/run_evaluator_panel_e1c_prompt_source_freeze_v2.py \
+            --root . \
+            --source-root "$SOURCE_ROOT" \
+            --config "$CONFIG" \
+            --safe-output "$SAFE_RESULT"
+          code=$?
+          set -e
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          test -f "$SAFE_RESULT"
+
+      - name: Audit safe section-aware result
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          path = Path(os.environ["SAFE_RESULT"])
+          result = json.loads(path.read_text(encoding="utf-8"))
+          assert result["model_weight_downloaded"] is False
+          assert result["model_inference_performed"] is False
+          assert result["harmbench_live_predictions_generated"] is False
+          assert result["new_harmful_attack_outputs_generated"] is False
+          assert result["semantic_only_stage_a_opened"] is False
+          assert result["cross_regime_stage_a_opened"] is False
+          assert result["causal_oracle_opened"] is False
+          assert result["keep_only_oracle_opened"] is False
+          assert result["wavelet_used"] is False
+          serialized = path.read_text(encoding="utf-8")
+          for forbidden in (
+              '"test_case"',
+              '"generation"',
+              '"behavior_id"',
+              '"behavior_text"',
+              '"prompt_text"',
+              '"prompt_contextual_text"',
+          ):
+              assert forbidden not in serialized.lower()
+          PY
+
+      - name: Record safe section-aware source identities
+        run: |
+          mkdir -p "$(dirname "$RECORD_RESULT")"
+          cp "$SAFE_RESULT" "$RECORD_RESULT"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$RECORD_RESULT"
+          if git diff --cached --quiet; then
+            echo "Prompt-source v2 result is already current."
+          else
+            git commit -m "Record E1C prompt-source freeze v2 result"
+            git push origin HEAD:agent/programmatic-agentharm-pivot
+          fi
+
+      - name: Upload safe section-aware artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evaluator-panel-e1c-prompt-source-freeze-v2-safe
+          path: ${{ env.SAFE_DIR }}
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Enforce section-aware source-freeze gate
+        if: always()
+        run: |
+          test "${{ steps.freeze.outputs.exit_code }}" = "0"
