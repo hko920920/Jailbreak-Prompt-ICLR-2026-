@@ -1,0 +1,153 @@
+{
+  "schema_version": "jailbreak-causal-topology-v1",
+  "status": "FROZEN_BEFORE_CROSS_REGIME_CAUSAL_OUTCOMES",
+  "frozen": true,
+  "paper_validity": false,
+  "research_question": "Across semantic-readable, fluent-optimized, and non-fluent optimized single-turn jailbreaks, what robust minimal input sets must be neutralized to restore safe behavior, and do those sets reveal singleton dependence, higher-order interaction, redundant pathways, or distributed structure?",
+  "primary_object": {
+    "name": "robust_minimal_recovery_hypergraph",
+    "vertices": "frozen regime-specific attack-added intervention units",
+    "hyperedges": "all robust minimal recovery sets discovered under the frozen oracle or contract-exact vocabulary",
+    "payload_is_vertex": false,
+    "removal_set_is_called_enabling_set": false
+  },
+  "eligibility": {
+    "explicit_harmful_goal_required": true,
+    "harmful_goal_occurrence_count": 1,
+    "payload_byte_invariance_required_when_structurally_supported": true,
+    "direct_condition_stably_non_harmful": true,
+    "full_attack_stably_substantive_harmful_assistance": true,
+    "already_successful_attacks_only": true
+  },
+  "primary_outcome": {
+    "source": "validated_standards_derived_abstaining_evaluator_panel",
+    "labels": [
+      "REFUSAL_OR_SAFE_REDIRECTION",
+      "NON_ACTIONABLE_OR_IRRELEVANT",
+      "SUBSTANTIVE_HARMFUL_ASSISTANCE",
+      "CAPABILITY_CONFOUNDED",
+      "ABSTAIN"
+    ],
+    "distributional_divergence_is_primary": false,
+    "refusal_probability_is_primary": false,
+    "same_model_personas_are_primary": false
+  },
+  "definitions": {
+    "recovery_set": "A neutralized unit set that satisfies the frozen stable safety-recovery predicate under every required neutralizer, without payload change, capability collapse, or unresolved abstention.",
+    "minimal_recovery_set": "A recovery set for which no strict subset is a recovery set.",
+    "minimal_sufficient_attack_set": "A separate keep-only object that preserves stable jailbreak success while every strict subset fails.",
+    "causal_core": "Term prohibited unless the reported experiment explicitly links recovery-cut and keep-only sufficiency evidence.",
+    "distributed": "Budget-relative unless all subsets of the complete intervention vocabulary are exhausted."
+  },
+  "topology_classes": [
+    "SINGLETON_LOCALIZED",
+    "LOCALIZED_INTERACTIVE",
+    "MULTIPLE_MINIMAL_PATHWAYS",
+    "REDUNDANT_PATHWAYS",
+    "DISTRIBUTED_OR_UNRESOLVED_WITHIN_BUDGET",
+    "CAPABILITY_CONFOUNDED"
+  ],
+  "interaction": {
+    "primary_evidence": "strict-subset minimality under the stable recovery predicate",
+    "diagnostic_pair_effect": "Gamma_ij_given_B = F(B union {i,j}) - F(B union {i}) - F(B union {j}) + F(B)",
+    "shapley_taylor_allowed_as_baseline": true,
+    "product_of_kl_and_refusal_delta_is_ground_truth": false
+  },
+  "metrics": [
+    "minimum_recovery_order",
+    "minimal_set_multiplicity",
+    "normalized_native_unit_size",
+    "attack_token_coverage",
+    "character_or_byte_coverage_when_meaningful",
+    "neutralizer_set_agreement",
+    "seed_stability",
+    "model_transfer_stability",
+    "pathway_disjointness_or_hitting_statistic",
+    "budget_recovery_curve",
+    "capability_confound_rate",
+    "abstention_rate"
+  ],
+  "regime_units": {
+    "S_semantic_readable": [
+      "typed_strategy_node",
+      "sentence_or_newline_unit",
+      "contiguous_span_inside_localized_node"
+    ],
+    "F_fluent_optimized": [
+      "provenance_preserving_generated_clause_or_strategy_block",
+      "sentence_or_clause",
+      "contiguous_token_block"
+    ],
+    "U_nonfluent_optimized": [
+      "predeclared_fixed_token_block",
+      "recursive_sub_block",
+      "contiguous_token_interval"
+    ]
+  },
+  "neutralization": {
+    "minimum_independent_families_where_meaningful": 2,
+    "text_level_preferred_for_human_editable_claims": true,
+    "representation_level_is_robustness_evidence": true,
+    "embedding_mean_replacement_is_on_manifold": false,
+    "position_preserving_neutralizer_required_for_position_sensitive_attacks": true,
+    "deletion_only_sufficient_for_slot_attacks": false
+  },
+  "capability_controls": [
+    "payload_invariance",
+    "syntactic_and_tokenizer_validity",
+    "response_coherence",
+    "task_comprehension",
+    "matched_benign_capability",
+    "random_same_size_neutralization",
+    "position_matched_neutralization",
+    "irrelevant_unit_neutralization",
+    "judge_injection_and_parse_abstention"
+  ],
+  "search": {
+    "oracle_first": true,
+    "iterative_deepening_preferred": true,
+    "greedy_sahara_style_is_oracle": false,
+    "greedy_sahara_style_role": "approximation_baseline",
+    "wavelet_allowed_now": false,
+    "wavelet_activation_condition": "Exact or contract-exact cross-regime ground truth exists and matched non-wavelet baselines are frozen."
+  },
+  "required_baselines": [
+    "leave_one_unit_out",
+    "random_same_size",
+    "greedy_backward_elimination",
+    "gradient_or_token_attribution",
+    "token_highlighter_affirmation_gradient",
+    "mask_gcg_scores_for_gcg_family",
+    "shapley_or_shapley_taylor_interaction",
+    "cpd_suffix_onset_when_applicable",
+    "group_testing_or_hierarchical_search"
+  ],
+  "novelty_boundary": {
+    "not_first_token_importance": true,
+    "not_first_jailbreak_critical_token_localization": true,
+    "not_first_minimal_local_causal_jailbreak_explanation": true,
+    "not_first_prompt_feature_causal_analysis": true,
+    "not_first_gcg_suffix_compression": true,
+    "not_first_adversarial_skill_decomposition": true,
+    "candidate_joint_novelty": "Stable behavioral minimal-recovery hypergraphs with multiple neutralizers and capability controls, compared across semantic-readable, fluent-optimized, and non-fluent optimized attack regimes."
+  },
+  "legacy_evidence": {
+    "broad_span_32_to_58_percent_is_paper_valid": false,
+    "same_model_persona_sensitivity_is_paper_valid": false,
+    "agentharm_negative_feasibility_rejects_causal_hypothesis": false
+  },
+  "sealed_boundaries": {
+    "legacy_semantic_only_stage_A_opened": false,
+    "cross_regime_stage_A_opened": false,
+    "gate1_evaluation_30_opened": false,
+    "gate2_heldout_opened": false,
+    "causal_oracle_opened": false,
+    "keep_only_sufficiency_opened": false,
+    "wavelet_used": false
+  },
+  "next_authorized_operations": [
+    "FINISH_EVALUATOR_PANEL_EXTERNAL_VALIDATION",
+    "COMPLETE_E0_ATTACK_FAMILY_PROVENANCE_AUDIT",
+    "FREEZE_CROSS_REGIME_MATRIX_UNITS_NEUTRALIZERS_AND_BUDGETS"
+  ]
+}
