@@ -39,22 +39,19 @@ jobs:
 
           path = Path("scripts/run_e0_gcg_static_audit.py")
           text = path.read_text(encoding="utf-8")
-          old = '''        "candidate_logits_replace_only_control_slice": (
-              "torch.arange(self._control_slice.start, self._control_slice.stop)" in attack_manager_text
-              and "self.input_ids.unsqueeze(0).repeat" in attack_manager_text
-              and "torch.scatter(" in attack_manager_text
-          ),'''
-          new = '''        "candidate_logits_replace_only_control_slice": (
-              (
-                  "torch.arange(self._control_slice.start, "
-                  "self._control_slice.stop)"
-              )
-              in attack_manager_text
-              and "self.input_ids.unsqueeze(0).repeat" in attack_manager_text
-              and "torch.scatter(" in attack_manager_text
-          ),'''
+          old = (
+              '            "torch.arange(self._control_slice.start, '
+              'self._control_slice.stop)" in attack_manager_text\n'
+          )
+          new = (
+              '            (\n'
+              '                "torch.arange(self._control_slice.start, "\n'
+              '                "self._control_slice.stop)"\n'
+              '            )\n'
+              '            in attack_manager_text\n'
+          )
           if text.count(old) != 1:
-              raise SystemExit("expected GCG long-line block did not match exactly once")
+              raise SystemExit("expected GCG long line did not match exactly once")
           path.write_text(text.replace(old, new), encoding="utf-8")
           PY
 
@@ -73,6 +70,10 @@ jobs:
           git add \
             scripts/run_e0_gcg_static_audit.py \
             tests/test_e0_gcg_static_audit.py
+          if git diff --cached --quiet; then
+            echo "GCG audit source already satisfies lint."
+            exit 0
+          fi
           git commit -m "Fix GCG static audit lint"
           for attempt in 1 2 3; do
             git fetch origin "$ACTIVE_BRANCH"
