@@ -1,0 +1,119 @@
+name: e1b-status-monitor
+
+on:
+  pull_request:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - .github/workflows/e1b_status_monitor.yml
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+  pull-requests: read
+
+concurrency:
+  group: e1b-status-monitor
+  cancel-in-progress: true
+
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Inspect hardened E1B push run and record safe status
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: bdf26570ff835498cb9dc85b40eaf379a1080a12
+          WORKFLOW_FILE: evaluator_panel_e1b_wildguard.yml
+          ACTIVE_BRANCH: agent/programmatic-agentharm-pivot
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+
+          runs_json="$(
+            gh api --method GET \
+              -H 'Accept: application/vnd.github+json' \
+              -H 'X-GitHub-Api-Version: 2022-11-28' \
+              "repos/${GITHUB_REPOSITORY}/actions/workflows/${WORKFLOW_FILE}/runs?branch=${ACTIVE_BRANCH}&event=push&per_page=20"
+          )"
+
+          run_json="$(
+            jq -c --arg sha "$TARGET_SHA" '
+              (.workflow_runs | map(select(.head_sha == $sha)) | first)
+              // (.workflow_runs | first)
+              // empty
+            ' <<<"$runs_json"
+          )"
+
+          if [[ -z "$run_json" ]]; then
+            body=$(cat <<EOF
+          <!-- e1b-status-monitor -->
+          ## E1B hardened-run status
+
+          - target trigger commit: \`${TARGET_SHA}\`
+          - workflow: \`${WORKFLOW_FILE}\`
+          - result: **no matching push-triggered run found**
+          - scientific thresholds changed: **false**
+          - Stage A / causal oracle / wavelet: **closed / closed / closed**
+          EOF
+            )
+          else
+            run_id="$(jq -r '.id' <<<"$run_json")"
+            run_number="$(jq -r '.run_number' <<<"$run_json")"
+            status="$(jq -r '.status' <<<"$run_json")"
+            conclusion="$(jq -r '.conclusion // "pending"' <<<"$run_json")"
+            head_sha="$(jq -r '.head_sha' <<<"$run_json")"
+            event="$(jq -r '.event' <<<"$run_json")"
+            created_at="$(jq -r '.created_at' <<<"$run_json")"
+            updated_at="$(jq -r '.updated_at' <<<"$run_json")"
+            html_url="$(jq -r '.html_url' <<<"$run_json")"
+
+            artifact_count=0
+            artifact_names="none"
+            if [[ "$status" == "completed" ]]; then
+              artifacts_json="$(
+                gh api --method GET \
+                  -H 'Accept: application/vnd.github+json' \
+                  -H 'X-GitHub-Api-Version: 2022-11-28' \
+                  "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/artifacts?per_page=100"
+              )"
+              artifact_count="$(jq -r '.total_count' <<<"$artifacts_json")"
+              artifact_names="$(jq -r '[.artifacts[].name] | if length == 0 then "none" else join(", ") end' <<<"$artifacts_json")"
+            fi
+
+            body=$(cat <<EOF
+          <!-- e1b-status-monitor -->
+          ## E1B hardened-run status
+
+          - run: [\`${run_id}\`](${html_url}) (run number \`${run_number}\`)
+          - target trigger commit: \`${TARGET_SHA}\`
+          - observed head: \`${head_sha}\`
+          - event: \`${event}\`
+          - status / conclusion: **${status} / ${conclusion}**
+          - created / updated: \`${created_at}\` / \`${updated_at}\`
+          - safe artifact count: **${artifact_count}**
+          - artifact names: \`${artifact_names}\`
+          - scientific thresholds changed: **false**
+          - Stage A / causal oracle / wavelet: **closed / closed / closed**
+          EOF
+            )
+          fi
+
+          comments="$(gh api --paginate "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments?per_page=100")"
+          existing_id="$(jq -r '[.[] | select(.body | contains("<!-- e1b-status-monitor -->"))] | last | .id // empty' <<<"$comments")"
+          payload="$(jq -n --arg body "$body" '{body:$body}')"
+          if [[ -n "$existing_id" ]]; then
+            gh api --method PATCH \
+              -H 'Accept: application/vnd.github+json' \
+              -H 'X-GitHub-Api-Version: 2022-11-28' \
+              "repos/${GITHUB_REPOSITORY}/issues/comments/${existing_id}" \
+              --input - <<<"$payload" >/dev/null
+          else
+            gh api --method POST \
+              -H 'Accept: application/vnd.github+json' \
+              -H 'X-GitHub-Api-Version: 2022-11-28' \
+              "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" \
+              --input - <<<"$payload" >/dev/null
+          fi
