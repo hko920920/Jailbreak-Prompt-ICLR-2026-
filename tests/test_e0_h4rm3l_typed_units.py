@@ -64,7 +64,10 @@ def test_frozen_contract_has_expected_exact_subset_budget() -> None:
     programs = cast(list[dict[str, object]], config["programs"])
     component_counts = [len(cast(list[str], row["expected_components"])) for row in programs]
     assert component_counts == [3, 2, 2]
-    subset_count = sum(len(module.all_nonempty_subsets([str(index) for index in range(count)])) for count in component_counts)
+    subset_count = sum(
+        len(module.all_nonempty_subsets([str(index) for index in range(count)]))
+        for count in component_counts
+    )
     assert subset_count == 13
     assert len(cast(list[dict[str, object]], config["neutralizers"])) == 2
 
