@@ -1,0 +1,43 @@
+name: temporary-e1b-ruff-autofix
+
+on:
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/_temporary_e1b_ruff_autofix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/programmatic-agentharm-pivot
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Apply Ruff import and formatting fixes
+        run: |
+          python -m pip install 'ruff==0.16.4'
+          ruff check --fix scripts/run_evaluator_panel_e1b.py
+          ruff format scripts/run_evaluator_panel_e1b.py
+          ruff check scripts/run_evaluator_panel_e1b.py
+
+      - name: Commit exact formatting-only repair
+        run: |
+          if git diff --quiet -- scripts/run_evaluator_panel_e1b.py; then
+            echo 'No formatting changes were required.'
+            exit 0
+          fi
+          git config user.name 'Taewook-git'
+          git config user.email 'lkhd3329@naver.com'
+          git add scripts/run_evaluator_panel_e1b.py
+          git commit -m 'Fix E1B Ruff formatting'
+          git push origin HEAD:agent/programmatic-agentharm-pivot
