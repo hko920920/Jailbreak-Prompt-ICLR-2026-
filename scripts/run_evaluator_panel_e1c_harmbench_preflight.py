@@ -266,7 +266,12 @@ def safe_selection_rows(selected: list[JsonObject]) -> list[JsonObject]:
     return rows
 
 
-def run(config_path: Path, source_root: Path, safe_output: Path, selection_output: Path) -> JsonObject:
+def run(
+    config_path: Path,
+    source_root: Path,
+    safe_output: Path,
+    selection_output: Path,
+) -> JsonObject:
     contract = load_object(config_path)
     if contract["status"] != "FROZEN_BEFORE_E1C_HARMBENCH_PREFLIGHT":
         raise ValueError("unexpected E1C preflight status")
@@ -277,7 +282,10 @@ def run(config_path: Path, source_root: Path, safe_output: Path, selection_outpu
     predecessor_result = load_object(Path(str(predecessor["result_path"])))
     if predecessor_result.get("status") != predecessor["required_status"]:
         raise ValueError("E1B predecessor status mismatch")
-    if predecessor_result.get("next_authorized_operation") != predecessor["required_next_operation"]:
+    if (
+        predecessor_result.get("next_authorized_operation")
+        != predecessor["required_next_operation"]
+    ):
         raise ValueError("E1B predecessor authorization mismatch")
 
     source = as_object(contract["harmbench_source"], where="harmbench_source")
@@ -304,7 +312,10 @@ def run(config_path: Path, source_root: Path, safe_output: Path, selection_outpu
         )
     tree_matches = observed_tree == source["tree_sha"]
 
-    validation = load_object(source_root / str(as_object(contract["validation_data"], where="validation_data")["path"]))
+    validation_data = as_object(
+        contract["validation_data"], where="validation_data"
+    )
+    validation = load_object(source_root / str(validation_data["path"]))
     records = flatten_validation(validation)
     selection_config = as_object(contract["selection"], where="selection")
     per_label = int(selection_config["per_label_target"])
