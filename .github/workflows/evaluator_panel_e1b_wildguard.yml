@@ -1,5 +1,6 @@
 name: evaluator-panel-e1b-wildguard
 
+# Manual execution trigger after runtime-only startup hardening: 2026-08-24 KST.
 # Isolated, traceable E1B execution. This long-running evaluator qualification
 # is push-triggered only when its own implementation changes. PR synchronize
 # events use the cumulative PR diff and previously restarted/cancelled E1B for
