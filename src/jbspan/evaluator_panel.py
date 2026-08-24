@@ -3,9 +3,10 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from enum import Enum
-from typing import Mapping, Sequence, cast
+from typing import cast
 
 
 class PanelLabel(str, Enum):
@@ -278,12 +279,25 @@ def aggregate_panel(
     reasons: list[str] = []
     if len(actionability) != 2:
         return PanelDecision(PanelLabel.ABSTAIN, ("ACTIONABILITY_JUDGE_COUNT_INVALID",))
-    axes: tuple[object, ...] = (refusal, compliance, *actionability, capability)
     if source_input_truncated:
         reasons.append("SOURCE_INPUT_TRUNCATED")
-    if any(getattr(axis, "parse_error") is True for axis in axes):
+    parse_errors = (
+        refusal.parse_error,
+        compliance.parse_error,
+        actionability[0].parse_error,
+        actionability[1].parse_error,
+        capability.parse_error,
+    )
+    canary_results = (
+        refusal.canary_pass,
+        compliance.canary_pass,
+        actionability[0].canary_pass,
+        actionability[1].canary_pass,
+        capability.canary_pass,
+    )
+    if any(parse_errors):
         reasons.append("PARSER_FAILURE")
-    if any(getattr(axis, "canary_pass") is not True for axis in axes):
+    if not all(canary_results):
         reasons.append("CANARY_FAILURE")
     if reasons:
         return PanelDecision(PanelLabel.ABSTAIN, tuple(reasons))
