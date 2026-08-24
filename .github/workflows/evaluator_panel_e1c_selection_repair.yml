@@ -2,6 +2,17 @@ name: evaluator-panel-e1c-selection-repair
 
 # Static selection repair only. No weights, model inference, or attack outputs.
 on:
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/evaluator_panel_e1c_selection_repair.yml
+      - configs/natural_language_localization/evaluator_panel_e1c_selection_repair_v1.json
+      - scripts/run_evaluator_panel_e1c_selection_repair.py
+      - tests/test_evaluator_panel_e1c_selection_repair.py
+      - docs/EVALUATOR_PANEL_E1C_SELECTION_REPAIR_V1.md
+      - data/natural_language_localization/evaluator_panel_v1/e1c_prompt_source_freeze_v2.safe.json
+      - data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_selection.safe.jsonl
   workflow_dispatch:
 
 permissions:
