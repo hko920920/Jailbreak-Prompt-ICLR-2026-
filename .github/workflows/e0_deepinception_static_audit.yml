@@ -1,0 +1,192 @@
+name: e0-deepinception-static-audit
+
+on:
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/e0_deepinception_static_audit.yml
+      - configs/natural_language_localization/e0_deepinception_static_audit_v1.json
+      - docs/E0_DEEPINCEPTION_STATIC_AUDIT_V1.md
+      - scripts/run_e0_deepinception_static_audit.py
+      - tests/test_e0_deepinception_static_audit.py
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: e0-deepinception-static-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      SOURCE_REPOSITORY: https://github.com/tmlr-group/DeepInception.git
+      SOURCE_REVISION: fc5689e76c4dd87a14babf1eadf890532f2b6880
+      CONTRACT: configs/natural_language_localization/e0_deepinception_static_audit_v1.json
+      SAFE_OUTPUT: artifacts/e0-deepinception-static-audit/e0_deepinception_static_audit.safe.json
+      RECORD_PATH: data/natural_language_localization/e0_attack_family_provenance_v1/deepinception_static_audit.safe.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install frozen audit dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'pytest==9.1.1' 'ruff==0.16.4'
+
+      - name: Validate audit code and frozen contract
+        run: |
+          ruff check \
+            scripts/run_e0_deepinception_static_audit.py \
+            tests/test_e0_deepinception_static_audit.py
+          pytest tests/test_e0_deepinception_static_audit.py
+          python -m json.tool "$CONTRACT" >/dev/null
+          git diff --check
+
+      - name: Check out immutable DeepInception source
+        run: |
+          source_root="$RUNNER_TEMP/deepinception-source"
+          git init -q "$source_root"
+          git -C "$source_root" remote add origin "$SOURCE_REPOSITORY"
+          git -C "$source_root" fetch -q --depth 1 origin "$SOURCE_REVISION"
+          git -C "$source_root" checkout -q --detach FETCH_HEAD
+          test "$(git -C "$source_root" rev-parse HEAD)" = "$SOURCE_REVISION"
+          test -f "$source_root/main.py"
+          test -f "$source_root/res/data_main.json"
+          test -f "$source_root/LICENSE"
+          echo "SOURCE_ROOT=$source_root" >> "$GITHUB_ENV"
+
+      - name: Execute synthetic-payload static audit
+        id: execute
+        run: |
+          set +e
+          python scripts/run_e0_deepinception_static_audit.py \
+            --config "$CONTRACT" \
+            --source-root "$SOURCE_ROOT" \
+            --output "$SAFE_OUTPUT"
+          code=$?
+          set -e
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          test -f "$SAFE_OUTPUT"
+
+      - name: Verify safe result and frozen boundary
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          result = json.loads(Path(os.environ["SAFE_OUTPUT"]).read_text())
+          assert result["status"] in {
+              "E0_DEEPINCEPTION_STATIC_ADAPTER_PASS_ADVANCE_TO_PARAMETER_AND_BALANCED_TEMPLATE_AUDIT",
+              "E0_DEEPINCEPTION_STATIC_ADAPTER_FAIL",
+          }
+          assert result["paper_validity"] is False
+          assert result["raw_source_or_rendered_text_committed"] is False
+          assert result["real_harmful_output_generated"] is False
+          assert result["target_model_called"] is False
+          assert result["attack_success_scored"] is False
+          assert result["cross_regime_stage_a_opened"] is False
+          assert result["causal_oracle_opened"] is False
+          assert result["keep_only_oracle_opened"] is False
+          assert result["wavelet_used"] is False
+          assert result["unit_count_per_row"] == 7
+          assert result["subset_count_per_row"] == 127
+          assert result["variant_count_per_row"] == 254
+
+          forbidden = {
+              "plain_attack",
+              "inception_attack",
+              "rendered_text",
+              "raw_prompt",
+              "raw_output",
+              "synthetic_prompt",
+              "synthetic_payload",
+          }
+          stack = [result]
+          while stack:
+              value = stack.pop()
+              if isinstance(value, dict):
+                  leaked = forbidden.intersection(value)
+                  if leaked:
+                      raise SystemExit(f"unsafe raw-field keys: {sorted(leaked)}")
+                  stack.extend(value.values())
+              elif isinstance(value, list):
+                  stack.extend(value)
+          PY
+
+      - name: Persist safe audit record on research branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          encoded="$(base64 -w0 < "$SAFE_OUTPUT")"
+          current_sha="$(gh api \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "repos/${GITHUB_REPOSITORY}/contents/${RECORD_PATH}?ref=agent/programmatic-agentharm-pivot" \
+            --jq '.sha' 2>/dev/null || true)"
+          args=(
+            --method PUT
+            -H 'Accept: application/vnd.github+json'
+            -H 'X-GitHub-Api-Version: 2022-11-28'
+            "repos/${GITHUB_REPOSITORY}/contents/${RECORD_PATH}"
+            -f message='Record DeepInception E0 static audit result'
+            -f content="$encoded"
+            -f branch='agent/programmatic-agentharm-pivot'
+          )
+          if [[ -n "$current_sha" ]]; then
+            args+=( -f sha="$current_sha" )
+          fi
+          gh api "${args[@]}" >/dev/null
+
+      - name: Publish safe summary
+        if: always()
+        run: |
+          if [[ -f "$SAFE_OUTPUT" ]]; then
+            python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          result = json.loads(Path(os.environ["SAFE_OUTPUT"]).read_text())
+          with Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a") as handle:
+              handle.write("# E0 DeepInception static audit\n\n")
+              handle.write(f"- status: **{result['status']}**\n")
+              handle.write(
+                  f"- rows: **{result['row_pass_count']}/"
+                  f"{result['official_row_count']} passed**\n"
+              )
+              handle.write(
+                  f"- variants: **{result['total_variant_pass_count']}/"
+                  f"{result['total_variant_count']} passed**\n"
+              )
+              handle.write(
+                  f"- payload match modes: **{result['payload_match_modes']}**\n"
+              )
+              handle.write("- target model / attack scoring: **false / false**\n")
+              handle.write("- Stage A / oracle / wavelet: **closed / closed / closed**\n")
+          PY
+          fi
+
+      - name: Upload safe audit artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e0-deepinception-static-audit-safe
+          path: artifacts/e0-deepinception-static-audit
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Enforce audit decision
+        run: |
+          test "${{ steps.execute.outputs.exit_code }}" = "0"
