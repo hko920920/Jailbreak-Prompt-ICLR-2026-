@@ -1,0 +1,17 @@
+{
+  "conclusion_at_record": "failure",
+  "created_at": "2026-08-24T15:18:39Z",
+  "event": "push",
+  "head_branch": "agent/programmatic-agentharm-pivot",
+  "head_sha": "60f82536fec51db132e69c79a1053c625d22d3d3",
+  "html_url": "https://github.com/hko920920/Jailbreak-Prompt-ICLR-2026-/actions/runs/32744066557",
+  "paper_validity": false,
+  "run_id": 32744066557,
+  "run_number": 1,
+  "schema_version": "evaluator-panel-e1c-prompt-lint-fix-run-safe-v1",
+  "scientific_contract_changed_by_probe": false,
+  "status_at_record": "completed",
+  "updated_at": "2026-08-24T15:18:39Z",
+  "workflow": ".github/workflows/_temporary_fix_e1c_prompt_source_lint.yml",
+  "workflow_id": 341344887
+}
