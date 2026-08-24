@@ -35,6 +35,7 @@ jobs:
       TOKENIZER_REVISION: a09a35458c702b33eeacc393d103063234e8bc28
       TRANSFORMERS_VERSION: 4.57.6
       HUGGINGFACE_HUB_VERSION: 0.36.2
+      JINJA2_VERSION: 3.1.6
       HF_HOME: ${{ github.workspace }}/.hf-autodan-qwen-adapter
 
     steps:
@@ -89,7 +90,8 @@ jobs:
           python -m pip install -e '.[dev]'
           python -m pip install \
             "transformers==$TRANSFORMERS_VERSION" \
-            "huggingface_hub==$HUGGINGFACE_HUB_VERSION"
+            "huggingface_hub==$HUGGINGFACE_HUB_VERSION" \
+            "jinja2==$JINJA2_VERSION"
           ruff check \
             scripts/run_e0_autodan_qwen_adapter_smoke.py \
             tests/test_e0_autodan_qwen_adapter_smoke.py
