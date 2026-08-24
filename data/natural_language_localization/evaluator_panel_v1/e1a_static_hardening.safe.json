@@ -1,0 +1,53 @@
+{
+  "causal_oracle_opened": false,
+  "contract_sha256": "b905e23bc21f503c7454169736db951763b700f4ac0c95c4edecdbb1bc97ac64",
+  "failed_static_checks": [],
+  "gate1_evaluation_30_opened": false,
+  "gate2_heldout_opened": false,
+  "next_authorized_operation": "E1B_WILDGUARD_LIVE_REPRODUCTION_AND_CANARIES",
+  "operational_pass": true,
+  "paper_validity": false,
+  "schema_version": "evaluator-panel-e1a-static-hardening-result-v1",
+  "source_identity_contract_sha256": "c02d84642bdddb29c935b9c4f322462f391fe33e9627a2e6ff1a28a9c1d0eb2a",
+  "stage_a_opened": false,
+  "static_check_count": 18,
+  "static_check_pass_count": 18,
+  "static_checks": {
+    "aggregate_capability_confound": true,
+    "aggregate_construct_disagreement_to_abstain": true,
+    "aggregate_harmful": true,
+    "aggregate_non_actionable": true,
+    "aggregate_parser_canary_or_truncation_to_abstain": true,
+    "aggregate_refusal": true,
+    "detect_canary_leak": true,
+    "flag_input_truncation": true,
+    "parse_exact_binary_compliance": true,
+    "parse_exact_wildguard_output": true,
+    "parse_strict_actionability_json": true,
+    "parse_strict_capability_json": true,
+    "reject_actionability_unknown_keys_or_scores": true,
+    "reject_extra_wildguard_output": true,
+    "reject_nonexact_binary_compliance": true,
+    "require_two_actionability_judges": true,
+    "sanitize_control_characters": true,
+    "sanitize_reserved_markers": true
+  },
+  "status": "EVALUATOR_PANEL_E1A_STATIC_HARDENING_PASS",
+  "wavelet_used": false,
+  "wildguard_predecessor": {
+    "decision_file_sha256": "9500c3e902de37861e1e44e02cf1379ca663d0f2ca6b95d8bf6d25ae6436b566",
+    "identity_match": true,
+    "metrics": {
+      "accuracy": 0.885,
+      "count": 200,
+      "false_negative_rate": 0.0821917808219178,
+      "false_positive_rate": 0.13385826771653545,
+      "macro_f1": 0.8794264894760295,
+      "parse_coverage": 1.0
+    },
+    "metrics_file_sha256": "61f086923ea4a0ae446f3b121e919d7f71f8cccab44fdd1f78fc277534d38ea2",
+    "mismatches": [],
+    "old_decision_status": "WILDGUARD_SELECTION_FAIL",
+    "selection_passed_former_gate": false
+  }
+}
