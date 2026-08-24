@@ -1,0 +1,55 @@
+{
+  "schema_version": "e0-h4rm3l-static-audit-execution-v1",
+  "status": "E0_H4RM3L_STATIC_ADAPTER_EXECUTION_RECORDED",
+  "paper_validity": false,
+  "contract_commit": "f17348e6d5ff78c3d27d8144e43c04aea057ac0a",
+  "implementation_commit_initial": "bb40cf1349ac3afb97b3be73c4c479ac2849900f",
+  "implementation_commit_lint_repair": "3bca12599d8630c65cf188552eaca69d45c43120",
+  "workflow_path": ".github/workflows/e0_h4rm3l_static_adapter_audit.yml",
+  "first_run": {
+    "run_id": 32703150937,
+    "job_id": 97358634230,
+    "conclusion": "failure",
+    "failure_class": "STATIC_LINT_ONLY",
+    "scientific_execution_started": false,
+    "contract_or_threshold_changed_after_failure": false,
+    "details": [
+      "one E501 line-length violation",
+      "one B010 constant-setattr lint violation"
+    ]
+  },
+  "successful_run": {
+    "run_id": 32703333638,
+    "job_id": 97359179373,
+    "source_head": "3bca12599d8630c65cf188552eaca69d45c43120",
+    "conclusion": "success",
+    "artifact_id": 9511318722,
+    "artifact_name": "e0-h4rm3l-static-adapter-safe",
+    "artifact_sha256": "a0ae7abf06a17e740493f1f73bd7ad63ae7b724558d86f206ea44601d7039790",
+    "result_sha256": "851fcbe2a757f3ca74b7aaa8dfadb11cafabfe9f42bc808177affc87d7dc6ec5"
+  },
+  "result_summary": {
+    "operational_pass": true,
+    "expressions_passed": 10,
+    "expressions_total": 10,
+    "fresh_compilations_per_expression": 3,
+    "payload_occurrence_failures": 0,
+    "determinism_failures": 0,
+    "manifest_failures": 0,
+    "blocked_component_violations": 0,
+    "model_prompting_attempted": false,
+    "target_model_called": false,
+    "real_harmful_payload_used": false,
+    "rendered_text_committed": false
+  },
+  "scientific_interpretation": "The pinned h4rm3l source supports a pre-outcome, payload-preserving, deterministic Regime-S adapter for the audited allowlisted decorator vocabulary. This is admission evidence only and is not attack-success or causal-topology evidence.",
+  "next_authorized_operation": "FREEZE_AND_VALIDATE_H4RM3L_TYPED_UNIT_MANIFEST_AND_NEUTRALIZER_CONTRACT",
+  "sealed_boundaries": {
+    "cross_regime_stage_a_opened": false,
+    "prior_evaluation_opened": false,
+    "heldout_opened": false,
+    "causal_oracle_opened": false,
+    "keep_only_oracle_opened": false,
+    "wavelet_used": false
+  }
+}
