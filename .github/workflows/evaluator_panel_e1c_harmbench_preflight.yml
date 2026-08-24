@@ -1,0 +1,166 @@
+name: evaluator-panel-e1c-harmbench-preflight
+
+# Opens only the source/model/data identity preflight authorized by E1B.
+# No HarmBench classifier predictions or new attack outputs are generated here.
+on:
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/evaluator_panel_e1c_harmbench_preflight.yml
+      - configs/natural_language_localization/evaluator_panel_e1c_harmbench_preflight_v1.json
+      - scripts/run_evaluator_panel_e1c_harmbench_preflight.py
+      - tests/test_evaluator_panel_e1c_harmbench_preflight.py
+      - data/natural_language_localization/evaluator_panel_v1/e1b_wildguard_execution.safe.json
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: evaluator-panel-e1c-harmbench-preflight
+  cancel-in-progress: false
+
+jobs:
+  e1c-preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      HARM_BENCH_REVISION: 8e1604d1171fe8a48d8febecd22f600e462bdcdd
+      CONTRACT: configs/natural_language_localization/evaluator_panel_e1c_harmbench_preflight_v1.json
+      SOURCE_ROOT: upstream/HarmBench
+      SAFE_DIR: artifacts/evaluator-panel-e1c-harmbench-preflight/safe
+      SAFE_RESULT: artifacts/evaluator-panel-e1c-harmbench-preflight/safe/e1c_harmbench_preflight.safe.json
+      SAFE_SELECTION: artifacts/evaluator-panel-e1c-harmbench-preflight/safe/e1c_harmbench_selection.safe.jsonl
+      RECORD_RESULT: data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_preflight.safe.json
+      RECORD_SELECTION: data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_selection.safe.jsonl
+      PIP_NO_CACHE_DIR: "1"
+      HF_HUB_DISABLE_TELEMETRY: "1"
+
+    steps:
+      - name: Check out research repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check out immutable HarmBench source
+        uses: actions/checkout@v4
+        with:
+          repository: centerforaisafety/HarmBench
+          ref: ${{ env.HARM_BENCH_REVISION }}
+          path: ${{ env.SOURCE_ROOT }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install preflight-only dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install \
+            'huggingface_hub>=0.24,<2' \
+            'pytest>=8.2' \
+            'ruff>=0.6'
+
+      - name: Validate E1C implementation and frozen contract tests
+        run: |
+          ruff check \
+            scripts/run_evaluator_panel_e1c_harmbench_preflight.py \
+            tests/test_evaluator_panel_e1c_harmbench_preflight.py
+          python -m pytest -q tests/test_evaluator_panel_e1c_harmbench_preflight.py
+
+      - name: Verify immutable upstream checkout
+        run: |
+          test "$(git -C "$SOURCE_ROOT" rev-parse HEAD)" = "$HARM_BENCH_REVISION"
+
+      - name: Execute frozen E1C preflight
+        id: preflight
+        shell: bash
+        run: |
+          mkdir -p "$SAFE_DIR"
+          set +e
+          python scripts/run_evaluator_panel_e1c_harmbench_preflight.py \
+            --config "$CONTRACT" \
+            --source-root "$SOURCE_ROOT" \
+            --safe-output "$SAFE_RESULT" \
+            --selection-output "$SAFE_SELECTION"
+          code=$?
+          set -e
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          test -f "$SAFE_RESULT"
+          test -f "$SAFE_SELECTION"
+
+      - name: Audit safe-output schema and absence of raw benchmark text
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          result_path = Path(os.environ["SAFE_RESULT"])
+          selection_path = Path(os.environ["SAFE_SELECTION"])
+          result = json.loads(result_path.read_text(encoding="utf-8"))
+          assert result["harmbench_live_predictions_generated"] is False
+          assert result["new_harmful_attack_outputs_generated"] is False
+          assert result["cross_regime_stage_a_opened"] is False
+          assert result["causal_oracle_opened"] is False
+          assert result["keep_only_oracle_opened"] is False
+          assert result["wavelet_used"] is False
+          assert result["validation"]["raw_text_recorded"] is False
+          assert result["selection"]["raw_text_recorded"] is False
+
+          rows = [
+              json.loads(line)
+              for line in selection_path.read_text(encoding="utf-8").splitlines()
+              if line.strip()
+          ]
+          for row in rows:
+              assert set(row) == {
+                  "position",
+                  "record_id",
+                  "behavior_hash",
+                  "label",
+              }
+          serialized = result_path.read_text(encoding="utf-8") + selection_path.read_text(
+              encoding="utf-8"
+          )
+          for forbidden in (
+              '"test_case"',
+              '"generation"',
+              '"behavior_id_private"',
+          ):
+              assert forbidden not in serialized
+          PY
+
+      - name: Record immutable safe preflight result on the research branch
+        run: |
+          mkdir -p "$(dirname "$RECORD_RESULT")"
+          cp "$SAFE_RESULT" "$RECORD_RESULT"
+          cp "$SAFE_SELECTION" "$RECORD_SELECTION"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$RECORD_RESULT" "$RECORD_SELECTION"
+          if git diff --cached --quiet; then
+            echo "Safe E1C preflight record is already current."
+          else
+            git commit -m "Record E1C HarmBench preflight result"
+            git push origin HEAD:agent/programmatic-agentharm-pivot
+          fi
+
+      - name: Upload safe E1C preflight artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evaluator-panel-e1c-harmbench-preflight-safe
+          path: ${{ env.SAFE_DIR }}
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Enforce frozen E1C preflight gate
+        if: always()
+        run: |
+          test "${{ steps.preflight.outputs.exit_code }}" = "0"
