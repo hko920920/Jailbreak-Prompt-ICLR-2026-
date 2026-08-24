@@ -1,0 +1,145 @@
+{
+  "schema_version": "jailbreak-attack-regime-scope-v2",
+  "status": "FROZEN_BEFORE_CROSS_REGIME_OUTCOMES",
+  "frozen": true,
+  "paper_validity": false,
+  "research_question": "Across semantic-readable, fluent-optimized, and non-fluent optimized single-turn jailbreaks, do successful attacks depend on compact causal components, higher-order interactions, redundant pathways, or distributed prompt structure?",
+  "main_scope": {
+    "text_only": true,
+    "single_turn": true,
+    "open_weight_targets": true,
+    "explicit_harmful_goal_required": true,
+    "harmful_goal_occurrence_count": 1,
+    "payload_byte_invariance_required": true,
+    "already_successful_attacks_only_for_causal_oracle": true,
+    "behavioral_counterfactual": true,
+    "new_attack_generation_is_not_a_contribution": true,
+    "model_internal_circuit_claims_excluded": true
+  },
+  "regimes": {
+    "S_semantic_readable": {
+      "definition": "Human-interpretable attack strategies and components.",
+      "candidate_family_classes": [
+        "persona_or_roleplay",
+        "refusal_suppression",
+        "few_shot_or_demonstration",
+        "fictional_or_persuasive_framing",
+        "compositional_strategy_wrapper"
+      ],
+      "minimum_families_before_confirmatory": 2,
+      "intervention_hierarchy": [
+        "typed_strategy_node",
+        "sentence_or_newline_unit",
+        "contiguous_span_inside_localized_node"
+      ]
+    },
+    "F_fluent_optimized": {
+      "definition": "Automatically generated or optimized attacks whose final surface form remains grammatical and human-readable.",
+      "candidate_methods_for_E0_audit": [
+        "AutoDAN",
+        "AdvPrompter",
+        "AutoDAN_Turbo_or_other_strategy_discovery"
+      ],
+      "minimum_families_before_confirmatory": 2,
+      "intervention_hierarchy": [
+        "provenance_preserving_generated_clause_or_strategy_block",
+        "sentence_or_clause",
+        "contiguous_token_block"
+      ]
+    },
+    "U_nonfluent_optimized": {
+      "definition": "Human-unreadable or weakly interpretable discrete optimized token sequences with an explicit harmful payload.",
+      "candidate_methods_for_E0_audit": [
+        "GCG",
+        "I_GCG",
+        "SlotGCG_or_other_position_aware_GCG"
+      ],
+      "minimum_families_before_confirmatory": 2,
+      "intervention_hierarchy": [
+        "predeclared_fixed_token_block",
+        "recursive_sub_block",
+        "contiguous_token_interval"
+      ],
+      "exactness_claim": "Exact only with respect to the frozen intervention vocabulary and tested intervals."
+    }
+  },
+  "excluded_from_main": [
+    "trigger_only_without_explicit_harmful_goal",
+    "soft_prompt_or_continuous_embedding_attack",
+    "decoding_time_logit_manipulation",
+    "multi_turn_or_many_shot_attack",
+    "multimodal_attack",
+    "agent_or_tool_trajectory",
+    "indirect_prompt_injection"
+  ],
+  "optional_extensions": {
+    "trigger_only_unnatural_language": "Boundary or appendix study only.",
+    "multi_turn": "Small external-validity extension only after the single-turn cross-regime result is stable."
+  },
+  "hypotheses": {
+    "H1_regime_dependent_topology": "Semantic attacks are more compact and interpretable; non-fluent optimized attacks are more distributed or redundant; fluent optimized attacks are intermediate.",
+    "H2_shared_sparse_structure": "All regimes contain compact minimal causal sets despite different surface forms.",
+    "H3_family_specific_topology": "Causal topology is primarily attack-family- and model-specific."
+  },
+  "required_E0_provenance_audit": {
+    "official_repository_required": true,
+    "immutable_revision_required": true,
+    "license_and_artifact_availability_required": true,
+    "attack_regeneration_or_frozen_artifact_route_required": true,
+    "tokenizer_and_insertion_position_required": true,
+    "payload_preservation_check_required": true,
+    "compute_budget_required": true,
+    "no_target_model_outcomes_during_E0": true
+  },
+  "minimum_confirmatory_evidence": {
+    "regimes_required": 3,
+    "minimum_attack_families_per_regime": 2,
+    "minimum_target_model_families": 2,
+    "stable_direct_safe_attacked_harmful_pairs_required": true,
+    "capability_confound_controls_required": true,
+    "contract_exact_minimality_required": true,
+    "baselines_required": [
+      "leave_one_out",
+      "random_same_size_intervention",
+      "greedy_elimination",
+      "attribution_or_token_saliency",
+      "suffix_onset_or_change_point_localization_when_applicable"
+    ],
+    "outcomes_required": [
+      "LOCALIZED_SINGLE",
+      "LOCALIZED_INTERACTIVE",
+      "MULTIPLE_MINIMAL_SETS",
+      "DISTRIBUTED_OR_NO_ROBUST_RECOVERY",
+      "CAPABILITY_CONFOUNDED"
+    ]
+  },
+  "measurement": {
+    "evaluator_panel_contract": "configs/natural_language_localization/evaluator_panel_v1.json",
+    "panel_must_pass_external_validation_before_stage_A": true,
+    "same_model_personas_are_production_votes": false,
+    "abstention_cannot_be_overridden_by_majority": true
+  },
+  "wavelet": {
+    "allowed_now": false,
+    "activation_condition": "Only after cross-regime exact or contract-exact ground truth exists and a matched non-wavelet baseline is frozen.",
+    "retain_only_if_pareto_improves": true
+  },
+  "sealed_boundaries": {
+    "legacy_semantic_only_stage_A_opened": false,
+    "cross_regime_stage_A_opened": false,
+    "gate1_evaluation_30_opened": false,
+    "gate2_heldout_opened": false,
+    "causal_oracle_opened": false,
+    "wavelet_used": false
+  },
+  "experiment_sequence": [
+    "FINISH_EVALUATOR_PANEL_EXTERNAL_VALIDATION",
+    "E0_ATTACK_FAMILY_PROVENANCE_AND_FEASIBILITY_AUDIT",
+    "FREEZE_CROSS_REGIME_ATTACK_MATRIX_AND_INTERVENTION_VOCABULARIES",
+    "RUN_BALANCED_DEVELOPMENT_SIGNAL_SCREEN",
+    "APPLY_PREDECLARED_GO_NARROW_STOP",
+    "RUN_CAUSAL_ORACLE_ONLY_FOR_STABLE_PAIRS",
+    "FREEZE_FRESH_CONFIRMATORY_CONTRACT"
+  ],
+  "next_authorized_operation": "FINISH_EVALUATOR_PANEL_E1_AND_PREPARE_E0_ATTACK_FAMILY_PROVENANCE_AUDIT"
+}
