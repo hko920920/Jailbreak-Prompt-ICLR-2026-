@@ -1,13 +1,14 @@
 name: evaluator-panel-e1b-wildguard
 
-# Isolated, traceable E1B execution. Terminal-path workflows were archived in
-# commit 4c5f427. PR-only triggering avoids duplicate push/PR runs while the
-# E1B decision is generated; this workflow will be archived after the result is
-# frozen.
+# Isolated, traceable E1B execution. This long-running evaluator qualification
+# is push-triggered only when its own implementation changes. PR synchronize
+# events use the cumulative PR diff and previously restarted/cancelled E1B for
+# unrelated research-ledger commits. The workflow is archived after a frozen
+# E1B decision is committed.
 on:
-  pull_request:
+  push:
     branches:
-      - agent/gate1-contract
+      - agent/programmatic-agentharm-pivot
     paths:
       - .github/workflows/evaluator_panel_e1b_wildguard.yml
       - configs/natural_language_localization/evaluator_panel_e1b_wildguard_v1.json
@@ -31,7 +32,7 @@ permissions:
 
 concurrency:
   group: evaluator-panel-e1b-wildguard
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   e1b:
@@ -63,6 +64,153 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
+      - name: Apply runtime-only server startup hardening
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("scripts/run_evaluator_panel_e1b_ci.sh")
+          text = path.read_text(encoding="utf-8")
+          old = r'''mkdir -p "$RUNNER_TEMP/wildguard-server"
+          nohup env LD_LIBRARY_PATH="$LD_LIBRARY_PATH" "$llama_server" \
+            -m "$wildguard_gguf" \
+            --alias wildguard \
+            --host 127.0.0.1 \
+            --port 8080 \
+            -c 4096 \
+            -t 4 \
+            -np 1 \
+            >"$RUNNER_TEMP/wildguard-server/server.log" 2>&1 &
+          server_pid=$!
+
+          ready=0
+          for _ in $(seq 1 240); do
+            if ! kill -0 "$server_pid" 2>/dev/null; then
+              tail -n 100 "$RUNNER_TEMP/wildguard-server/server.log"
+              exit 1
+            fi
+            if [[ "$(curl -sS -o /dev/null -w '%{http_code}' \
+              http://127.0.0.1:8080/health || true)" == "200" ]]; then
+              ready=1
+              break
+            fi
+            sleep 5
+          done
+          test "$ready" = "1"
+          '''
+          new = r'''mkdir -p "$RUNNER_TEMP/wildguard-server"
+          server_log="$RUNNER_TEMP/wildguard-server/server.log"
+          startup_safe_log="$SAFE_OUTPUT/wildguard_server_startup.safe.log"
+          startup_safe_json="$SAFE_OUTPUT/wildguard_server_startup.safe.json"
+
+          no_warmup=0
+          if env LD_LIBRARY_PATH="$LD_LIBRARY_PATH" "$llama_server" --help 2>&1 \
+            | grep -q -- '--no-warmup'; then
+            no_warmup=1
+          fi
+          server_extra_args=()
+          if [[ "$no_warmup" = "1" ]]; then
+            server_extra_args+=(--no-warmup)
+          fi
+
+          startup_epoch="$(date +%s)"
+          nohup env LD_LIBRARY_PATH="$LD_LIBRARY_PATH" \
+            stdbuf -oL -eL "$llama_server" \
+            -m "$wildguard_gguf" \
+            --alias wildguard \
+            --host 127.0.0.1 \
+            --port 8080 \
+            -c 4096 \
+            -t 4 \
+            -np 1 \
+            "${server_extra_args[@]}" \
+            >"$server_log" 2>&1 &
+          server_pid=$!
+
+          ready=0
+          last_http_status="000"
+          for attempt in $(seq 1 360); do
+            if ! kill -0 "$server_pid" 2>/dev/null; then
+              cp "$server_log" "$startup_safe_log" 2>/dev/null || true
+              echo "llama-server exited before readiness" >&2
+              tail -n 160 "$server_log" || true
+              exit 1
+            fi
+            last_http_status="$(curl -sS -o /dev/null -w '%{http_code}' \
+              http://127.0.0.1:8080/health || true)"
+            if [[ "$last_http_status" == "200" ]]; then
+              ready=1
+              break
+            fi
+            if (( attempt % 12 == 0 )); then
+              echo "::group::WildGuard startup diagnostic attempt ${attempt}"
+              ps -o pid,etime,rss,vsz,stat,cmd -p "$server_pid" || true
+              free -h || true
+              tail -n 80 "$server_log" || true
+              echo "::endgroup::"
+            fi
+            sleep 5
+          done
+
+          startup_elapsed="$(( $(date +%s) - startup_epoch ))"
+          cp "$server_log" "$startup_safe_log" 2>/dev/null || true
+          python - "$startup_safe_json" "$startup_safe_log" "$ready" \
+            "$startup_elapsed" "$last_http_status" "$no_warmup" "$server_pid" <<'PY2'
+          import hashlib
+          import json
+          import os
+          import sys
+          from pathlib import Path
+
+          output, log_path, ready, elapsed, http_status, no_warmup, pid = sys.argv[1:]
+          log = Path(log_path)
+          digest = None
+          size = 0
+          if log.is_file():
+              payload = log.read_bytes()
+              digest = hashlib.sha256(payload).hexdigest()
+              size = len(payload)
+          result = {
+              "schema_version": "evaluator-panel-e1b-server-startup-v2",
+              "status": (
+                  "WILDGUARD_SERVER_READY"
+                  if ready == "1"
+                  else "WILDGUARD_SERVER_NOT_READY"
+              ),
+              "ready": ready == "1",
+              "elapsed_seconds": int(elapsed),
+              "last_http_status": http_status,
+              "no_warmup_supported_and_used": no_warmup == "1",
+              "process_alive_at_record": os.path.exists(f"/proc/{pid}"),
+              "context_tokens": 4096,
+              "threads": 4,
+              "parallel_slots": 1,
+              "startup_log_sha256": digest,
+              "startup_log_bytes": size,
+              "raw_evaluation_inputs_sent_before_record": False,
+              "scientific_contract_changed": False,
+          }
+          Path(output).write_text(
+              json.dumps(result, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY2
+
+          if [[ "$ready" != "1" ]]; then
+            echo "WildGuard server failed to become ready" >&2
+            tail -n 200 "$server_log" || true
+            exit 1
+          fi
+
+          # Preserve only the pre-evaluation startup log in the safe artifact.
+          # Truncate the live log before any benchmark prompt is sent.
+          : > "$server_log"
+          '''
+          if text.count(old) != 1:
+              raise SystemExit("frozen E1B startup block did not match exactly once")
+          path.write_text(text.replace(old, new), encoding="utf-8")
+          PY
 
       - name: Validate E1B harness syntax
         run: |
