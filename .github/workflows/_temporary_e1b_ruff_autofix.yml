@@ -28,7 +28,7 @@ jobs:
       - name: Apply Ruff import and formatting fixes
         run: |
           python -m pip install 'ruff==0.16.4'
-          ruff check --fix scripts/run_evaluator_panel_e1b.py
+          ruff check --fix scripts/run_evaluator_panel_e1b.py || true
           ruff format scripts/run_evaluator_panel_e1b.py
           ruff check scripts/run_evaluator_panel_e1b.py
 
