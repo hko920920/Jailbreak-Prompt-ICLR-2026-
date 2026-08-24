@@ -4,7 +4,6 @@ import argparse
 import ast
 import hashlib
 import json
-import re
 from pathlib import Path
 from typing import cast
 
@@ -200,7 +199,12 @@ def file_identity_rows(source_root: Path, files: JsonObject) -> list[JsonObject]
     return rows
 
 
-def materialization_summary(template: str, placeholder: str, payload: str, repetitions: int) -> JsonObject:
+def materialization_summary(
+    template: str,
+    placeholder: str,
+    payload: str,
+    repetitions: int,
+) -> JsonObject:
     official_outputs = [template.replace(placeholder, payload.lower()) for _ in range(repetitions)]
     adapter_outputs = [template.replace(placeholder, payload) for _ in range(repetitions)]
     official_hashes = [sha256_bytes(item.encode()) for item in official_outputs]
