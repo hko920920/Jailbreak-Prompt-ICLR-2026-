@@ -2,7 +2,7 @@ name: evaluator-panel-e1c-harmbench-preflight
 
 # Opens only the source/model/data identity preflight authorized by E1B.
 # No HarmBench classifier predictions or new attack outputs are generated here.
-# Explicit retrigger after formatting-only correction: 2026-08-24 KST.
+# Runtime-only correction: keep PIP_NO_CACHE_DIR and disable setup-python pip cache.
 on:
   push:
     branches:
@@ -57,7 +57,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: pip
 
       - name: Install preflight-only dependencies
         run: |
