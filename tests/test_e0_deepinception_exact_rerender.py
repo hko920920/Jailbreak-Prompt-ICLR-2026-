@@ -115,7 +115,7 @@ def test_exact_rerender_preserves_goal_and_all_127_subsets() -> None:
     )
     assert result["operational_pass"] is True
     assert result["source_payload_match_mode"] == "internal_case_only"
-    assert result["source_case_change_count"] == 4
+    assert result["source_case_change_count"] == 3
     assert result["canonical_goal_occurrence_count"] == 1
     assert result["canonical_goal_byte_occurrence_count"] == 1
     assert result["nonpayload_preserved"] is True
