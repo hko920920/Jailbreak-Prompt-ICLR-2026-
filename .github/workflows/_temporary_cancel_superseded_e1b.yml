@@ -1,0 +1,197 @@
+name: cancel-superseded-e1b-run
+
+on:
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/_temporary_cancel_superseded_e1b.yml
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: write
+  issues: write
+
+concurrency:
+  group: cancel-superseded-e1b-run
+  cancel-in-progress: false
+
+jobs:
+  cancel-and-record:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SUPERSEDED_RUN_ID: "32703333568"
+      HARDENED_RUN_ID: "32704859942"
+      TARGET_BRANCH: agent/programmatic-agentharm-pivot
+      PR_NUMBER: "4"
+      SAFE_RECORD: data/natural_language_localization/evaluator_panel_v1/superseded_e1b_cancellation.safe.json
+    steps:
+      - name: Cancel only the superseded PR-triggered E1B run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          get_run() {
+            gh api --method GET \
+              -H 'Accept: application/vnd.github+json' \
+              -H 'X-GitHub-Api-Version: 2022-11-28' \
+              "repos/${GITHUB_REPOSITORY}/actions/runs/$1"
+          }
+
+          before="$(get_run "$SUPERSEDED_RUN_ID")"
+          before_status="$(jq -r '.status' <<<"$before")"
+          before_conclusion="$(jq -r '.conclusion // "pending"' <<<"$before")"
+          before_head="$(jq -r '.head_sha' <<<"$before")"
+          before_event="$(jq -r '.event' <<<"$before")"
+
+          cancel_requested=false
+          if [[ "$before_status" != "completed" ]]; then
+            set +e
+            gh api --method POST \
+              -H 'Accept: application/vnd.github+json' \
+              -H 'X-GitHub-Api-Version: 2022-11-28' \
+              "repos/${GITHUB_REPOSITORY}/actions/runs/${SUPERSEDED_RUN_ID}/cancel" \
+              >/tmp/e1b-cancel-response.txt 2>&1
+            cancel_code=$?
+            set -e
+            if [[ "$cancel_code" = "0" ]]; then
+              cancel_requested=true
+            else
+              echo "Cancellation API returned ${cancel_code}; re-reading run state."
+              cat /tmp/e1b-cancel-response.txt || true
+            fi
+          fi
+
+          after="$before"
+          for _ in $(seq 1 120); do
+            after="$(get_run "$SUPERSEDED_RUN_ID")"
+            if [[ "$(jq -r '.status' <<<"$after")" == "completed" ]]; then
+              break
+            fi
+            sleep 5
+          done
+
+          after_status="$(jq -r '.status' <<<"$after")"
+          after_conclusion="$(jq -r '.conclusion // "pending"' <<<"$after")"
+          if [[ "$after_status" != "completed" ]]; then
+            echo "Superseded run did not reach a terminal state." >&2
+            exit 1
+          fi
+
+          hardened="$(get_run "$HARDENED_RUN_ID")"
+          for _ in $(seq 1 120); do
+            hardened_status="$(jq -r '.status' <<<"$hardened")"
+            if [[ "$hardened_status" != "pending" ]]; then
+              break
+            fi
+            sleep 5
+            hardened="$(get_run "$HARDENED_RUN_ID")"
+          done
+
+          hardened_status="$(jq -r '.status' <<<"$hardened")"
+          hardened_conclusion="$(jq -r '.conclusion // "pending"' <<<"$hardened")"
+          hardened_head="$(jq -r '.head_sha' <<<"$hardened")"
+          hardened_event="$(jq -r '.event' <<<"$hardened")"
+
+          record="$(jq -n \
+            --arg recorded_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --argjson cancel_requested "$cancel_requested" \
+            --arg superseded_id "$SUPERSEDED_RUN_ID" \
+            --arg superseded_event "$before_event" \
+            --arg superseded_head "$before_head" \
+            --arg superseded_before_status "$before_status" \
+            --arg superseded_before_conclusion "$before_conclusion" \
+            --arg superseded_after_status "$after_status" \
+            --arg superseded_after_conclusion "$after_conclusion" \
+            --arg hardened_id "$HARDENED_RUN_ID" \
+            --arg hardened_event "$hardened_event" \
+            --arg hardened_head "$hardened_head" \
+            --arg hardened_status "$hardened_status" \
+            --arg hardened_conclusion "$hardened_conclusion" '
+            {
+              schema_version: "superseded-e1b-cancellation-safe-v1",
+              recorded_at: $recorded_at,
+              reason: "The active PR-triggered run used the pre-hardening workflow and blocked the intended push-triggered hardened run in the same concurrency group.",
+              superseded_run: {
+                id: ($superseded_id | tonumber),
+                event: $superseded_event,
+                head_sha: $superseded_head,
+                status_before: $superseded_before_status,
+                conclusion_before: $superseded_before_conclusion,
+                cancellation_requested: $cancel_requested,
+                status_after: $superseded_after_status,
+                conclusion_after: $superseded_after_conclusion
+              },
+              hardened_run: {
+                id: ($hardened_id | tonumber),
+                event: $hardened_event,
+                head_sha: $hardened_head,
+                status_after_slot_release: $hardened_status,
+                conclusion_after_slot_release: $hardened_conclusion
+              },
+              classification: "OPERATIONAL_SUPERSESSION_NOT_SCIENTIFIC_FAILURE",
+              model_changed: false,
+              data_changed: false,
+              split_changed: false,
+              thresholds_changed: false,
+              parser_changed: false,
+              evaluator_rule_changed: false,
+              stage_a_opened: false,
+              heldout_opened: false,
+              causal_oracle_opened: false,
+              wavelet_used: false
+            }
+          ')"
+
+          encoded="$(printf '%s\n' "$record" | base64 -w0)"
+          current_sha="$(gh api \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "repos/${GITHUB_REPOSITORY}/contents/${SAFE_RECORD}?ref=${TARGET_BRANCH}" \
+            --jq '.sha' 2>/dev/null || true)"
+          args=(
+            --method PUT
+            -H 'Accept: application/vnd.github+json'
+            -H 'X-GitHub-Api-Version: 2022-11-28'
+            "repos/${GITHUB_REPOSITORY}/contents/${SAFE_RECORD}"
+            -f message='Record superseded E1B cancellation and hardened-run release'
+            -f content="$encoded"
+            -f branch="$TARGET_BRANCH"
+          )
+          if [[ -n "$current_sha" ]]; then
+            args+=( -f sha="$current_sha" )
+          fi
+          gh api "${args[@]}" >/dev/null
+
+          marker='<!-- superseded-e1b-cancellation -->'
+          body="${marker}
+          ## Superseded E1B run released
+
+          - superseded run \`${SUPERSEDED_RUN_ID}\`: **${after_status} / ${after_conclusion}**
+          - hardened run \`${HARDENED_RUN_ID}\`: **${hardened_status} / ${hardened_conclusion}**
+          - record: \`${SAFE_RECORD}\`
+
+          The cancelled run used the pre-hardening PR-triggered workflow. This is operational supersession, not evaluator failure. Model, data, split, thresholds, parser, and scientific boundaries were unchanged."
+          comments="$(gh api --paginate \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments?per_page=100")"
+          comment_id="$(jq -r --arg marker "$marker" '[.[] | select(.body | contains($marker))] | last | .id // empty' <<<"$comments")"
+          if [[ -n "$comment_id" ]]; then
+            gh api --method PATCH \
+              -H 'Accept: application/vnd.github+json' \
+              -H 'X-GitHub-Api-Version: 2022-11-28' \
+              "repos/${GITHUB_REPOSITORY}/issues/comments/${comment_id}" \
+              -f body="$body" >/dev/null
+          else
+            gh api --method POST \
+              -H 'Accept: application/vnd.github+json' \
+              -H 'X-GitHub-Api-Version: 2022-11-28' \
+              "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" \
+              -f body="$body" >/dev/null
+          fi
+
+          printf '%s\n' "$body" >> "$GITHUB_STEP_SUMMARY"
