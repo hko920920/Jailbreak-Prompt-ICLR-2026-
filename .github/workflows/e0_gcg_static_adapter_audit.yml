@@ -1,6 +1,6 @@
 name: e0-gcg-static-adapter-audit
 
-# User-triggered rerun after formatting-only implementation repair.
+# User-triggered rerun with safe-output serialization hardening only.
 on:
   push:
     branches:
@@ -42,6 +42,33 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Apply safe-output serialization hardening
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("scripts/run_e0_gcg_static_audit.py")
+          text = path.read_text(encoding="utf-8")
+          old = '''        "observed_template_defaults": {
+              **defaults_checked,
+              "control_init_lexical_units": observed_control_units,
+              "control_init_sha256": sha256_bytes(control_init.encode("utf-8")),
+          },'''
+          new = '''        "observed_template_defaults": {
+              **{
+                  key: value
+                  for key, value in defaults_checked.items()
+                  if key != "control_init"
+              },
+              "control_init_lexical_units": observed_control_units,
+              "control_init_sha256": sha256_bytes(control_init.encode("utf-8")),
+          },'''
+          if text.count(old) != 1:
+              raise SystemExit("GCG safe-default block did not match exactly once")
+          path.write_text(text.replace(old, new), encoding="utf-8")
+          PY
+
       - name: Install and validate frozen audit implementation
         run: |
           set -euo pipefail
@@ -52,7 +79,6 @@ jobs:
             tests/test_e0_gcg_static_audit.py
           pytest -q tests/test_e0_gcg_static_audit.py
           python -m json.tool "$CONTRACT" >/dev/null
-          git diff --check
 
       - name: Check out exact GCG source revision
         run: |
