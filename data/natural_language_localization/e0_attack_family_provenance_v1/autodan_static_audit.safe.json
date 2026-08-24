@@ -1,0 +1,210 @@
+{
+  "binary_artifact_deserialized": false,
+  "blockers_before_admission": [
+    "CURRENT_QWEN_TARGET_NOT_IN_OFFICIAL_MODEL_MAP",
+    "HGA_SYNONYM_REPLACEMENT_DOES_NOT_PROTECT_REPLACE_TOKEN",
+    "LOCAL_SYNONYM_MUTATION_DOES_NOT_PROTECT_REPLACE_TOKEN",
+    "OFFICIAL_FINAL_OPTIMIZED_PROMPT_ARTIFACT_ROUTE_NOT_ESTABLISHED",
+    "OFFICIAL_SUFFIX_MANAGER_LOWERCASES_PAYLOAD",
+    "REGENERATION_COMPUTE_AND_SELECTION_BUDGET_NOT_FROZEN"
+  ],
+  "causal_oracle_opened": false,
+  "config_sha256": "16fd522acbce9bfa70f67d19997a3ebe17069d43318df208f47b4c50f998b3df",
+  "cross_regime_stage_a_opened": false,
+  "family": "AutoDAN",
+  "family_admitted_to_balanced_signal_screen": false,
+  "mandatory_checks": {
+    "entrypoint_defaults": true,
+    "exact_adapter_payload_preservation": true,
+    "exact_adapter_placeholder_removed": true,
+    "ga_suffix_manager_wiring": true,
+    "hga_suffix_manager_wiring": true,
+    "initial_placeholder_count": true,
+    "license": true,
+    "official_lowercasing_detected": true,
+    "official_model_keys": true,
+    "official_route_non_invariant_detected": true,
+    "prompt_group_not_deserialized": true,
+    "source_identities": true
+  },
+  "materialization": {
+    "exact_placeholder_adapter": {
+      "deterministic": true,
+      "exact_payload_byte_occurrences": 1,
+      "exact_payload_occurrences": 1,
+      "output_sha256": "3ba41e5c1f3e38ebe5d92780a9fa4b0d4dcdf9cfd1967febcfa003bb6b1177d5",
+      "payload_preserved": true,
+      "placeholder_occurrences_after_materialization": 0
+    },
+    "official_route": {
+      "byte_invariant": false,
+      "deterministic": true,
+      "exact_payload_occurrences": 0,
+      "lowercased_payload_occurrences": 1,
+      "output_sha256": "e9fe6a57ed55274256aa81ad6e5569cdd41da5b733edc6edd62bbe1e20f8fd5c",
+      "placeholder_occurrences_after_materialization": 0
+    },
+    "rendered_text_recorded": false,
+    "repetitions": 3,
+    "template_placeholder_occurrences": 1
+  },
+  "next_authorized_operation": "E0_AUTODAN_STATIC_AUDIT_CONDITIONAL_ADVANCE_TO_EXACT_PLACEHOLDER_AND_TARGET_ADAPTER_SMOKE",
+  "operational_pass": true,
+  "paper_validity": false,
+  "prompt_group_artifact": {
+    "deserialization_forbidden_by_contract": true,
+    "deserialized": false,
+    "first_16_bytes_sha256": "8c6a0bbb7d912aedd0d61626139dcdd4587ac66ef8e87f780fd6e0030d05116f",
+    "path": "assets/prompt_group.pth",
+    "sha256": "04dc00899aab6f09ef460ab022776867075e13c78ea0150feb9c7c34201f9a1b",
+    "size_bytes": 168703
+  },
+  "raw_rendered_prompt_committed": false,
+  "real_harmful_payload_used": false,
+  "regime": "F_fluent_optimized",
+  "required_follow_up": [
+    "EXACT_PLACEHOLDER_ADAPTER_SYNTHETIC_SMOKE",
+    "TARGET_CHAT_TEMPLATE_AND_TOKENIZER_ADAPTER_SMOKE",
+    "FREEZE_REGENERATION_OR_FROZEN_ARTIFACT_ROUTE",
+    "FREEZE_COMPUTE_AND_CANDIDATE_SELECTION_BUDGET"
+  ],
+  "schema_version": "e0-autodan-static-adapter-result-v1",
+  "source": {
+    "file_identities": [
+      {
+        "exists": true,
+        "expected_git_blob_sha": "3bd73144537c2b4985cd36ce06f68935e86eb23a",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "3bd73144537c2b4985cd36ce06f68935e86eb23a",
+        "path": "autodan_ga_eval.py",
+        "role": "ga_entrypoint",
+        "sha256": "985630cdd7f092f2d92dbc144b48dd30dcf9c483163dec22e9ab77efb11194ce",
+        "size_bytes": 11147
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "8701dab6ac674b2f4d681b6df84c4fa4cf4509cd",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "8701dab6ac674b2f4d681b6df84c4fa4cf4509cd",
+        "path": "autodan_hga_eval.py",
+        "role": "hga_entrypoint",
+        "sha256": "feb193b0fe61a331a7c4ee500d1b448524268dcf836c4abee9da572324b76f46",
+        "size_bytes": 12239
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "b99248622923b631346bced8ebd38effc4a6b87b",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "b99248622923b631346bced8ebd38effc4a6b87b",
+        "path": "assets/autodan_initial_prompt.txt",
+        "role": "initial_prompt",
+        "sha256": "fc1b4ace08784d0ba9ec2ab5e8c65ae75bbe59621e41425df9541dd7155a3283",
+        "size_bytes": 300
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "13b56831a55b3014e20d1677b6ffeb95511390d7",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "13b56831a55b3014e20d1677b6ffeb95511390d7",
+        "path": "LICENSE",
+        "role": "license",
+        "sha256": "5b9fd08d5288e130414800b0495264313bbc1120dc3d01a1290a6fd371adb536",
+        "size_bytes": 1069
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "337b5d2d6d368334aa21238e9876e8d9905d3ff5",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "337b5d2d6d368334aa21238e9876e8d9905d3ff5",
+        "path": "utils/opt_utils.py",
+        "role": "opt_utils",
+        "sha256": "eafd912b28b811c498c8e9e93af952b9c50e9bc2ba13ea7d66c621ad29aa1ea7",
+        "size_bytes": 20686
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "bf241dca59bba95f7fae9d7d0f2a117392da1a37",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "bf241dca59bba95f7fae9d7d0f2a117392da1a37",
+        "path": "assets/prompt_group.pth",
+        "role": "prompt_group",
+        "sha256": "04dc00899aab6f09ef460ab022776867075e13c78ea0150feb9c7c34201f9a1b",
+        "size_bytes": 168703
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "c78ecf52c9e299b9577c2aa473a669052686b2d1",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "c78ecf52c9e299b9577c2aa473a669052686b2d1",
+        "path": "README.md",
+        "role": "readme",
+        "sha256": "3651c2cfb50f6a26f07d992ce61749b03a5ffc8c180e4a3a46593bfb0e6c257e",
+        "size_bytes": 5245
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "0be54c0e4033f46dec625e9ffbc8b21f9366630d",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "0be54c0e4033f46dec625e9ffbc8b21f9366630d",
+        "path": "requirements.txt",
+        "role": "requirements",
+        "sha256": "c635d0f7af2746c59afb98bbed7df7d5c40091031460c4db15b82edb2683ded0",
+        "size_bytes": 161
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "eb0a3f007f743b6feca316b8d9956db8014a5197",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "eb0a3f007f743b6feca316b8d9956db8014a5197",
+        "path": "utils/string_utils.py",
+        "role": "string_utils",
+        "sha256": "de4f37801943753c8234becc37102e37affc70a3a9dbf89ccfe25ff63751246f",
+        "size_bytes": 5822
+      }
+    ],
+    "license": "MIT",
+    "repository": "SheltonLiu-N/AutoDAN",
+    "revision": "34062e964185693e81a6775b4f0d00bfd7507612",
+    "tree_sha": "39ceba6f45e5dec17db8d3099d7281f8673ceb14"
+  },
+  "source_analysis": {
+    "current_project_target": "Qwen2.5-7B-Instruct",
+    "current_project_target_officially_supported": false,
+    "entrypoint_defaults_match": true,
+    "expected_entrypoint_defaults": {
+      "batch_size": 256,
+      "model": "llama2",
+      "num_steps": 100,
+      "seed": 20
+    },
+    "ga_suffix_manager_wiring_pass": true,
+    "gpt_mutation_prompt_protects_placeholder": true,
+    "hga_placeholder_protected": false,
+    "hga_protected_terms_sha256": "87e9696c20b536f865e67ff6c57443c7a82e216b5d9385bacda6406347b9107d",
+    "hga_suffix_manager_wiring_pass": true,
+    "local_synonym_placeholder_protected": false,
+    "local_synonym_protected_terms_sha256": "87e9696c20b536f865e67ff6c57443c7a82e216b5d9385bacda6406347b9107d",
+    "observed_entrypoint_defaults": {
+      "batch_size": 256,
+      "model": "llama2",
+      "num_steps": 100,
+      "seed": 20
+    },
+    "official_lowercase_replacement_detected": true,
+    "official_model_keys": [
+      "llama2",
+      "vicuna",
+      "guanaco",
+      "WizardLM",
+      "mpt-chat",
+      "mpt-instruct",
+      "falcon"
+    ],
+    "official_model_keys_match": true
+  },
+  "status": "E0_AUTODAN_STATIC_AUDIT_CONDITIONAL_ADVANCE",
+  "synthetic_payload_character_length": 52,
+  "synthetic_payload_sha256": "e7babafac8197c6b7069237724343f77ff7f12bc3638fec3f37041e5b77d1215",
+  "target_model_called": false,
+  "wavelet_used": false
+}

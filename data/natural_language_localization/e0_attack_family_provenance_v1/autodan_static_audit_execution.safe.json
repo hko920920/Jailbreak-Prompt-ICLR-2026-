@@ -1,0 +1,22 @@
+{
+  "schema_version": "e0-autodan-static-audit-execution-v1",
+  "status": "E0_AUTODAN_STATIC_AUDIT_EXECUTION_RECORDED",
+  "paper_validity": false,
+  "source_head_sha": "86eb41feb79899d99cfc846056a6dcf730ba8bb5",
+  "workflow": "e0-autodan-static-adapter-audit",
+  "workflow_run_id": 32711644171,
+  "workflow_run_number": 2,
+  "workflow_run_attempt": 1,
+  "artifact_id": "9514302311",
+  "artifact_digest": "022183567c687a90cce6d1f768077cba0d828241a5e9bec6dcf21b051e332569",
+  "artifact_url": "https://github.com/hko920920/Jailbreak-Prompt-ICLR-2026-/actions/runs/32711644171/artifacts/9514302311",
+  "safe_result_sha256": "256bcbbe8306b181033dc35e3a6a2a0edb7bddd681dfd8e5209d226f6cfcf2b3",
+  "decision": "E0_AUTODAN_STATIC_AUDIT_CONDITIONAL_ADVANCE",
+  "family_admitted_to_balanced_signal_screen": false,
+  "real_harmful_payload_used": false,
+  "target_model_called": false,
+  "cross_regime_stage_a_opened": false,
+  "causal_oracle_opened": false,
+  "wavelet_used": false,
+  "next_authorized_operation": "EXACT_PLACEHOLDER_AND_TARGET_ADAPTER_SYNTHETIC_SMOKE"
+}
