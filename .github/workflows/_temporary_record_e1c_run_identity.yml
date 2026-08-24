@@ -1,0 +1,96 @@
+name: temporary-record-e1c-run-identity
+
+on:
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/_temporary_record_e1c_run_identity.yml
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: temporary-record-e1c-run-identity
+  cancel-in-progress: false
+
+jobs:
+  record:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      TARGET_WORKFLOW: evaluator_panel_e1c_harmbench_preflight.yml
+      TARGET_HEAD_SHA: d88fc778b43c2a37fe1e7299ff17cebbde9cb637
+      TARGET_BRANCH: agent/programmatic-agentharm-pivot
+      OUTPUT: data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_preflight_run.safe.json
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/programmatic-agentharm-pivot
+          fetch-depth: 0
+
+      - name: Locate the corrected push-triggered E1C run
+        run: |
+          mkdir -p "$(dirname "$OUTPUT")"
+          gh api --method GET \
+            "/repos/$GITHUB_REPOSITORY/actions/workflows/$TARGET_WORKFLOW/runs" \
+            -f branch="$TARGET_BRANCH" \
+            -f event=push \
+            -f per_page=30 \
+            > "$RUNNER_TEMP/e1c-runs.json"
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          source = json.loads(
+              (Path(os.environ["RUNNER_TEMP"]) / "e1c-runs.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+          runs = source.get("workflow_runs", [])
+          target_sha = os.environ["TARGET_HEAD_SHA"]
+          selected = next(
+              (run for run in runs if run.get("head_sha") == target_sha),
+              None,
+          )
+          if selected is None:
+              raise SystemExit(
+                  f"E1C run for {target_sha} not found among {len(runs)} runs"
+              )
+          safe = {
+              "schema_version": "evaluator-panel-e1c-run-identity-safe-v1",
+              "workflow": selected.get("name"),
+              "workflow_id": selected.get("workflow_id"),
+              "run_id": selected.get("id"),
+              "run_number": selected.get("run_number"),
+              "event": selected.get("event"),
+              "status_at_record": selected.get("status"),
+              "conclusion_at_record": selected.get("conclusion"),
+              "head_branch": selected.get("head_branch"),
+              "head_sha": selected.get("head_sha"),
+              "created_at": selected.get("created_at"),
+              "updated_at": selected.get("updated_at"),
+              "html_url": selected.get("html_url"),
+              "paper_validity": False,
+              "harmbench_live_predictions_generated_by_probe": False,
+              "new_attack_outputs_generated_by_probe": False,
+          }
+          Path(os.environ["OUTPUT"]).write_text(
+              json.dumps(safe, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print(json.dumps(safe, sort_keys=True))
+          PY
+
+      - name: Commit identity record and remove one-shot probe
+        run: |
+          git rm .github/workflows/_temporary_record_e1c_run_identity.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$OUTPUT"
+          git commit -m "Record corrected E1C HarmBench preflight run identity"
+          git push origin HEAD:agent/programmatic-agentharm-pivot
