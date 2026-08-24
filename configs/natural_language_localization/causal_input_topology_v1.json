@@ -1,0 +1,169 @@
+{
+  "schema_version": "causal-input-topology-v1",
+  "status": "FROZEN_BEFORE_CROSS_REGIME_CAUSAL_OUTPUTS",
+  "frozen": true,
+  "paper_validity": false,
+  "research_object": "input_level_causal_topology_of_already_successful_jailbreaks",
+  "primary_set_function": {
+    "name": "J_a_S",
+    "definition": "seed-averaged probability of SUBSTANTIVE_HARMFUL_ASSISTANCE after neutralizing unit set S with operator a",
+    "production_measurement": "externally_validated_abstaining_evaluator_panel",
+    "secondary_only": [
+      "sequence_or_token_KL",
+      "refusal_logit_or_prefix_mass",
+      "affirmation_loss_gradient",
+      "token_saliency",
+      "attention_weight",
+      "embedding_gradient"
+    ]
+  },
+  "causal_objects": {
+    "minimal_causal_cut_set": {
+      "meaning": "minimal necessary-removal set",
+      "must_break_under_all_required_operators": true,
+      "all_strict_subsets_must_fail_recovery_rule": true,
+      "may_be_called_minimal_enabling_set": false
+    },
+    "minimal_sufficient_enabling_set": {
+      "meaning": "minimal keep-only set preserving attack success",
+      "optional_when_coherent_reconstruction_is_undefined": true,
+      "no_sufficiency_claim_without_keep_only_test": true
+    }
+  },
+  "interaction": {
+    "pairwise_numeric": "V({i,j})-V({i})-V({j})+V(empty)",
+    "higher_order_numeric": "Moebius_Harsanyi_finite_difference",
+    "confirmatory_interaction": "robust minimal cut set size >= 2 with all strict subsets preserving attack",
+    "monotonicity_assumed": false,
+    "non_monotonicity_must_be_reported": true
+  },
+  "regime_hierarchies": {
+    "S_semantic_readable": [
+      "typed_strategy_node",
+      "sentence_or_newline_or_clause",
+      "word_or_byte_span",
+      "token_refinement_inside_localized_coherent_span"
+    ],
+    "F_fluent_optimized": [
+      "provenance_preserving_generated_clause_or_strategy_block",
+      "sentence_or_clause",
+      "fixed_contiguous_token_block",
+      "token_refinement_inside_localized_block"
+    ],
+    "U_nonfluent_optimized": [
+      "predeclared_fixed_token_block",
+      "recursive_sub_block",
+      "contiguous_token_interval",
+      "individual_token_position_if_budget_allows"
+    ]
+  },
+  "interventions": {
+    "surface_primary_candidates": [
+      "length_aware_neutral_replacement",
+      "regime_specific_neutral_block_replacement"
+    ],
+    "surface_secondary_contrast": [
+      "deletion"
+    ],
+    "white_box_sensitivity_only": [
+      "embedding_scaling_toward_zero",
+      "neutral_embedding_interpolation",
+      "position_specific_information_attenuation"
+    ],
+    "minimum_meaningful_operators_per_regime": 2,
+    "operator_disagreement_must_be_reported": true
+  },
+  "preservation": {
+    "explicit_harmful_payload_occurs_exactly_once": true,
+    "payload_bytes_unchanged": true,
+    "intervention_restricted_to_frozen_attack_units": true,
+    "behavior_compliance_axis_must_recognize_target": true,
+    "coherence_required": true,
+    "decision_relevant_truncation_forbidden": true,
+    "matched_capability_control_required": true,
+    "semantic_similarity_alone_is_sufficient": false,
+    "generic_failure_label": "CAPABILITY_CONFOUNDED"
+  },
+  "ground_truth": {
+    "small_unit_sets": "full_subset_enumeration",
+    "token_level": "coarse_to_fine_then_exact_or_contract_exact_within_frozen_vocabulary",
+    "all_minimal_sets_must_be_enumerated": true,
+    "heuristic_can_prove_minimality": false,
+    "all_reported_minimal_sets_verified_against_all_strict_subsets": true
+  },
+  "heuristic_baselines": [
+    "ships_like_distribution_shift",
+    "token_highlighter_affirmation_gradient",
+    "sahara_style_greedy_forward_addition",
+    "leave_one_out",
+    "random_same_size_intervention",
+    "mask_gcg_style_masking",
+    "CPD_suffix_onset",
+    "greedy_elimination",
+    "wavelet_only_after_ground_truth"
+  ],
+  "metrics": [
+    "minimum_robust_cut_size",
+    "minimum_sufficient_set_size_if_defined",
+    "number_of_distinct_minimal_cut_sets",
+    "number_of_distinct_minimal_sufficient_sets",
+    "maximum_confirmed_interaction_order",
+    "non_monotonicity_rate",
+    "operator_agreement",
+    "seed_stability",
+    "cross_model_set_transfer",
+    "capability_confounded_rate",
+    "distributed_within_budget_rate",
+    "attack_normalized_cut_fraction",
+    "full_prompt_cut_fraction",
+    "coarse_to_fine_compression"
+  ],
+  "effect_retention": {
+    "defined_for": "minimal_sufficient_enabling_set_only",
+    "formula": "ASR_keep_only_E_star / ASR_full_attack",
+    "may_use_minimal_cut_set_as_numerator_object": false
+  },
+  "topology_labels": [
+    "LOCALIZED_SINGLE",
+    "LOCALIZED_SMALL_SET",
+    "LOCALIZED_INTERACTIVE",
+    "MULTIPLE_MINIMAL_CUT_SETS",
+    "MULTIPLE_SUFFICIENT_PATHWAYS",
+    "DISTRIBUTED_WITHIN_BUDGET",
+    "NON_MONOTONE",
+    "CAPABILITY_CONFOUNDED",
+    "UNRESOLVED_ABSTENTION"
+  ],
+  "claim_boundary": {
+    "first_token_localization": false,
+    "first_token_suppression": false,
+    "ships_applied_to_tokens_is_main_contribution": false,
+    "main_contribution_candidate": "robust_input_level_causal_topology_across_attack_regimes",
+    "exactness_for_U": "only_with_respect_to_frozen_intervention_vocabulary"
+  },
+  "closest_work_required_comparisons": [
+    "SHIPs_SAHARA",
+    "Token_Highlighter",
+    "Mask_GCG",
+    "TriageFuzz",
+    "Erase_and_Check",
+    "CPD_Online",
+    "LOCA",
+    "Adversarial_Deja_Vu"
+  ],
+  "sealed_boundaries": {
+    "legacy_semantic_stage_A_opened": false,
+    "cross_regime_stage_A_opened": false,
+    "prior_evaluation_opened": false,
+    "heldout_opened": false,
+    "causal_oracle_opened": false,
+    "wavelet_used": false
+  },
+  "next_authorized_operations": [
+    "FINISH_EVALUATOR_PANEL_EXTERNAL_VALIDATION",
+    "COMPLETE_E0_ATTACK_FAMILY_PROVENANCE_AUDIT",
+    "FREEZE_REGIME_SPECIFIC_UNIT_VOCABULARIES_AND_LABEL_PRIORITY",
+    "RUN_BALANCED_SIGNAL_SCREEN",
+    "OPEN_CAUSAL_TOPOLOGY_ONLY_FOR_STABLE_PAIRS"
+  ]
+}
