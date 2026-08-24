@@ -1,0 +1,57 @@
+{
+  "candidate_repository": "mradermacher/HarmBench-Llama-2-13b-cls-GGUF",
+  "candidate_revision": "e1ff40dd31c7a3ebd38326f6d684b849ca18c434",
+  "causal_oracle_opened": false,
+  "checks": {
+    "candidate_repository_accessible": true,
+    "candidate_revision_immutable": true,
+    "file_sha256_visible": true,
+    "file_size_within_frozen_bounds": true,
+    "model_card_names_official_source": true,
+    "model_card_names_selected_file": true,
+    "model_card_states_static_quantization": true,
+    "no_model_inference": true,
+    "no_model_weight_download": true,
+    "selection_rule_has_exactly_one_match": true
+  },
+  "cross_regime_stage_a_opened": false,
+  "error_type": null,
+  "evidence_class": "DEVELOPMENT",
+  "harmbench_live_predictions_generated": false,
+  "keep_only_oracle_opened": false,
+  "matching_files": [
+    {
+      "filename": "HarmBench-Llama-2-13b-cls.Q4_K_M.gguf",
+      "sha256": "45f6c4dc9e86d540a2e153f57852673f54732704a3039b1426ce46b1e436f578",
+      "size": 7865957120
+    }
+  ],
+  "model_card": {
+    "downloaded": true,
+    "names_official_source": true,
+    "names_selected_file": true,
+    "sha256": "68c8a83d933a3a6a90e76a1c31ea77d1f5f3e40afa1ee4a7708eeb88c96ae2cb",
+    "states_static_quantization": true
+  },
+  "model_inference_performed": false,
+  "model_weight_downloaded": false,
+  "new_harmful_attack_outputs_generated": false,
+  "next_authorized_operation": "FREEZE_E1C_HARMBENCH_LIVE_REPRODUCTION_AND_CANARY_CONTRACT_WITH_RUNTIME_V2_IDENTITY",
+  "official_source_repository": "cais/HarmBench-Llama-2-13b-cls",
+  "official_source_revision": "bda705349d1144fa618770bea64d99ce54e3835b",
+  "operational_pass": true,
+  "paper_validity": false,
+  "schema_version": "evaluator-panel-e1c-runtime-artifact-probe-v2-result-v1",
+  "selected_file": {
+    "filename": "HarmBench-Llama-2-13b-cls.Q4_K_M.gguf",
+    "sha256": "45f6c4dc9e86d540a2e153f57852673f54732704a3039b1426ce46b1e436f578",
+    "size": 7865957120
+  },
+  "selection_rule": {
+    "required_match_count": 1,
+    "required_prefix": "HarmBench-Llama-2-13b-cls.",
+    "required_suffix": ".Q4_K_M.gguf"
+  },
+  "status": "E1C_RUNTIME_ARTIFACT_V2_PROBE_PASS",
+  "wavelet_used": false
+}
