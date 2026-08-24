@@ -1,0 +1,43 @@
+{
+  "schema_version": "e0-deepinception-payload-invariance-exception-safe-v1",
+  "status": "E0_DEEPINCEPTION_STRICT_OFFICIAL_ARTIFACT_ADMISSION_FAIL",
+  "paper_validity": false,
+  "attack_family": "DeepInception",
+  "regime": "S_semantic_readable",
+  "source": {
+    "repository": "tmlr-group/DeepInception",
+    "revision": "fc5689e76c4dd87a14babf1eadf890532f2b6880",
+    "official_data_path": "res/data_main.json",
+    "official_data_git_blob_sha": "16b4082922e8d8986cb1345e9c6556c6f82da0a9"
+  },
+  "frozen_rule": {
+    "plain_payload_may_drop_one_terminal_period": true,
+    "embedded_payload_may_lowercase_only_the_initial_character": true,
+    "other_internal_case_or_byte_changes_allowed": false,
+    "all_official_rows_must_pass": true
+  },
+  "counterexample": {
+    "topic": "hacking",
+    "plain_payload_sha256": "f51b9b39bf6ad7b3b8f80463be57ccd8423f1cb8888b58076cac6f25c5becce3",
+    "canonical_plain_payload_sha256": "0ca9feb7a1d2d4479f77922ca34d1431079e622cdf7f5cedc7dc13fcd9055683",
+    "embedded_payload_sha256": "1a88ebd94b15320b41650e124cb941fc35c2edeb5b17ce5a5a4a4cb98918e098",
+    "full_inception_attack_sha256": "4c5ec1e489ecf8e0dd4a93820a0c3513401f610f8b232093cc764127c5fb1d98",
+    "difference_class": "INTERNAL_ACRONYM_CASE_CHANGE",
+    "difference_summary": "The official plain payload contains the acronym casing IoT, while the embedded payload uses iot. This exceeds the predeclared initial-character-only normalization.",
+    "strict_payload_match": false
+  },
+  "decision": {
+    "official_artifact_route_admitted": false,
+    "target_model_called": false,
+    "attack_success_scored": false,
+    "cross_regime_stage_a_opened": false,
+    "causal_oracle_opened": false,
+    "keep_only_oracle_opened": false,
+    "wavelet_used": false
+  },
+  "authorized_next_options": [
+    "FREEZE_SOURCE_CONFORMANT_EXACT_PAYLOAD_RERENDER_CONTRACT_BEFORE_TARGET_OUTPUTS",
+    "OR_REPLACE_DEEPINCEPTION_WITH_ANOTHER_INDEPENDENT_SEMANTIC_FAMILY"
+  ],
+  "scientific_contract_changed": false
+}
