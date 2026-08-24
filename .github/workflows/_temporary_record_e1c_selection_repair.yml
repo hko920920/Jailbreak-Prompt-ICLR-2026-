@@ -1,0 +1,86 @@
+name: temporary-record-e1c-selection-repair
+
+on:
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/_temporary_record_e1c_selection_repair.yml
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: temporary-record-e1c-selection-repair
+  cancel-in-progress: false
+
+jobs:
+  record:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SOURCE_RUN_ID: "32749293206"
+      SOURCE_ARTIFACT: evaluator-panel-e1c-selection-repair-safe
+      TARGET_BRANCH: agent/programmatic-agentharm-pivot
+      RESULT_TARGET: data/natural_language_localization/evaluator_panel_v1/e1c_selection_repair.safe.json
+      SELECTION_TARGET: data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_selection_v2.safe.jsonl
+      EXPECTED_SELECTION_SHA256: 8e897219ce0fa12cd10a95091275f4f22c4528748f15ef1f601ceef4fd834510
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TARGET_BRANCH }}
+          fetch-depth: 0
+
+      - name: Download completed safe artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          rm -rf /tmp/e1c-selection-repair
+          mkdir -p /tmp/e1c-selection-repair
+          gh run download "$SOURCE_RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --name "$SOURCE_ARTIFACT" \
+            --dir /tmp/e1c-selection-repair
+          test -f /tmp/e1c-selection-repair/e1c_selection_repair.safe.json
+          test -f /tmp/e1c-selection-repair/e1c_harmbench_selection_v2.safe.jsonl
+
+      - name: Verify completed result and safe boundary
+        run: |
+          result=/tmp/e1c-selection-repair/e1c_selection_repair.safe.json
+          selection=/tmp/e1c-selection-repair/e1c_harmbench_selection_v2.safe.jsonl
+          test "$(jq -r '.status' "$result")" = "E1C_SELECTION_REPAIR_PASS"
+          test "$(jq -r '.operational_pass' "$result")" = "true"
+          test "$(jq -r '.old_selection.missing_registry_row_count' "$result")" = "3"
+          test "$(jq -r '.new_selection.record_count' "$result")" = "200"
+          test "$(jq -r '.new_selection.label_counts["0"]' "$result")" = "100"
+          test "$(jq -r '.new_selection.label_counts["1"]' "$result")" = "100"
+          test "$(jq -r '.new_selection.missing_registry_row_count' "$result")" = "0"
+          test "$(jq -r '.new_selection.deterministic' "$result")" = "true"
+          test "$(jq -r '.model_inference_performed' "$result")" = "false"
+          test "$(jq -r '.harmbench_live_predictions_generated' "$result")" = "false"
+          test "$(jq -r '.cross_regime_stage_a_opened' "$result")" = "false"
+          test "$(jq -r '.causal_oracle_opened' "$result")" = "false"
+          test "$(jq -r '.keep_only_oracle_opened' "$result")" = "false"
+          test "$(jq -r '.wavelet_used' "$result")" = "false"
+          test "$(wc -l < "$selection")" = "200"
+          test "$(sha256sum "$selection" | cut -d' ' -f1)" = "$EXPECTED_SELECTION_SHA256"
+
+      - name: Commit immutable safe records
+        run: |
+          mkdir -p "$(dirname "$RESULT_TARGET")"
+          cp /tmp/e1c-selection-repair/e1c_selection_repair.safe.json "$RESULT_TARGET"
+          cp /tmp/e1c-selection-repair/e1c_harmbench_selection_v2.safe.jsonl "$SELECTION_TARGET"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$RESULT_TARGET" "$SELECTION_TARGET"
+          if git diff --cached --quiet; then
+            echo 'Safe records already committed.'
+            exit 0
+          fi
+          git commit -m 'Record E1C selection repair result'
+          git fetch origin "$TARGET_BRANCH"
+          git rebase "origin/$TARGET_BRANCH"
+          git push origin "HEAD:$TARGET_BRANCH"
