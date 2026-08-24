@@ -1,6 +1,6 @@
 name: e0-gcg-static-adapter-audit
 
-# User-triggered rerun with safe-output serialization hardening only.
+# User-triggered rerun with post-execution safe-aggregate sanitization only.
 on:
   push:
     branches:
@@ -42,33 +42,6 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Apply safe-output serialization hardening
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-
-          path = Path("scripts/run_e0_gcg_static_audit.py")
-          text = path.read_text(encoding="utf-8")
-          old = '''        "observed_template_defaults": {
-              **defaults_checked,
-              "control_init_lexical_units": observed_control_units,
-              "control_init_sha256": sha256_bytes(control_init.encode("utf-8")),
-          },'''
-          new = '''        "observed_template_defaults": {
-              **{
-                  key: value
-                  for key, value in defaults_checked.items()
-                  if key != "control_init"
-              },
-              "control_init_lexical_units": observed_control_units,
-              "control_init_sha256": sha256_bytes(control_init.encode("utf-8")),
-          },'''
-          if text.count(old) != 1:
-              raise SystemExit("GCG safe-default block did not match exactly once")
-          path.write_text(text.replace(old, new), encoding="utf-8")
-          PY
-
       - name: Install and validate frozen audit implementation
         run: |
           set -euo pipefail
@@ -79,6 +52,7 @@ jobs:
             tests/test_e0_gcg_static_audit.py
           pytest -q tests/test_e0_gcg_static_audit.py
           python -m json.tool "$CONTRACT" >/dev/null
+          git diff --check
 
       - name: Check out exact GCG source revision
         run: |
@@ -100,6 +74,32 @@ jobs:
             --source-root "$GCG_SOURCE_ROOT" \
             --output "$SAFE_OUTPUT"
 
+      - name: Sanitize safe aggregate representation
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          path = Path(os.environ["SAFE_OUTPUT"])
+          result = json.loads(path.read_text(encoding="utf-8"))
+          defaults = result["observed_template_defaults"]
+          removed = defaults.pop("control_init", None)
+          if not isinstance(removed, str) or not removed:
+              raise SystemExit("expected upstream control_init was not present before sanitization")
+          assert defaults["control_init_lexical_units"] == 20
+          assert len(defaults["control_init_sha256"]) == 64
+          result["safe_aggregate_sanitization"] = {
+              "raw_control_init_removed": True,
+              "control_init_identity_retained_as_sha256_and_lexical_count": True,
+              "scientific_contract_changed": False,
+          }
+          path.write_text(
+              json.dumps(result, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
       - name: Verify pass result and sealed boundary
         run: |
           python - <<'PY'
@@ -114,6 +114,7 @@ jobs:
           assert result["operational_pass"] is True
           assert result["paper_validity"] is False
           assert all(result["mandatory_checks"].values())
+          assert result["safe_aggregate_sanitization"]["raw_control_init_removed"] is True
           assert result["family_admitted_to_balanced_signal_screen"] is False
           assert result["real_harmful_payload_used"] is False
           assert result["target_model_weights_downloaded"] is False
@@ -202,6 +203,7 @@ jobs:
               handle.write(
                   f"- harmless intervals: **{block['contiguous_interval_count']} / pass**\n"
               )
+              handle.write("- raw control text retained: **false**\n")
               handle.write("- target model / real harmful payload: **false / false**\n")
               handle.write("- Stage A / oracle / wavelet: **closed / closed / closed**\n")
           PY
