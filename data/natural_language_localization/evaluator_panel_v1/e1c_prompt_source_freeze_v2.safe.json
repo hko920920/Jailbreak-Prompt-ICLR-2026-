@@ -1,0 +1,195 @@
+{
+  "behavior_registry": {
+    "behavior_hash_collision_count": 0,
+    "behavior_hash_collisions": [],
+    "full_validation_missing_from_text_count": 3,
+    "full_validation_missing_from_text_hashes": [
+      "92a817c9b39fdd90365f14dcf8b6d8a6b534a3da4b8fba05f4ffc3df485dbec4",
+      "9fb9eab22b6d645141ffe9e82733ec9ebb80237a539f1e81555cbdf7a2891751",
+      "cf7965220fb58f5cefa92cf7ffc2db554962f8d1e5c0e6daa0b38f78c6fd7d01"
+    ],
+    "full_validation_missing_from_union_count": 3,
+    "full_validation_missing_from_union_hashes": [
+      "92a817c9b39fdd90365f14dcf8b6d8a6b534a3da4b8fba05f4ffc3df485dbec4",
+      "9fb9eab22b6d645141ffe9e82733ec9ebb80237a539f1e81555cbdf7a2891751",
+      "cf7965220fb58f5cefa92cf7ffc2db554962f8d1e5c0e6daa0b38f78c6fd7d01"
+    ],
+    "full_validation_notebook_unusable_count": 0,
+    "full_validation_notebook_unusable_hashes": [],
+    "multimodal_registry_count": 110,
+    "raw_behavior_ids_or_text_recorded": false,
+    "registry_overlap_count": 0,
+    "selected_missing_behavior_hashes": [
+      "92a817c9b39fdd90365f14dcf8b6d8a6b534a3da4b8fba05f4ffc3df485dbec4",
+      "9fb9eab22b6d645141ffe9e82733ec9ebb80237a539f1e81555cbdf7a2891751"
+    ],
+    "selected_missing_registry_row_count": 3,
+    "selected_notebook_unusable_behavior_hashes": [],
+    "selected_notebook_unusable_row_count": 0,
+    "selected_record_count": 200,
+    "text_registry_count": 400,
+    "union_registry_count": 510
+  },
+  "causal_oracle_opened": false,
+  "checks": {
+    "all_cached_predictions_binary": true,
+    "all_selected_rows_have_notebook_required_fields": true,
+    "all_selected_rows_resolve_in_notebook_registry": false,
+    "behavior_hashes_collision_free": true,
+    "classifier_path_matches": true,
+    "effective_prompt_family_matches": true,
+    "loaded_model_argument_matches": true,
+    "max_tokens_matches": true,
+    "model_prompt_family_mismatch_matches": true,
+    "no_live_predictions": true,
+    "no_model_inference": true,
+    "no_model_weight_download": true,
+    "notebook_and_production_prompt_families_are_distinct": true,
+    "selection_label_counts_match": true,
+    "selection_record_count_matches": true,
+    "source_file_blobs_match": true,
+    "source_tree_matches": true,
+    "temperature_matches": true,
+    "test_classifier_path_matches": true,
+    "text_target_cell_found": true,
+    "val_classifier_path_matches": true
+  },
+  "contract_sha256": "42c9ae35f86d8941d4200b6b2741df71314239e6dc0f9dc772e7be98b43113b9",
+  "cross_regime_stage_a_opened": false,
+  "evidence_class": "DEVELOPMENT",
+  "harmbench_live_predictions_generated": false,
+  "keep_only_oracle_opened": false,
+  "model_inference_performed": false,
+  "model_weight_downloaded": false,
+  "new_harmful_attack_outputs_generated": false,
+  "next_authorized_operation": "STOP_E1C_AND_RESOLVE_REMAINING_SOURCE_OR_SELECTION_AMBIGUITY_BEFORE_LIVE_OUTPUTS",
+  "operational_pass": false,
+  "paper_validity": false,
+  "production_execution": {
+    "max_tokens": 1,
+    "prompt": {
+      "canonical_family_sha256": "3dea5cd9ab408e5fc39ae6a0614eeb9441dee552a5e52224d064d0a3b66d4d65",
+      "field_names": [
+        "description",
+        "prompt",
+        "prompt_contextual"
+      ],
+      "prompt_contextual_length": 1401,
+      "prompt_contextual_sha256": "5d6bb9e3cf4d1e5f3f7620093113222ee115af75b0b2913f00e4c7225ec9f219",
+      "prompt_length": 1359,
+      "prompt_sha256": "788f4f6aa1491c433c4da76c9140cfc30966cea3ff3875c4d0fcb336d92f60e0",
+      "raw_prompt_recorded": false
+    },
+    "prompt_family": "LLAMA2_CLS_PROMPT",
+    "temperature": 0.0
+  },
+  "schema_version": "evaluator-panel-e1c-prompt-source-freeze-v2-result-v1",
+  "selection": {
+    "label_counts": {
+      "0": 100,
+      "1": 100
+    },
+    "raw_records_recorded": false,
+    "record_count": 200,
+    "record_ids_sha256": "8839e523fe353861a5ca69f7230f539e026044966867c8284251f750361b9356"
+  },
+  "semantic_only_stage_a_opened": false,
+  "source": {
+    "expected_tree_sha": "e28303aa064b3a4fdbe5698bc323e43306b7ab74",
+    "files": [
+      {
+        "exists": true,
+        "expected_git_blob_sha": "d39d6c6b4ad68e37e60a408d3181791b49740221",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "d39d6c6b4ad68e37e60a408d3181791b49740221",
+        "path": "data/behavior_datasets/harmbench_behaviors_multimodal_all.csv",
+        "sha256": "0a4dd6bd0df2a52d1d9ee25f3d018af49b52b61ee2ccdaaac16b9660f753145d",
+        "size_bytes": 137713
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "8a6b423d85e9acdc168c57a6a957755cfa86c4cb",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "8a6b423d85e9acdc168c57a6a957755cfa86c4cb",
+        "path": "data/behavior_datasets/harmbench_behaviors_text_all.csv",
+        "sha256": "8d81accedd38eaaf8b760618622bb888417d1fd0c86eba65c427a16f1cbb4afc",
+        "size_bytes": 198850
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "3d7d0a98742a36b5c7824aadcea433e42a045022",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "3d7d0a98742a36b5c7824aadcea433e42a045022",
+        "path": "data/classifier_val_sets/text_behaviors_val_set.json",
+        "sha256": "e740727b6874e492063e097122a9916833d57f9bd2ce3e86713ec188741a41c8",
+        "size_bytes": 1875939
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "be95edd9523de0cde2a7823217b26983d57c496b",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "be95edd9523de0cde2a7823217b26983d57c496b",
+        "path": "eval_utils.py",
+        "sha256": "46f1db751866848834d45d5128a18d4cc0a820828e89796ab51bc605d10c7058",
+        "size_bytes": 16658
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "f6b3cf674ec940d2384e277d77867f2293489595",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "f6b3cf674ec940d2384e277d77867f2293489595",
+        "path": "notebooks/run_classifier_val_set.ipynb",
+        "sha256": "2f3dab25208e0a06c7d415c80fbae7405f2d529eaef7ade510ac8fe2723dbd4c",
+        "size_bytes": 18617
+      }
+    ],
+    "observed_tree_sha": "e28303aa064b3a4fdbe5698bc323e43306b7ab74",
+    "repository": "centerforaisafety/HarmBench",
+    "revision": "8e1604d1171fe8a48d8febecd22f600e462bdcdd"
+  },
+  "status": "E1C_PROMPT_SOURCE_FREEZE_V2_FAIL",
+  "text_section_execution": {
+    "classifier_path": "cais/HarmBench-Mistral-7b-val-cls",
+    "effective_prompt": {
+      "canonical_family_sha256": "21b308f9f5b4cbb27fc6cd63e1e014b38ffe900320bfcd7efb290516568e628f",
+      "field_names": [
+        "description",
+        "prompt",
+        "prompt_contextual",
+        "prompt_multimodal"
+      ],
+      "prompt_contextual_length": 1384,
+      "prompt_contextual_sha256": "df32d8fa50fe36817f2fb4ee38aa3c36a3b2726c71e30769ae26ea8a8104f16f",
+      "prompt_length": 1342,
+      "prompt_sha256": "c1c47e30cc03e00197f1d12be25296fc3150969bb3ddb058bfd9f550e0d66f81",
+      "raw_prompt_recorded": false
+    },
+    "effective_prompt_family": "MISTRAL_CLS_PROMPT",
+    "loaded_model_argument": "cais/HarmBench-Llama-2-13b-cls",
+    "max_tokens": 1,
+    "model_prompt_family_mismatch": true,
+    "target_cell_execution_count": 5,
+    "target_cell_index": 4,
+    "temperature": 0.0,
+    "test_classifier_path": "cais/HarmBench-Llama-2-13b-cls",
+    "val_classifier_path": "cais/HarmBench-Mistral-7b-val-cls"
+  },
+  "v1_resolution": {
+    "failure_class": "CROSS_SECTION_LAST_ASSIGNMENT_OVERWRITE",
+    "live_predictions_observed_before_resolution": false,
+    "scientific_contract_changed": false,
+    "v1_result_preserved": true
+  },
+  "validation": {
+    "behavior_count": 301,
+    "cached_label_counts": {
+      "0": 292,
+      "1": 310
+    },
+    "cached_prediction_count": 602,
+    "invalid_cached_prediction_count": 0,
+    "raw_validation_text_recorded": false,
+    "record_count": 602
+  },
+  "wavelet_used": false
+}
