@@ -75,9 +75,9 @@ jobs:
               "created_at": selected.get("created_at"),
               "updated_at": selected.get("updated_at"),
               "html_url": selected.get("html_url"),
-              "paper_validity": false,
-              "harmbench_live_predictions_generated_by_probe": false,
-              "new_attack_outputs_generated_by_probe": false
+              "paper_validity": False,
+              "harmbench_live_predictions_generated_by_probe": False,
+              "new_attack_outputs_generated_by_probe": False,
           }
           Path(os.environ["OUTPUT"]).write_text(
               json.dumps(safe, indent=2, sort_keys=True) + "\n",
