@@ -43,6 +43,42 @@ jobs:
           ref: agent/programmatic-agentharm-pivot
           fetch-depth: 0
 
+      - name: Record active run checkpoint
+        run: |
+          mkdir -p "$DATA_DIR"
+          jq -n \
+            --arg source_head "$GITHUB_SHA" \
+            --arg workflow "$GITHUB_WORKFLOW" \
+            --argjson run_id "$GITHUB_RUN_ID" \
+            --argjson run_number "$GITHUB_RUN_NUMBER" \
+            --argjson run_attempt "$GITHUB_RUN_ATTEMPT" \
+            '{
+              schema_version: "e0-autodan-qwen-adapter-active-run-v1",
+              status: "E0_AUTODAN_QWEN_ADAPTER_SMOKE_IN_PROGRESS",
+              paper_validity: false,
+              source_head_sha: $source_head,
+              workflow: $workflow,
+              workflow_run_id: $run_id,
+              workflow_run_number: $run_number,
+              workflow_run_attempt: $run_attempt,
+              scientific_contract_changed: false,
+              real_harmful_payload_used: false,
+              target_model_weights_downloaded: false,
+              target_model_called: false,
+              target_model_generation_performed: false,
+              cross_regime_stage_a_opened: false,
+              causal_oracle_opened: false,
+              wavelet_used: false,
+              next_authorized_operation: "COMPLETE_OR_DIAGNOSE_THIS_SYNTHETIC_ADAPTER_SMOKE"
+            }' > "$DATA_DIR/autodan_qwen_adapter_active_run.safe.json"
+          git config user.name 'Taewook-git'
+          git config user.email 'lkhd3329@naver.com'
+          git add "$DATA_DIR/autodan_qwen_adapter_active_run.safe.json"
+          if ! git diff --cached --quiet; then
+            git commit -m 'Record active AutoDAN Qwen adapter smoke run'
+            git push origin HEAD:agent/programmatic-agentharm-pivot
+          fi
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
