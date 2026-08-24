@@ -10,7 +10,7 @@ on:
 
 permissions:
   actions: read
-  contents: read
+  contents: write
   issues: write
 
 concurrency:
@@ -26,6 +26,7 @@ jobs:
       TARGET_BRANCH: agent/programmatic-agentharm-pivot
       TARGET_TRIGGER_SHA: bdf26570ff835498cb9dc85b40eaf379a1080a12
       PR_NUMBER: "4"
+      STATUS_PATH: data/natural_language_localization/evaluator_panel_v1/e1b_status_probe.safe.json
     steps:
       - name: Resolve and record latest hardened E1B run
         env:
@@ -72,6 +73,66 @@ jobs:
             | join("\n")
           ' <<<"$jobs_json")"
 
+          status_json="$(jq -n \
+            --argjson run "$run_json" \
+            --argjson jobs "$jobs_json" \
+            --arg expected_sha "$TARGET_TRIGGER_SHA" \
+            --arg recorded_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" '
+            {
+              schema_version: "e1b-status-probe-safe-v1",
+              recorded_at: $recorded_at,
+              expected_trigger_sha: $expected_sha,
+              run: {
+                id: $run.id,
+                workflow_name: $run.name,
+                event: $run.event,
+                head_sha: $run.head_sha,
+                status: $run.status,
+                conclusion: $run.conclusion,
+                created_at: $run.created_at,
+                updated_at: $run.updated_at,
+                html_url: $run.html_url,
+                run_number: $run.run_number,
+                run_attempt: $run.run_attempt
+              },
+              jobs: [
+                $jobs.jobs[] | {
+                  id,
+                  name,
+                  status,
+                  conclusion,
+                  started_at,
+                  completed_at,
+                  steps: [.steps[]? | {name, status, conclusion, number}]
+                }
+              ],
+              scientific_contract_changed: false,
+              target_outputs_opened_by_probe: false,
+              causal_oracle_opened_by_probe: false,
+              wavelet_used_by_probe: false
+            }
+          ')"
+
+          encoded="$(printf '%s\n' "$status_json" | base64 -w0)"
+          current_sha="$(gh api \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "repos/${GITHUB_REPOSITORY}/contents/${STATUS_PATH}?ref=${TARGET_BRANCH}" \
+            --jq '.sha' 2>/dev/null || true)"
+          api_args=(
+            --method PUT
+            -H 'Accept: application/vnd.github+json'
+            -H 'X-GitHub-Api-Version: 2022-11-28'
+            "repos/${GITHUB_REPOSITORY}/contents/${STATUS_PATH}"
+            -f message="Record E1B status probe for run ${run_id}"
+            -f content="$encoded"
+            -f branch="$TARGET_BRANCH"
+          )
+          if [[ -n "$current_sha" ]]; then
+            api_args+=( -f sha="$current_sha" )
+          fi
+          gh api "${api_args[@]}" >/dev/null
+
           marker='<!-- e1b-status-probe -->'
           body="${marker}
           ## E1B hardened-run status probe
@@ -84,6 +145,7 @@ jobs:
           - conclusion: **${conclusion}**
           - created: \`${created_at}\`
           - last updated: \`${updated_at}\`
+          - safe status record: \`${STATUS_PATH}\`
 
           ### Jobs
           ${job_summary}
