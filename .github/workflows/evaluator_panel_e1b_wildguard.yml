@@ -1,5 +1,6 @@
 name: evaluator-panel-e1b-wildguard
 
+# Execution wrapper stabilized after E1B preflight/safe-boundary repair.
 on:
   pull_request:
     branches:
