@@ -1,0 +1,48 @@
+{
+  "schema_version": "cross-regime-e0-preopen-safe-v1",
+  "status": "E0_PROVENANCE_MATRIX_RECORDED_BEFORE_TARGET_OUTCOMES",
+  "recorded_at": "2026-08-24T16:00:00+09:00",
+  "paper_validity": false,
+  "source_documents": {
+    "scope": "docs/JAILBREAK_ATTACK_REGIME_SCOPE_V2.md",
+    "causal_method": "docs/CAUSAL_INPUT_TOPOLOGY_METHOD_V1.md",
+    "provenance_audit": "docs/E0_ATTACK_FAMILY_PROVENANCE_AUDIT_V1.md",
+    "executable_contract": "configs/natural_language_localization/e0_attack_family_provenance_v1.json"
+  },
+  "provisional_matrix": {
+    "S": [
+      "h4rm3l",
+      "DeepInception"
+    ],
+    "F": [
+      "AutoDAN",
+      "AdvPrompter"
+    ],
+    "U": [
+      "GCG",
+      "AmpleGCG"
+    ]
+  },
+  "conditional_candidates": [
+    "AdvPrompter",
+    "AmpleGCG"
+  ],
+  "blocked_or_sensitivity_candidates": [
+    "BEAST",
+    "AttnGCG",
+    "I_GCG",
+    "SlotGCG"
+  ],
+  "target_model_outputs_observed_for_e0_selection": false,
+  "real_harmful_attack_outputs_generated_during_e0": false,
+  "family_selection_used_attack_success": false,
+  "thresholds_changed_after_outputs": false,
+  "legacy_semantic_stage_a_opened": false,
+  "cross_regime_stage_a_opened": false,
+  "prior_evaluation_opened": false,
+  "heldout_opened": false,
+  "causal_oracle_opened": false,
+  "keep_only_oracle_opened": false,
+  "wavelet_used": false,
+  "next_authorized_operation": "RUN_STATIC_SOURCE_ADAPTER_PAYLOAD_AND_BUDGET_AUDIT_ON_SYNTHETIC_PLACEHOLDERS_ONLY"
+}
