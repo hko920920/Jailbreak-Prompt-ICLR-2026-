@@ -1,5 +1,6 @@
 name: e0-gcg-static-adapter-audit
 
+# User-triggered rerun after formatting-only implementation repair.
 on:
   push:
     branches:
