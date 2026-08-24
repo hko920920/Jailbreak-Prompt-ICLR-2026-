@@ -1,0 +1,227 @@
+name: e0-autodan-qwen-adapter-smoke
+
+on:
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/e0_autodan_qwen_adapter_smoke.yml
+      - configs/natural_language_localization/e0_autodan_qwen_adapter_smoke_v1.json
+      - docs/E0_AUTODAN_QWEN_ADAPTER_SMOKE_V1.md
+      - scripts/run_e0_autodan_qwen_adapter_smoke.py
+      - tests/test_e0_autodan_qwen_adapter_smoke.py
+      - data/natural_language_localization/e0_attack_family_provenance_v1/autodan_static_audit.safe.json
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: e0-autodan-qwen-adapter-smoke
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      CONFIG: configs/natural_language_localization/e0_autodan_qwen_adapter_smoke_v1.json
+      OUTPUT: artifacts/e0-autodan-qwen-adapter/safe/autodan_qwen_adapter_smoke.safe.json
+      DATA_DIR: data/natural_language_localization/e0_attack_family_provenance_v1
+      AUTODAN_REPOSITORY: https://github.com/SheltonLiu-N/AutoDAN.git
+      AUTODAN_REVISION: 34062e964185693e81a6775b4f0d00bfd7507612
+      AUTODAN_TREE: 39ceba6f45e5dec17db8d3099d7281f8673ceb14
+      TOKENIZER_REPOSITORY: Qwen/Qwen2.5-7B-Instruct
+      TOKENIZER_REVISION: a09a35458c702b33eeacc393d103063234e8bc28
+      TRANSFORMERS_VERSION: 4.57.6
+      HUGGINGFACE_HUB_VERSION: 0.36.2
+      HF_HOME: ${{ github.workspace }}/.hf-autodan-qwen-adapter
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/programmatic-agentharm-pivot
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install and validate frozen adapter smoke
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev]'
+          python -m pip install \
+            "transformers==$TRANSFORMERS_VERSION" \
+            "huggingface_hub==$HUGGINGFACE_HUB_VERSION"
+          ruff check \
+            scripts/run_e0_autodan_qwen_adapter_smoke.py \
+            tests/test_e0_autodan_qwen_adapter_smoke.py
+          pytest -q tests/test_e0_autodan_qwen_adapter_smoke.py
+          python -m json.tool "$CONFIG" >/dev/null
+          git diff --check
+
+      - name: Verify predecessor and fetch pinned AutoDAN source
+        run: |
+          source_root="$RUNNER_TEMP/autodan-source"
+          git init -q "$source_root"
+          git -C "$source_root" remote add origin "$AUTODAN_REPOSITORY"
+          git -C "$source_root" fetch -q --depth 1 origin "$AUTODAN_REVISION"
+          git -C "$source_root" checkout -q --detach FETCH_HEAD
+          test "$(git -C "$source_root" rev-parse HEAD)" = "$AUTODAN_REVISION"
+          test "$(git -C "$source_root" rev-parse HEAD^{tree})" = "$AUTODAN_TREE"
+          echo "AUTODAN_SOURCE_ROOT=$source_root" >> "$GITHUB_ENV"
+
+      - name: Download pinned Qwen tokenizer-only snapshot
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          from huggingface_hub import HfApi, snapshot_download
+
+          config = json.loads(Path(os.environ["CONFIG"]).read_text())
+          target = config["target_tokenizer"]
+          assert target["repository"] == os.environ["TOKENIZER_REPOSITORY"]
+          assert target["revision"] == os.environ["TOKENIZER_REVISION"]
+          info = HfApi(token=os.environ.get("HF_TOKEN") or None).model_info(
+              repo_id=target["repository"],
+              revision=target["revision"],
+          )
+          assert info.sha == target["revision"]
+          snapshot = snapshot_download(
+              repo_id=target["repository"],
+              revision=target["revision"],
+              allow_patterns=target["allow_patterns"],
+              token=os.environ.get("HF_TOKEN") or None,
+              cache_dir=Path(os.environ["HF_HOME"]),
+          )
+          snapshot_path = Path(snapshot)
+          for relative in target["allow_patterns"]:
+              assert (snapshot_path / relative).is_file(), relative
+          forbidden = list(snapshot_path.glob("*.safetensors"))
+          forbidden += list(snapshot_path.glob("pytorch_model*"))
+          assert not forbidden
+          with Path(os.environ["GITHUB_ENV"]).open("a") as handle:
+              handle.write(f"QWEN_TOKENIZER_DIR={snapshot_path}\n")
+          PY
+
+      - name: Run synthetic exact-placeholder and Qwen chat-template smoke
+        run: |
+          mkdir -p "$(dirname "$OUTPUT")"
+          python scripts/run_e0_autodan_qwen_adapter_smoke.py \
+            --root . \
+            --config "$CONFIG" \
+            --autodan-source "$AUTODAN_SOURCE_ROOT" \
+            --tokenizer-dir "$QWEN_TOKENIZER_DIR" \
+            --output "$OUTPUT"
+
+      - name: Verify conditional decision and sealed boundaries
+        run: |
+          test "$(jq -r '.status' "$OUTPUT")" = \
+            "E0_AUTODAN_QWEN_ADAPTER_SMOKE_PASS_REMAIN_CONDITIONAL"
+          test "$(jq -r '.operational_pass' "$OUTPUT")" = "true"
+          test "$(jq -r '.family_admitted_to_balanced_signal_screen' "$OUTPUT")" = \
+            "false"
+          test "$(jq -r '.target_tokenizer.is_fast' "$OUTPUT")" = "true"
+          test "$(jq -r '.target_tokenizer.model_weights_downloaded' "$OUTPUT")" = \
+            "false"
+          test "$(jq -r '.rendered_chat.payload_token_interval.nonempty' \
+            "$OUTPUT")" = "true"
+          test "$(jq -r '.rendered_chat.payload_token_interval.contiguous' \
+            "$OUTPUT")" = "true"
+          test "$(jq -r '.rendered_chat.payload_token_interval.covers_character_span' \
+            "$OUTPUT")" = "true"
+          test "$(jq -r '.real_harmful_payload_used' "$OUTPUT")" = "false"
+          test "$(jq -r '.target_model_called' "$OUTPUT")" = "false"
+          test "$(jq -r '.target_model_generation_performed' "$OUTPUT")" = "false"
+          test "$(jq -r '.cross_regime_stage_a_opened' "$OUTPUT")" = "false"
+          test "$(jq -r '.causal_oracle_opened' "$OUTPUT")" = "false"
+          test "$(jq -r '.wavelet_used' "$OUTPUT")" = "false"
+
+      - name: Publish safe summary
+        run: |
+          {
+            echo "# E0 AutoDAN-to-Qwen adapter smoke"
+            echo
+            echo "- status: **$(jq -r '.status' "$OUTPUT")**"
+            echo "- adapter smoke pass: **$(jq -r '.operational_pass' "$OUTPUT")**"
+            echo "- Qwen tokenizer class: **$(jq -r '.target_tokenizer.tokenizer_class' \
+              "$OUTPUT")**"
+            echo "- payload token interval size: **$(jq -r \
+              '.rendered_chat.payload_token_interval.count' "$OUTPUT")**"
+            echo "- admitted to signal screen: **false**"
+            echo "- model weights / generation: **not downloaded / not performed**"
+            echo "- Stage A / causal oracle / wavelet: **closed / closed / closed**"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload safe adapter artifact
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: e0-autodan-qwen-adapter-smoke-safe
+          path: artifacts/e0-autodan-qwen-adapter/safe
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Commit immutable safe result and execution record
+        env:
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+          ARTIFACT_DIGEST: ${{ steps.upload.outputs.artifact-digest }}
+          ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
+        run: |
+          mkdir -p "$DATA_DIR"
+          cp "$OUTPUT" "$DATA_DIR/autodan_qwen_adapter_smoke.safe.json"
+          result_sha="$(sha256sum "$OUTPUT" | cut -d' ' -f1)"
+          jq -n \
+            --arg source_head "$GITHUB_SHA" \
+            --arg workflow "$GITHUB_WORKFLOW" \
+            --argjson run_id "$GITHUB_RUN_ID" \
+            --argjson run_number "$GITHUB_RUN_NUMBER" \
+            --argjson run_attempt "$GITHUB_RUN_ATTEMPT" \
+            --arg artifact_id "$ARTIFACT_ID" \
+            --arg artifact_digest "$ARTIFACT_DIGEST" \
+            --arg artifact_url "$ARTIFACT_URL" \
+            --arg result_sha256 "$result_sha" \
+            '{
+              schema_version: "e0-autodan-qwen-adapter-smoke-execution-v1",
+              status: "E0_AUTODAN_QWEN_ADAPTER_SMOKE_EXECUTION_RECORDED",
+              paper_validity: false,
+              source_head_sha: $source_head,
+              workflow: $workflow,
+              workflow_run_id: $run_id,
+              workflow_run_number: $run_number,
+              workflow_run_attempt: $run_attempt,
+              artifact_id: $artifact_id,
+              artifact_digest: $artifact_digest,
+              artifact_url: $artifact_url,
+              safe_result_sha256: $result_sha256,
+              decision: "E0_AUTODAN_QWEN_ADAPTER_SMOKE_PASS_REMAIN_CONDITIONAL",
+              family_admitted_to_balanced_signal_screen: false,
+              real_harmful_payload_used: false,
+              target_model_weights_downloaded: false,
+              target_model_called: false,
+              target_model_generation_performed: false,
+              cross_regime_stage_a_opened: false,
+              causal_oracle_opened: false,
+              wavelet_used: false,
+              next_authorized_operation: "FREEZE_AUTODAN_ARTIFACT_OR_REGENERATION_ROUTE_AND_MUTATION_PAYLOAD_PROTECTION"
+            }' > "$DATA_DIR/autodan_qwen_adapter_smoke_execution.safe.json"
+
+          git config user.name 'Taewook-git'
+          git config user.email 'lkhd3329@naver.com'
+          git add \
+            "$DATA_DIR/autodan_qwen_adapter_smoke.safe.json" \
+            "$DATA_DIR/autodan_qwen_adapter_smoke_execution.safe.json"
+          if git diff --cached --quiet; then
+            echo 'Safe AutoDAN Qwen adapter records already match.'
+            exit 0
+          fi
+          git commit -m 'Record AutoDAN Qwen adapter smoke result'
+          git pull --rebase origin agent/programmatic-agentharm-pivot
+          git push origin HEAD:agent/programmatic-agentharm-pivot
+
+      - name: Remove tokenizer cache
+        if: always()
+        run: rm -rf "$HF_HOME"
