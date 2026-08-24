@@ -1,0 +1,121 @@
+name: e0-autodan-static-adapter-audit
+
+on:
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/e0_autodan_static_adapter_audit.yml
+      - configs/natural_language_localization/e0_autodan_static_audit_v1.json
+      - docs/E0_AUTODAN_STATIC_ADAPTER_AUDIT_V1.md
+      - scripts/run_e0_autodan_static_audit.py
+      - tests/test_e0_autodan_static_audit.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e0-autodan-static-adapter-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      CONFIG: configs/natural_language_localization/e0_autodan_static_audit_v1.json
+      OUTPUT: artifacts/e0-autodan-static/safe/autodan_static_audit.safe.json
+      AUTODAN_REPOSITORY: https://github.com/SheltonLiu-N/AutoDAN.git
+      AUTODAN_REVISION: 34062e964185693e81a6775b4f0d00bfd7507612
+      AUTODAN_TREE: 39ceba6f45e5dec17db8d3099d7281f8673ceb14
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate frozen audit implementation
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev]'
+          ruff check \
+            scripts/run_e0_autodan_static_audit.py \
+            tests/test_e0_autodan_static_audit.py
+          pytest -q tests/test_e0_autodan_static_audit.py
+          python -m json.tool "$CONFIG" >/dev/null
+          git diff --check
+
+      - name: Fetch and verify pinned AutoDAN source
+        run: |
+          source_root="$RUNNER_TEMP/autodan-source"
+          git init -q "$source_root"
+          git -C "$source_root" remote add origin "$AUTODAN_REPOSITORY"
+          git -C "$source_root" fetch -q --depth 1 origin "$AUTODAN_REVISION"
+          git -C "$source_root" checkout -q --detach FETCH_HEAD
+          test "$(git -C "$source_root" rev-parse HEAD)" = "$AUTODAN_REVISION"
+          test "$(git -C "$source_root" rev-parse HEAD^{tree})" = "$AUTODAN_TREE"
+          echo "AUTODAN_SOURCE_ROOT=$source_root" >> "$GITHUB_ENV"
+
+      - name: Run synthetic-only static adapter audit
+        run: |
+          mkdir -p "$(dirname "$OUTPUT")"
+          python scripts/run_e0_autodan_static_audit.py \
+            --config "$CONFIG" \
+            --source-root "$AUTODAN_SOURCE_ROOT" \
+            --output "$OUTPUT"
+
+      - name: Verify conditional decision and sealed boundaries
+        run: |
+          test "$(jq -r '.status' "$OUTPUT")" = \
+            "E0_AUTODAN_STATIC_AUDIT_CONDITIONAL_ADVANCE"
+          test "$(jq -r '.operational_pass' "$OUTPUT")" = "true"
+          test "$(jq -r '.family_admitted_to_balanced_signal_screen' "$OUTPUT")" = \
+            "false"
+          test "$(jq -r '.real_harmful_payload_used' "$OUTPUT")" = "false"
+          test "$(jq -r '.target_model_called' "$OUTPUT")" = "false"
+          test "$(jq -r '.binary_artifact_deserialized' "$OUTPUT")" = "false"
+          test "$(jq -r '.cross_regime_stage_a_opened' "$OUTPUT")" = "false"
+          test "$(jq -r '.causal_oracle_opened' "$OUTPUT")" = "false"
+          test "$(jq -r '.wavelet_used' "$OUTPUT")" = "false"
+          test "$(jq -r '.materialization.official_route.byte_invariant' \
+            "$OUTPUT")" = "false"
+          test "$(jq -r \
+            '.materialization.exact_placeholder_adapter.payload_preserved' \
+            "$OUTPUT")" = "true"
+
+      - name: Publish safe summary
+        if: always()
+        run: |
+          if [ -f "$OUTPUT" ]; then
+            {
+              echo "# E0 AutoDAN static adapter audit"
+              echo
+              echo "- status: **$(jq -r '.status' "$OUTPUT")**"
+              echo "- audit pass: **$(jq -r '.operational_pass' "$OUTPUT")**"
+              echo "- admitted to signal screen: **false**"
+              echo "- official byte-invariant payload route: **false**"
+              echo "- exact-placeholder adapter string test: **$(jq -r \
+                '.materialization.exact_placeholder_adapter.payload_preserved' \
+                "$OUTPUT")**"
+              echo "- blocker count: **$(jq '.blockers_before_admission | length' \
+                "$OUTPUT")**"
+              echo "- target model called: **false**"
+              echo "- Stage A / causal oracle / wavelet: **closed / closed / closed**"
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Safe audit result was not produced." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload safe audit artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e0-autodan-static-adapter-audit-safe
+          path: artifacts/e0-autodan-static/safe
+          if-no-files-found: warn
+          retention-days: 30
