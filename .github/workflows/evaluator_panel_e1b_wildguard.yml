@@ -1,8 +1,9 @@
 name: evaluator-panel-e1b-wildguard
 
-# Execute only when the active E1B files change on the research branch.  The
+# Execute only when the active E1B files change on the research branch. The
 # former pull_request trigger re-ran every expensive historical workflow on
 # each synchronization because the PR carries a large cumulative diff.
+# Terminal-path workflows were archived in commit 4c5f427 before this run.
 on:
   push:
     branches:
