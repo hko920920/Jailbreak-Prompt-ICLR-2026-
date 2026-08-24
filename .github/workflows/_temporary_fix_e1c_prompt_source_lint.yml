@@ -35,29 +35,41 @@ jobs:
 
           script = Path("scripts/run_evaluator_panel_e1c_prompt_source_freeze.py")
           script_text = script.read_text(encoding="utf-8")
-          old_script = '    framed = f"blob {len(payload)}\\0".encode("utf-8") + payload\n'
+          old_script = (
+              '    framed = f"blob {len(payload)}\\0".encode("utf-8") + payload\n'
+          )
           new_script = '    framed = f"blob {len(payload)}\\0".encode() + payload\n'
           if script_text.count(old_script) != 1:
               raise SystemExit("expected one script lint target")
-          script.write_text(script_text.replace(old_script, new_script), encoding="utf-8")
+          script.write_text(
+              script_text.replace(old_script, new_script),
+              encoding="utf-8",
+          )
 
           test = Path("tests/test_evaluator_panel_e1c_prompt_source_freeze.py")
           test_text = test.read_text(encoding="utf-8")
-          old_test = '''LLAMA2_CLS_PROMPT = {"prompt": "llama {behavior} {generation}", "prompt_contextual": "llama contextual"}
-MISTRAL_CLS_PROMPT = {"prompt": "mistral {behavior} {generation}", "prompt_contextual": "mistral contextual"}
-'''
-          new_test = '''LLAMA2_CLS_PROMPT = {
-    "prompt": "llama {behavior} {generation}",
-    "prompt_contextual": "llama contextual",
-}
-MISTRAL_CLS_PROMPT = {
-    "prompt": "mistral {behavior} {generation}",
-    "prompt_contextual": "mistral contextual",
-}
-'''
+          old_test = (
+              'LLAMA2_CLS_PROMPT = {"prompt": "llama {behavior} {generation}", '
+              '"prompt_contextual": "llama contextual"}\n'
+              'MISTRAL_CLS_PROMPT = {"prompt": "mistral {behavior} {generation}", '
+              '"prompt_contextual": "mistral contextual"}\n'
+          )
+          new_test = (
+              'LLAMA2_CLS_PROMPT = {\n'
+              '    "prompt": "llama {behavior} {generation}",\n'
+              '    "prompt_contextual": "llama contextual",\n'
+              '}\n'
+              'MISTRAL_CLS_PROMPT = {\n'
+              '    "prompt": "mistral {behavior} {generation}",\n'
+              '    "prompt_contextual": "mistral contextual",\n'
+              '}\n'
+          )
           if test_text.count(old_test) != 1:
               raise SystemExit("expected one synthetic prompt lint target")
-          test.write_text(test_text.replace(old_test, new_test), encoding="utf-8")
+          test.write_text(
+              test_text.replace(old_test, new_test),
+              encoding="utf-8",
+          )
           PY
 
       - name: Validate complete correction
