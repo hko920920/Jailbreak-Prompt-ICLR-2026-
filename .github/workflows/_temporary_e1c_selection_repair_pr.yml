@@ -1,0 +1,97 @@
+name: temporary-e1c-selection-repair-pr
+
+on:
+  pull_request:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - .github/workflows/_temporary_e1c_selection_repair_pr.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: temporary-e1c-selection-repair-pr
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      HARM_BENCH_REVISION: 8e1604d1171fe8a48d8febecd22f600e462bdcdd
+      SOURCE_ROOT: upstream/HarmBench
+      CONFIG: configs/natural_language_localization/evaluator_panel_e1c_selection_repair_v1.json
+      SAFE_DIR: artifacts/evaluator-panel-e1c-selection-repair/safe
+      SAFE_RESULT: artifacts/evaluator-panel-e1c-selection-repair/safe/e1c_selection_repair.safe.json
+      SAFE_SELECTION: artifacts/evaluator-panel-e1c-selection-repair/safe/e1c_harmbench_selection_v2.safe.jsonl
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/checkout@v4
+        with:
+          repository: centerforaisafety/HarmBench
+          ref: ${{ env.HARM_BENCH_REVISION }}
+          path: ${{ env.SOURCE_ROOT }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate frozen implementation
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'pytest>=8.2' 'ruff>=0.6'
+          ruff check \
+            scripts/run_evaluator_panel_e1c_selection_repair.py \
+            tests/test_evaluator_panel_e1c_selection_repair.py
+          python -m pytest -q tests/test_evaluator_panel_e1c_selection_repair.py
+          python -m json.tool "$CONFIG" >/dev/null
+          git diff --check
+
+      - name: Verify immutable upstream checkout
+        run: |
+          test "$(git -C "$SOURCE_ROOT" rev-parse HEAD)" = "$HARM_BENCH_REVISION"
+
+      - name: Execute static selection repair
+        run: |
+          mkdir -p "$SAFE_DIR"
+          python scripts/run_evaluator_panel_e1c_selection_repair.py \
+            --root . \
+            --source-root "$SOURCE_ROOT" \
+            --config "$CONFIG" \
+            --safe-output "$SAFE_RESULT" \
+            --selection-output "$SAFE_SELECTION"
+
+      - name: Verify pass and sealed boundary
+        run: |
+          test "$(jq -r '.status' "$SAFE_RESULT")" = "E1C_SELECTION_REPAIR_PASS"
+          test "$(jq -r '.operational_pass' "$SAFE_RESULT")" = "true"
+          test "$(jq -r '.old_selection.missing_registry_row_count' "$SAFE_RESULT")" = "3"
+          test "$(jq -r '.new_selection.record_count' "$SAFE_RESULT")" = "200"
+          test "$(jq -r '.new_selection.label_counts["0"]' "$SAFE_RESULT")" = "100"
+          test "$(jq -r '.new_selection.label_counts["1"]' "$SAFE_RESULT")" = "100"
+          test "$(jq -r '.new_selection.dropped_record_count' "$SAFE_RESULT")" = "3"
+          test "$(jq -r '.new_selection.added_record_count' "$SAFE_RESULT")" = "3"
+          test "$(jq -r '.new_selection.missing_registry_row_count' "$SAFE_RESULT")" = "0"
+          test "$(jq -r '.model_inference_performed' "$SAFE_RESULT")" = "false"
+          test "$(jq -r '.harmbench_live_predictions_generated' "$SAFE_RESULT")" = "false"
+          test "$(jq -r '.cross_regime_stage_a_opened' "$SAFE_RESULT")" = "false"
+          test "$(jq -r '.causal_oracle_opened' "$SAFE_RESULT")" = "false"
+          test "$(jq -r '.wavelet_used' "$SAFE_RESULT")" = "false"
+          test "$(wc -l < "$SAFE_SELECTION")" = "200"
+
+      - name: Upload safe repair artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evaluator-panel-e1c-selection-repair-safe
+          path: ${{ env.SAFE_DIR }}
+          if-no-files-found: error
+          retention-days: 30
