@@ -1,0 +1,24 @@
+{
+  "canary_request_count": 24,
+  "causal_oracle_opened": false,
+  "expected_total_request_count": 448,
+  "full_request_count": 400,
+  "label_counts": {
+    "0": 100,
+    "1": 100
+  },
+  "model_inference_performed": false,
+  "raw_text_recorded": false,
+  "record_ids_sha256": "c02d697f27c6507691f55d2eaff63b760da0b6bce33f5756279b53d2a433979b",
+  "repeat_record_ids_sha256": "c4df3cf16fca995823cc2a35d37b31d7fbc02d89e03e66c0a9ea47c29c6038f2",
+  "repeatability_request_count": 24,
+  "request_modes": [
+    "raw_official_template",
+    "hardened_production_template"
+  ],
+  "schema_version": "e1c-harmbench-live-design-safe-v1",
+  "selection_count": 200,
+  "stage_a_opened": false,
+  "status": "E1C_HARMBENCH_LIVE_REQUESTS_PREPARED",
+  "wavelet_used": false
+}

@@ -1,0 +1,23 @@
+{
+  "causal_oracle_opened": false,
+  "event": "push",
+  "head_sha_at_start": "6815b524ccee4d0a09c807f6c71ce6519c7e562f",
+  "heldout_opened": false,
+  "keep_only_oracle_opened": false,
+  "new_harmful_attack_outputs_generated": false,
+  "next_authorized_operation": "REPAIR_RUNTIME_ONLY_WITH_FROZEN_MODEL_DATA_PROMPT_AND_THRESHOLDS",
+  "operational_pass": false,
+  "paper_validity": false,
+  "raw_text_recorded": false,
+  "result_sha256": "4a8faa774f9946598322ca22066369c2477459d789c3cf04d3e1d814cd1853f6",
+  "run_attempt": 1,
+  "run_id": 32822371869,
+  "safe_file_count": 3,
+  "safe_file_manifest_sha256": "9deb5ff63cfea39f7412f5d2a48de8fff3b325d28525a1e38790be6b83b29fc8",
+  "schema_version": "e1c-harmbench-live-run-safe-v1",
+  "scientific_pass": false,
+  "stage_a_opened": false,
+  "terminal_status": "E1C_HARMBENCH_COMPONENT_OPERATIONAL_FAIL",
+  "wavelet_used": false,
+  "workflow": "evaluator-panel-e1c-harmbench-live"
+}
