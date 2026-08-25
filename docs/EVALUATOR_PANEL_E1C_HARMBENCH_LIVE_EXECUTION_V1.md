@@ -99,3 +99,7 @@ The step keeps all of the following closed:
 
 The frozen live workflow was explicitly triggered after the one-shot installer, lint,
 and predecessor-identity checks completed successfully. No scientific parameter changed.
+
+The workflow was retriggered after the obsolete bundle-based installer was removed. The
+model, source revision, 200-record selection, request matrix, thresholds, parser, and
+all sealed research boundaries remain unchanged.
