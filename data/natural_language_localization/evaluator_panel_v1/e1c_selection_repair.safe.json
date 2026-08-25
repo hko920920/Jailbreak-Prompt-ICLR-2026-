@@ -1,0 +1,110 @@
+{
+  "causal_oracle_opened": false,
+  "checks": {
+    "added_count_matches": true,
+    "dropped_count_matches": true,
+    "new_count_matches": true,
+    "new_ids_unique": true,
+    "new_labels_match": true,
+    "new_rows_resolve": true,
+    "new_selection_deterministic": true,
+    "no_live_predictions": true,
+    "no_model_inference": true,
+    "no_model_weight_download": true,
+    "old_count_matches": true,
+    "old_identity_matches": true,
+    "old_labels_match": true,
+    "old_missing_count_matches": true,
+    "old_missing_hashes_match": true,
+    "source_files_match": true,
+    "source_tree_matches": true
+  },
+  "contract_sha256": "7bd063d2a5a499d3dd01d28f8e70c5fabc9341c9d6f9b81ca5c8c5bca6a29271",
+  "cross_regime_stage_a_opened": false,
+  "evidence_class": "DEVELOPMENT",
+  "harmbench_live_predictions_generated": false,
+  "keep_only_oracle_opened": false,
+  "model_inference_performed": false,
+  "model_weight_downloaded": false,
+  "new_harmful_attack_outputs_generated": false,
+  "new_selection": {
+    "added_record_count": 3,
+    "added_record_ids_sha256": "772d46e41130090105e2ac18075bc4edb61a074ce3558112a3da9983831ce790",
+    "behavior_count": 166,
+    "deterministic": true,
+    "dropped_record_count": 3,
+    "dropped_record_ids_sha256": "174a22aa544c9530156bc5448c86186d7a2e647cbc67bd969d9537275ee0a0e0",
+    "label_counts": {
+      "0": 100,
+      "1": 100
+    },
+    "missing_registry_row_count": 0,
+    "raw_records_recorded": false,
+    "record_count": 200,
+    "record_ids_sha256": "c02d697f27c6507691f55d2eaff63b760da0b6bce33f5756279b53d2a433979b",
+    "safe_rows_sha256": "84acea4be52616456427fb92607322f074a9e3dc89cd4829b9037f2a846c3e7b"
+  },
+  "next_authorized_operation": "FREEZE_E1C_PROMPT_SOURCE_V3_WITH_REPAIRED_SELECTION",
+  "old_selection": {
+    "label_counts": {
+      "0": 100,
+      "1": 100
+    },
+    "missing_behavior_hashes": [
+      "92a817c9b39fdd90365f14dcf8b6d8a6b534a3da4b8fba05f4ffc3df485dbec4",
+      "9fb9eab22b6d645141ffe9e82733ec9ebb80237a539f1e81555cbdf7a2891751"
+    ],
+    "missing_registry_row_count": 3,
+    "raw_records_recorded": false,
+    "record_count": 200,
+    "record_ids_sha256": "8839e523fe353861a5ca69f7230f539e026044966867c8284251f750361b9356"
+  },
+  "operational_pass": true,
+  "paper_validity": false,
+  "predecessor_status": "E1C_PROMPT_SOURCE_FREEZE_V2_FAIL",
+  "registry": {
+    "multimodal_count": 110,
+    "raw_behavior_ids_or_text_recorded": false,
+    "resolvable_behavior_count": 400,
+    "text_count": 400
+  },
+  "schema_version": "evaluator-panel-e1c-selection-repair-result-v1",
+  "semantic_only_stage_a_opened": false,
+  "source": {
+    "expected_tree_sha": "e28303aa064b3a4fdbe5698bc323e43306b7ab74",
+    "files": [
+      {
+        "exists": true,
+        "expected_git_blob_sha": "d39d6c6b4ad68e37e60a408d3181791b49740221",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "d39d6c6b4ad68e37e60a408d3181791b49740221",
+        "path": "data/behavior_datasets/harmbench_behaviors_multimodal_all.csv",
+        "sha256": "0a4dd6bd0df2a52d1d9ee25f3d018af49b52b61ee2ccdaaac16b9660f753145d",
+        "size_bytes": 137713
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "8a6b423d85e9acdc168c57a6a957755cfa86c4cb",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "8a6b423d85e9acdc168c57a6a957755cfa86c4cb",
+        "path": "data/behavior_datasets/harmbench_behaviors_text_all.csv",
+        "sha256": "8d81accedd38eaaf8b760618622bb888417d1fd0c86eba65c427a16f1cbb4afc",
+        "size_bytes": 198850
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "3d7d0a98742a36b5c7824aadcea433e42a045022",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "3d7d0a98742a36b5c7824aadcea433e42a045022",
+        "path": "data/classifier_val_sets/text_behaviors_val_set.json",
+        "sha256": "e740727b6874e492063e097122a9916833d57f9bd2ce3e86713ec188741a41c8",
+        "size_bytes": 1875939
+      }
+    ],
+    "observed_tree_sha": "e28303aa064b3a4fdbe5698bc323e43306b7ab74",
+    "repository": "centerforaisafety/HarmBench",
+    "revision": "8e1604d1171fe8a48d8febecd22f600e462bdcdd"
+  },
+  "status": "E1C_SELECTION_REPAIR_PASS",
+  "wavelet_used": false
+}

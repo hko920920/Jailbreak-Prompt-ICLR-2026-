@@ -1,0 +1,58 @@
+{
+  "schema_version": "e0-h4rm3l-typed-units-execution-v1",
+  "status": "E0_H4RM3L_TYPED_UNITS_EXECUTION_RECORDED",
+  "paper_validity": false,
+  "contract_commit": "7e06a547c448d9af62d9fff2a128a70c1d0b6eb7",
+  "implementation_commit": "f88e7891cfaf4df700d61af27701f3661ffd6ad0",
+  "test_commit_initial": "810c18c9a9cbf1612f05295929d456d83378185a",
+  "test_commit_format_repair": "f5d6b153170c98ab5bf14b813c8c6bc2595a445e",
+  "workflow_path": ".github/workflows/e0_h4rm3l_typed_units.yml",
+  "first_run": {
+    "run_id": 32704075456,
+    "job_id": 97361380864,
+    "conclusion": "failure",
+    "failure_class": "STATIC_LINT_ONLY",
+    "scientific_execution_started": false,
+    "contract_or_threshold_changed_after_failure": false,
+    "details": [
+      "one E501 line-length violation in the unit test"
+    ]
+  },
+  "successful_run": {
+    "run_id": 32704273253,
+    "job_id": 97361967922,
+    "source_head": "f5d6b153170c98ab5bf14b813c8c6bc2595a445e",
+    "conclusion": "success",
+    "artifact_id": 9511655110,
+    "artifact_name": "e0-h4rm3l-typed-units-safe",
+    "artifact_sha256": "73ae13754162b9727b0e41097bf2e2a45214ca525a5fd18a8ada50df86f00461",
+    "full_result_sha256": "6405343e23df8ae57e4f06e82e0a0ccd7b181fe246d6a51802814b31847af2ae"
+  },
+  "result_summary": {
+    "operational_pass": true,
+    "programs_passed": 3,
+    "programs_total": 3,
+    "typed_component_count": 7,
+    "nonempty_subset_count": 13,
+    "neutralizer_count": 2,
+    "neutralized_variants_passed": 26,
+    "neutralized_variants_total": 26,
+    "manifest_partition_failures": 0,
+    "payload_occurrence_failures": 0,
+    "length_rule_failures": 0,
+    "model_prompting_attempted": false,
+    "target_model_called": false,
+    "real_harmful_payload_used": false,
+    "raw_fragment_or_prompt_text_committed": false
+  },
+  "scientific_interpretation": "For the audited synthetic h4rm3l compositions, ordered decorator calls can be converted into a complete typed fragment manifest, and every component subset can be neutralized by deletion and layout-preserving blanking without changing the unique payload. This is intervention-admission evidence only, not jailbreak-success or causal-recovery evidence.",
+  "next_authorized_operation": "E0_H4RM3L_REAL_TEMPLATE_PAYLOAD_INVARIANCE_AUDIT_WITH_SYNTHETIC_SENTINEL_ONLY",
+  "sealed_boundaries": {
+    "cross_regime_stage_a_opened": false,
+    "prior_evaluation_opened": false,
+    "heldout_opened": false,
+    "causal_oracle_opened": false,
+    "keep_only_oracle_opened": false,
+    "wavelet_used": false
+  }
+}

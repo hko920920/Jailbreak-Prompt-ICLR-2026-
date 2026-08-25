@@ -1,0 +1,159 @@
+name: e0-h4rm3l-static-adapter-audit
+
+on:
+  pull_request:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - .github/workflows/e0_h4rm3l_static_adapter_audit.yml
+      - configs/natural_language_localization/e0_h4rm3l_static_audit_v1.json
+      - docs/E0_H4RM3L_STATIC_ADAPTER_AUDIT_V1.md
+      - scripts/run_e0_h4rm3l_static_audit.py
+      - tests/test_e0_h4rm3l_static_audit.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e0-h4rm3l-static-adapter-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      H4RM3L_REPOSITORY: https://github.com/mdoumbouya/h4rm3l.git
+      H4RM3L_REVISION: e6f58a1a1e56c1a95b26b06aa4fe393ee2240dbd
+      CONTRACT: configs/natural_language_localization/e0_h4rm3l_static_audit_v1.json
+      SAFE_OUTPUT: artifacts/e0-h4rm3l-static-audit/e0_h4rm3l_static_audit.safe.json
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install frozen audit dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install \
+            'numpy==2.2.6' \
+            'pytest==9.1.1' \
+            'ruff==0.16.4'
+
+      - name: Validate audit code and frozen contract
+        run: |
+          ruff check \
+            scripts/run_e0_h4rm3l_static_audit.py \
+            tests/test_e0_h4rm3l_static_audit.py
+          pytest tests/test_e0_h4rm3l_static_audit.py
+          python -m json.tool "$CONTRACT" >/dev/null
+          git diff --check
+
+      - name: Check out exact h4rm3l source revision
+        run: |
+          source_root="$RUNNER_TEMP/h4rm3l-source"
+          git init -q "$source_root"
+          git -C "$source_root" remote add origin "$H4RM3L_REPOSITORY"
+          git -C "$source_root" fetch -q --depth 1 origin "$H4RM3L_REVISION"
+          git -C "$source_root" checkout -q --detach FETCH_HEAD
+          test "$(git -C "$source_root" rev-parse HEAD)" = "$H4RM3L_REVISION"
+          test -f "$source_root/h4rm3l/src/h4rm3l/decorators.py"
+          echo "H4RM3L_SOURCE_ROOT=$source_root" >> "$GITHUB_ENV"
+
+      - name: Execute synthetic-payload static adapter audit
+        run: |
+          python scripts/run_e0_h4rm3l_static_audit.py \
+            --config "$CONTRACT" \
+            --source-root "$H4RM3L_SOURCE_ROOT" \
+            --output "$SAFE_OUTPUT"
+
+      - name: Verify pass result and safe boundary
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          path = Path(os.environ["SAFE_OUTPUT"])
+          result = json.loads(path.read_text(encoding="utf-8"))
+          assert result["status"] == (
+              "E0_H4RM3L_STATIC_ADAPTER_PASS_ADVANCE_TO_TYPED_UNIT_MANIFEST"
+          )
+          assert result["operational_pass"] is True
+          assert result["paper_validity"] is False
+          assert result["real_harmful_payload_used"] is False
+          assert result["target_model_called"] is False
+          assert result["model_prompting_attempted"] is False
+          assert result["expression_count"] == 10
+          assert result["expression_pass_count"] == 10
+          assert result["rendered_text_committed"] is False
+          assert result["cross_regime_stage_a_opened"] is False
+          assert result["causal_oracle_opened"] is False
+          assert result["wavelet_used"] is False
+
+          forbidden_keys = {
+              "rendered_text",
+              "raw_prompt",
+              "raw_output",
+              "synthetic_payload",
+              "expression",
+          }
+          stack = [result]
+          while stack:
+              value = stack.pop()
+              if isinstance(value, dict):
+                  leaked = forbidden_keys.intersection(value)
+                  if leaked:
+                      raise SystemExit(f"unsafe raw-field keys: {sorted(leaked)}")
+                  stack.extend(value.values())
+              elif isinstance(value, list):
+                  stack.extend(value)
+          PY
+
+      - name: Publish safe audit summary
+        if: always()
+        run: |
+          if [ -f "$SAFE_OUTPUT" ]; then
+            python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          result = json.loads(Path(os.environ["SAFE_OUTPUT"]).read_text())
+          with Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a") as handle:
+              handle.write("# E0 h4rm3l static adapter audit\n\n")
+              handle.write(f"- status: **{result['status']}**\n")
+              handle.write(
+                  f"- expressions: **{result['expression_pass_count']}/"
+                  f"{result['expression_count']} passed**\n"
+              )
+              handle.write(
+                  "- payload preserved and deterministic: "
+                  f"**{result['operational_pass']}**\n"
+              )
+              handle.write(
+                  "- model prompting / target model: "
+                  f"**{result['model_prompting_attempted']} / "
+                  f"{result['target_model_called']}**\n"
+              )
+              handle.write("- real harmful payload: **false**\n")
+              handle.write("- Stage A / oracle / wavelet: **closed / closed / closed**\n")
+          PY
+          else
+            echo "E0 h4rm3l safe result was not produced." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload safe E0 h4rm3l artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e0-h4rm3l-static-adapter-safe
+          path: artifacts/e0-h4rm3l-static-audit
+          if-no-files-found: warn
+          retention-days: 30

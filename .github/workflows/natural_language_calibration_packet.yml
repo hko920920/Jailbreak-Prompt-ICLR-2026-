@@ -1,0 +1,25 @@
+name: natural-language-calibration-packet
+
+# The v3 calibration capture and model-assisted sensitivity records are frozen.
+# This archived stub preserves history and prevents duplicate expensive captures.
+on:
+  pull_request:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - .github/workflows/natural_language_calibration_packet.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: natural-language-calibration-packet
+  cancel-in-progress: true
+
+jobs:
+  archived:
+    if: ${{ false }}
+    runs-on: ubuntu-24.04
+    steps:
+      - run: echo 'Archived; see data/natural_language_localization/feasibility_v1/calibration_capture_v3.safe.json.'

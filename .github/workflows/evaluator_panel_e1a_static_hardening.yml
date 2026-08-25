@@ -1,0 +1,25 @@
+name: evaluator-panel-e1a-static-hardening
+
+# E1A passed 18/18 checks and is immutable. This archived stub cancels any
+# superseded E1A runs while retaining the committed safe execution record.
+on:
+  pull_request:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - .github/workflows/evaluator_panel_e1a_static_hardening.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: evaluator-panel-e1a-static-hardening
+  cancel-in-progress: true
+
+jobs:
+  archived:
+    if: ${{ false }}
+    runs-on: ubuntu-24.04
+    steps:
+      - run: echo 'Archived; see data/natural_language_localization/evaluator_panel_v1/e1a_execution_record.safe.json.'

@@ -1,0 +1,25 @@
+name: programmatic-agentharm-candidate-sweep
+
+# Archived after the immutable AgentHarm terminal decision. Historical runs and
+# artifacts remain intact; this stub cancels superseded runs without using a runner.
+on:
+  pull_request:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - .github/workflows/programmatic_agentharm_candidate_sweep.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: programmatic-agentharm-candidate-sweep
+  cancel-in-progress: true
+
+jobs:
+  archived:
+    if: ${{ false }}
+    runs-on: ubuntu-24.04
+    steps:
+      - run: echo 'Archived; see data/programmatic_agentharm/development/agentharm_terminal_decision.json.'

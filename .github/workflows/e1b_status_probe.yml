@@ -1,0 +1,186 @@
+name: research-status-probe
+
+on:
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/e1b_status_probe.yml
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+  issues: write
+
+concurrency:
+  group: research-status-probe
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      TARGET_BRANCH: agent/programmatic-agentharm-pivot
+      TARGET_TRIGGER_SHA: bdf26570ff835498cb9dc85b40eaf379a1080a12
+      E1B_NAME: evaluator-panel-e1b-wildguard
+      DEEP_NAME: e0-deepinception-static-audit
+      PR_NUMBER: "4"
+      STATUS_PATH: data/natural_language_localization/evaluator_panel_v1/e1b_status_probe.safe.json
+    steps:
+      - name: Resolve and persist active research runs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          all_runs="$(gh api --method GET \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "repos/${GITHUB_REPOSITORY}/actions/runs?branch=${TARGET_BRANCH}&per_page=100")"
+
+          e1b_run="$(jq -c --arg name "$E1B_NAME" --arg sha "$TARGET_TRIGGER_SHA" '
+            [ .workflow_runs[] | select(.name == $name) ]
+            | (map(select(.head_sha == $sha)) + .)
+            | unique_by(.id)
+            | sort_by(.created_at)
+            | reverse
+            | .[0]
+          ' <<<"$all_runs")"
+          deep_run="$(jq -c --arg name "$DEEP_NAME" '
+            [ .workflow_runs[] | select(.name == $name) ]
+            | sort_by(.created_at)
+            | reverse
+            | .[0]
+          ' <<<"$all_runs")"
+
+          if [[ "$e1b_run" == "null" ]]; then
+            echo "No E1B run was found." >&2
+            exit 1
+          fi
+
+          e1b_id="$(jq -r '.id' <<<"$e1b_run")"
+          e1b_jobs="$(gh api --method GET \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "repos/${GITHUB_REPOSITORY}/actions/runs/${e1b_id}/jobs?per_page=100")"
+
+          deep_jobs='{"jobs":[]}'
+          if [[ "$deep_run" != "null" ]]; then
+            deep_id="$(jq -r '.id' <<<"$deep_run")"
+            deep_jobs="$(gh api --method GET \
+              -H 'Accept: application/vnd.github+json' \
+              -H 'X-GitHub-Api-Version: 2022-11-28' \
+              "repos/${GITHUB_REPOSITORY}/actions/runs/${deep_id}/jobs?per_page=100")"
+          fi
+
+          status_json="$(jq -n \
+            --arg recorded_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg expected_sha "$TARGET_TRIGGER_SHA" \
+            --argjson all_runs "$all_runs" \
+            --argjson e1b "$e1b_run" \
+            --argjson e1b_jobs "$e1b_jobs" \
+            --argjson deep "$deep_run" \
+            --argjson deep_jobs "$deep_jobs" '
+            def compact_run($run; $jobs):
+              if $run == null then null else {
+                id: $run.id,
+                workflow_name: $run.name,
+                event: $run.event,
+                head_sha: $run.head_sha,
+                status: $run.status,
+                conclusion: $run.conclusion,
+                created_at: $run.created_at,
+                updated_at: $run.updated_at,
+                run_started_at: $run.run_started_at,
+                html_url: $run.html_url,
+                run_number: $run.run_number,
+                run_attempt: $run.run_attempt,
+                jobs: [
+                  $jobs.jobs[] | {
+                    id,
+                    name,
+                    status,
+                    conclusion,
+                    started_at,
+                    completed_at,
+                    steps: [.steps[]? | {name, status, conclusion, number}]
+                  }
+                ]
+              } end;
+            {
+              schema_version: "research-status-probe-safe-v2",
+              recorded_at: $recorded_at,
+              expected_e1b_trigger_sha: $expected_sha,
+              evaluator_panel_e1b: compact_run($e1b; $e1b_jobs),
+              deepinception_e0: compact_run($deep; $deep_jobs),
+              e1b_recent_runs: [
+                $all_runs.workflow_runs[]
+                | select(.name == "evaluator-panel-e1b-wildguard")
+                | {id, run_number, event, head_sha, status, conclusion, created_at, updated_at}
+              ][:10],
+              scientific_contract_changed: false,
+              target_outputs_opened_by_probe: false,
+              causal_oracle_opened_by_probe: false,
+              wavelet_used_by_probe: false
+            }
+          ')"
+
+          encoded="$(printf '%s\n' "$status_json" | base64 -w0)"
+          current_sha="$(gh api \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "repos/${GITHUB_REPOSITORY}/contents/${STATUS_PATH}?ref=${TARGET_BRANCH}" \
+            --jq '.sha' 2>/dev/null || true)"
+          args=(
+            --method PUT
+            -H 'Accept: application/vnd.github+json'
+            -H 'X-GitHub-Api-Version: 2022-11-28'
+            "repos/${GITHUB_REPOSITORY}/contents/${STATUS_PATH}"
+            -f message='Refresh evaluator and E0 status probe'
+            -f content="$encoded"
+            -f branch="$TARGET_BRANCH"
+          )
+          if [[ -n "$current_sha" ]]; then
+            args+=( -f sha="$current_sha" )
+          fi
+          gh api "${args[@]}" >/dev/null
+
+          e1b_status="$(jq -r '.evaluator_panel_e1b.status' <<<"$status_json")"
+          e1b_conclusion="$(jq -r '.evaluator_panel_e1b.conclusion // "pending"' <<<"$status_json")"
+          e1b_url="$(jq -r '.evaluator_panel_e1b.html_url' <<<"$status_json")"
+          deep_status="$(jq -r '.deepinception_e0.status // "not_found"' <<<"$status_json")"
+          deep_conclusion="$(jq -r '.deepinception_e0.conclusion // "pending"' <<<"$status_json")"
+          deep_url="$(jq -r '.deepinception_e0.html_url // ""' <<<"$status_json")"
+
+          marker='<!-- research-status-probe -->'
+          body="${marker}
+          ## Research workflow status
+
+          - E1B: [run ${e1b_id}](${e1b_url}) — **${e1b_status} / ${e1b_conclusion}**
+          - DeepInception E0: ${deep_url:+[run](${deep_url}) — }**${deep_status} / ${deep_conclusion}**
+          - safe status record: \`${STATUS_PATH}\`
+
+          Operational metadata only; no scientific contract or sealed boundary changed."
+
+          comments="$(gh api --paginate \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments?per_page=100")"
+          comment_id="$(jq -r --arg marker "$marker" '
+            [ .[] | select(.body | contains($marker)) ] | last | .id // empty
+          ' <<<"$comments")"
+          if [[ -n "$comment_id" ]]; then
+            gh api --method PATCH \
+              -H 'Accept: application/vnd.github+json' \
+              -H 'X-GitHub-Api-Version: 2022-11-28' \
+              "repos/${GITHUB_REPOSITORY}/issues/comments/${comment_id}" \
+              -f body="$body" >/dev/null
+          else
+            gh api --method POST \
+              -H 'Accept: application/vnd.github+json' \
+              -H 'X-GitHub-Api-Version: 2022-11-28' \
+              "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" \
+              -f body="$body" >/dev/null
+          fi
+          printf '%s\n' "$body" >> "$GITHUB_STEP_SUMMARY"

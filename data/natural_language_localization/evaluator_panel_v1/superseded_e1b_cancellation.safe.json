@@ -1,0 +1,33 @@
+{
+  "schema_version": "superseded-e1b-cancellation-safe-v1",
+  "recorded_at": "2026-08-24T08:45:47Z",
+  "reason": "The active PR-triggered run used the pre-hardening workflow and blocked the intended push-triggered hardened run in the same concurrency group.",
+  "superseded_run": {
+    "id": 32703333568,
+    "event": "pull_request",
+    "head_sha": "3bca12599d8630c65cf188552eaca69d45c43120",
+    "status_before": "in_progress",
+    "conclusion_before": "pending",
+    "cancellation_requested": true,
+    "status_after": "completed",
+    "conclusion_after": "cancelled"
+  },
+  "hardened_run": {
+    "id": 32704859942,
+    "event": "push",
+    "head_sha": "bdf26570ff835498cb9dc85b40eaf379a1080a12",
+    "status_after_slot_release": "queued",
+    "conclusion_after_slot_release": "pending"
+  },
+  "classification": "OPERATIONAL_SUPERSESSION_NOT_SCIENTIFIC_FAILURE",
+  "model_changed": false,
+  "data_changed": false,
+  "split_changed": false,
+  "thresholds_changed": false,
+  "parser_changed": false,
+  "evaluator_rule_changed": false,
+  "stage_a_opened": false,
+  "heldout_opened": false,
+  "causal_oracle_opened": false,
+  "wavelet_used": false
+}

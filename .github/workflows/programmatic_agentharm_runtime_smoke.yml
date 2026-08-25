@@ -1,0 +1,26 @@
+name: programmatic-agentharm-runtime-smoke
+
+# Archived after the immutable AgentHarm terminal decision. Historical runs and
+# artifacts remain intact; this stub exists only to cancel superseded runs and
+# prevent the large draft PR from re-consuming runners.
+on:
+  pull_request:
+    branches:
+      - agent/gate1-contract
+    paths:
+      - .github/workflows/programmatic_agentharm_runtime_smoke.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: programmatic-agentharm-runtime-smoke
+  cancel-in-progress: true
+
+jobs:
+  archived:
+    if: ${{ false }}
+    runs-on: ubuntu-24.04
+    steps:
+      - run: echo 'Archived; see data/programmatic_agentharm/development/agentharm_terminal_decision.json.'

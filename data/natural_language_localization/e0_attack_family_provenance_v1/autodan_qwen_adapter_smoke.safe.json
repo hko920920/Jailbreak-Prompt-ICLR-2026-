@@ -1,0 +1,163 @@
+{
+  "autodan": {
+    "initial_prompt_git_blob_sha": "b99248622923b631346bced8ebd38effc4a6b87b",
+    "repository": "SheltonLiu-N/AutoDAN",
+    "revision": "34062e964185693e81a6775b4f0d00bfd7507612",
+    "tree_sha": "39ceba6f45e5dec17db8d3099d7281f8673ceb14"
+  },
+  "causal_oracle_opened": false,
+  "cross_regime_stage_a_opened": false,
+  "family": "AutoDAN",
+  "family_admitted_to_balanced_signal_screen": false,
+  "mandatory_checks": {
+    "autodan_source_identity": true,
+    "deterministic_chat_render": true,
+    "deterministic_materialization": true,
+    "intervention_domain_excludes_payload": true,
+    "materialized_payload_byte_count": true,
+    "materialized_payload_count": true,
+    "no_model_weights_in_allowlist": true,
+    "payload_span_covered": true,
+    "payload_token_interval_contiguous": true,
+    "payload_token_interval_nonempty": true,
+    "placeholder_removed": true,
+    "predecessor_authorized": true,
+    "rendered_payload_byte_count": true,
+    "rendered_payload_count": true,
+    "source_placeholder_count": true,
+    "tokenizer_files_present": true,
+    "tokenizer_is_fast": true
+  },
+  "materialized_attack": {
+    "byte_length": 333,
+    "character_length": 329,
+    "deterministic": true,
+    "payload_character_span": [
+      67,
+      109
+    ],
+    "raw_text_recorded": false,
+    "sha256": "b37dc9b04f13bfb476963668753205d5fa8ec61e9172a3eca8bfeec2b84d549d"
+  },
+  "next_authorized_operation": "E0_AUTODAN_QWEN_ADAPTER_SMOKE_PASS_REMAIN_CONDITIONAL",
+  "operational_pass": true,
+  "paper_validity": false,
+  "predecessor": {
+    "git_blob_sha": "cfa1b642986526cc92e9dad0c3c85215eeccfbb1",
+    "path": "data/natural_language_localization/e0_attack_family_provenance_v1/autodan_static_audit.safe.json",
+    "status": "E0_AUTODAN_STATIC_AUDIT_CONDITIONAL_ADVANCE"
+  },
+  "real_harmful_payload_used": false,
+  "regime": "F_fluent_optimized",
+  "remaining_before_admission": [
+    "FREEZE_REGENERATION_OR_FROZEN_ARTIFACT_ROUTE",
+    "FREEZE_COMPUTE_AND_CANDIDATE_SELECTION_BUDGET",
+    "PROTECT_PAYLOAD_PLACEHOLDER_ACROSS_ALL_ENABLED_MUTATION_ROUTES",
+    "RUN_HARMLESS_END_TO_END_CANDIDATE_MATERIALIZATION_WITHOUT_TARGET_GENERATION"
+  ],
+  "rendered_chat": {
+    "byte_length": 481,
+    "character_length": 477,
+    "deterministic": true,
+    "payload_character_span": [
+      182,
+      224
+    ],
+    "payload_token_ids_sha256": "f46d16d12eedb5d92bc93bd52f80762858dd887ad867b3ec6ea55a089b353f2f",
+    "payload_token_interval": {
+      "contiguous": true,
+      "count": 21,
+      "coverage_end": 224,
+      "coverage_start": 181,
+      "covers_character_span": true,
+      "end_exclusive": 59,
+      "nonempty": true,
+      "start": 38
+    },
+    "raw_text_recorded": false,
+    "sha256": "955f0fd0eb3d5930d9efd0fea07de3459195b696a36e54ef6807155953f19109",
+    "total_token_count": 109
+  },
+  "resolved_this_step": [
+    "EXACT_PLACEHOLDER_ADAPTER_SYNTHETIC_SMOKE",
+    "TARGET_CHAT_TEMPLATE_AND_TOKENIZER_ADAPTER_SMOKE"
+  ],
+  "schema_version": "e0-autodan-qwen-adapter-smoke-result-v1",
+  "status": "E0_AUTODAN_QWEN_ADAPTER_SMOKE_PASS_REMAIN_CONDITIONAL",
+  "synthetic_payload_byte_length": 42,
+  "synthetic_payload_character_length": 42,
+  "synthetic_payload_sha256": "f683242a5806c5041c373cf5e9fd2d081083db7971392ca71dd5e2597e35e2d2",
+  "target_model_called": false,
+  "target_model_generation_performed": false,
+  "target_model_weights_downloaded": false,
+  "target_tokenizer": {
+    "chat_template_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+    "files": [
+      {
+        "exists": true,
+        "path": "config.json",
+        "sha256": "7463bb0ea78315365e6c6b74de4e73bbcc8359dfb0c5a737584e077d42c0b03c",
+        "size_bytes": 663
+      },
+      {
+        "exists": true,
+        "path": "merges.txt",
+        "sha256": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3",
+        "size_bytes": 1671839
+      },
+      {
+        "exists": true,
+        "path": "tokenizer.json",
+        "sha256": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+        "size_bytes": 7031645
+      },
+      {
+        "exists": true,
+        "path": "tokenizer_config.json",
+        "sha256": "5b5d4f65d0acd3b2d56a35b56d374a36cbc1c8fa5cf3b3febbbfabf22f359583",
+        "size_bytes": 7305
+      },
+      {
+        "exists": true,
+        "path": "vocab.json",
+        "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+        "size_bytes": 2776833
+      }
+    ],
+    "is_fast": true,
+    "license": "apache-2.0",
+    "model_weights_downloaded": false,
+    "repository": "Qwen/Qwen2.5-7B-Instruct",
+    "revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+    "special_tokens_map_sha256": "f1406a0b11ca298eb91fbe60f73d2be86249997f99ddcf46fc08fe9d93877a14",
+    "tokenizer_class": "Qwen2TokenizerFast",
+    "vocab_size": 151643
+  },
+  "unit_manifest": [
+    {
+      "byte_length": 67,
+      "character_length": 67,
+      "id": "AUTODAN_PREFIX_BEFORE_PAYLOAD",
+      "neutralizable": true,
+      "raw_text_recorded": false,
+      "sha256": "448be67e48224cb19335cd1a714ccf5fa823abe370cd3a1d9c07b44a0fb74611"
+    },
+    {
+      "byte_length": 42,
+      "character_length": 42,
+      "id": "IMMUTABLE_SYNTHETIC_PAYLOAD",
+      "neutralizable": false,
+      "raw_text_recorded": false,
+      "sha256": "f683242a5806c5041c373cf5e9fd2d081083db7971392ca71dd5e2597e35e2d2"
+    },
+    {
+      "byte_length": 224,
+      "character_length": 220,
+      "id": "AUTODAN_SUFFIX_AFTER_PAYLOAD",
+      "neutralizable": true,
+      "raw_text_recorded": false,
+      "sha256": "50c73ea7d41af9bc9c268255bfcc94627247695fffb3277fbcc0804cc1907fb9"
+    }
+  ],
+  "wavelet_used": false
+}

@@ -1,0 +1,85 @@
+name: temporary-fix-gcg-audit-lint
+
+on:
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/_temporary_fix_gcg_audit_lint.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: temporary-fix-gcg-audit-lint
+  cancel-in-progress: false
+
+jobs:
+  fix:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      ACTIVE_BRANCH: agent/programmatic-agentharm-pivot
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.ACTIVE_BRANCH }}
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Apply exact implementation-only formatting repair
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("scripts/run_e0_gcg_static_audit.py")
+          text = path.read_text(encoding="utf-8")
+          old = (
+              '            "torch.arange(self._control_slice.start, '
+              'self._control_slice.stop)" in attack_manager_text\n'
+          )
+          new = (
+              '            (\n'
+              '                "torch.arange(self._control_slice.start, "\n'
+              '                "self._control_slice.stop)"\n'
+              '            )\n'
+              '            in attack_manager_text\n'
+          )
+          if text.count(old) != 1:
+              raise SystemExit("expected GCG long line did not match exactly once")
+          path.write_text(text.replace(old, new), encoding="utf-8")
+          PY
+
+          python -m pip install 'ruff==0.16.4'
+          ruff check --fix tests/test_e0_gcg_static_audit.py
+          ruff check \
+            scripts/run_e0_gcg_static_audit.py \
+            tests/test_e0_gcg_static_audit.py
+          git diff --check
+
+      - name: Commit formatting-only repair
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add \
+            scripts/run_e0_gcg_static_audit.py \
+            tests/test_e0_gcg_static_audit.py
+          if git diff --cached --quiet; then
+            echo "GCG audit source already satisfies lint."
+            exit 0
+          fi
+          git commit -m "Fix GCG static audit lint"
+          for attempt in 1 2 3; do
+            git fetch origin "$ACTIVE_BRANCH"
+            git rebase "origin/$ACTIVE_BRANCH"
+            if git push origin "HEAD:$ACTIVE_BRANCH"; then
+              exit 0
+            fi
+          done
+          exit 1

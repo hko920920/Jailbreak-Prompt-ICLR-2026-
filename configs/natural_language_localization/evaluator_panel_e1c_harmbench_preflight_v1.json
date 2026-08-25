@@ -1,0 +1,101 @@
+{
+  "schema_version": "evaluator-panel-e1c-harmbench-preflight-v1.1",
+  "status": "FROZEN_BEFORE_E1C_HARMBENCH_PREFLIGHT",
+  "frozen": true,
+  "paper_validity": false,
+  "evidence_class": "PROTOCOL",
+  "predecessor": {
+    "result_path": "data/natural_language_localization/evaluator_panel_v1/e1b_wildguard_execution.safe.json",
+    "required_status": "EVALUATOR_PANEL_E1B_WILDGUARD_PASS",
+    "required_next_operation": "E1C_HARMBENCH_COMPONENT_REPRODUCTION_AND_CANARIES"
+  },
+  "harmbench_source": {
+    "repository": "centerforaisafety/HarmBench",
+    "revision": "8e1604d1171fe8a48d8febecd22f600e462bdcdd",
+    "tree_sha": "e28303aa064b3a4fdbe5698bc323e43306b7ab74",
+    "files": {
+      "eval_utils.py": "be95edd9523de0cde2a7823217b26983d57c496b",
+      "configs/model_configs/models.yaml": "024dc7fd61233c6efcd8234bea648e0735d67b72",
+      "data/classifier_val_sets/text_behaviors_val_set.json": "3d7d0a98742a36b5c7824aadcea433e42a045022"
+    }
+  },
+  "source_identity_correction": {
+    "correction_version": 1,
+    "trigger_run_id": 32740398974,
+    "trigger_result_path": "data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_preflight.safe.json",
+    "reason": "TWO_EXPECTED_GIT_BLOB_SHAS_WERE_TRANSCRIBED_INCORRECTLY_WHILE_THE_PINNED_REVISION_AND_TREE_WERE_CORRECT",
+    "verification_method": "PINNED_GITHUB_CONTENTS_API_AND_RUNNER_GIT_BLOB_IDENTITIES_AGREE",
+    "scientific_contract_changed": false,
+    "model_changed": false,
+    "validation_data_changed": false,
+    "selection_changed": false,
+    "threshold_changed": false,
+    "live_predictions_observed_before_correction": false,
+    "new_attack_outputs_observed_before_correction": false,
+    "changes": [
+      {
+        "path": "eval_utils.py",
+        "previous_expected_git_blob_sha": "de084a8fd403cdc087a1fcead916d750dd81f797",
+        "corrected_expected_git_blob_sha": "be95edd9523de0cde2a7823217b26983d57c496b"
+      },
+      {
+        "path": "configs/model_configs/models.yaml",
+        "previous_expected_git_blob_sha": "0df08dc0ea6d791c851a434d4d691aff18bd46fe",
+        "corrected_expected_git_blob_sha": "024dc7fd61233c6efcd8234bea648e0735d67b72"
+      }
+    ],
+    "immutable_revision_preserved": "8e1604d1171fe8a48d8febecd22f600e462bdcdd",
+    "immutable_tree_preserved": "e28303aa064b3a4fdbe5698bc323e43306b7ab74"
+  },
+  "official_classifier": {
+    "repository": "cais/HarmBench-Llama-2-13b-cls",
+    "immutable_revision_required": true,
+    "expected_architecture_contains": "LlamaForCausalLM",
+    "silent_model_substitution_allowed": false,
+    "secondary_model_may_replace_primary_without_new_contract": false
+  },
+  "validation_data": {
+    "path": "data/classifier_val_sets/text_behaviors_val_set.json",
+    "label_rule": "MAJORITY_OF_HUMAN_0_HUMAN_1_HUMAN_2",
+    "required_labels": [0, 1],
+    "raw_text_may_enter_safe_artifact": false,
+    "raw_text_may_be_committed": false
+  },
+  "selection": {
+    "target_count": 200,
+    "per_label_target": 100,
+    "record_id": "SHA256_OF_CANONICAL_PRIVATE_RECORD_FIELDS",
+    "algorithm": "LABEL_BALANCED_BEHAVIOR_ROUND_ROBIN_THEN_RECORD_HASH",
+    "selection_must_be_deterministic": true,
+    "selection_identity_must_be_frozen_before_live_model_outputs": true,
+    "selected_raw_records_may_enter_safe_artifact": false
+  },
+  "preflight_checks": {
+    "source_revision_and_tree_match": true,
+    "source_file_blob_identities_match": true,
+    "official_validation_set_parses": true,
+    "both_human_majority_labels_exist": true,
+    "balanced_selection_is_feasible": true,
+    "official_classifier_access_succeeds": true,
+    "classifier_revision_is_immutable": true,
+    "classifier_architecture_matches": true,
+    "classifier_weight_metadata_is_visible": true,
+    "no_raw_behavior_or_generation_text_in_safe_output": true
+  },
+  "live_stage_not_authorized_by_preflight_alone": true,
+  "decision_gate": {
+    "on_pass": "FREEZE_E1C_HARMBENCH_LIVE_REPRODUCTION_AND_CANARY_CONTRACT",
+    "on_fail": "REPAIR_ACCESS_OR_REPLACE_COMPONENT_WITHOUT_OPENING_ATTACK_OUTCOMES"
+  },
+  "sealed_boundaries": {
+    "harmbench_live_predictions_generated": false,
+    "new_harmful_attack_outputs_generated": false,
+    "semantic_only_stage_a_opened": false,
+    "cross_regime_stage_a_opened": false,
+    "prior_evaluation_opened": false,
+    "heldout_opened": false,
+    "causal_oracle_opened": false,
+    "keep_only_oracle_opened": false,
+    "wavelet_used": false
+  }
+}

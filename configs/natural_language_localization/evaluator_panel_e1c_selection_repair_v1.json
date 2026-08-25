@@ -1,0 +1,78 @@
+{
+  "schema_version": "evaluator-panel-e1c-selection-repair-v1",
+  "status": "FROZEN_BEFORE_E1C_SELECTION_REPAIR",
+  "frozen": true,
+  "paper_validity": false,
+  "evidence_class": "PROTOCOL",
+  "predecessor": {
+    "result_path": "data/natural_language_localization/evaluator_panel_v1/e1c_prompt_source_freeze_v2.safe.json",
+    "required_status": "E1C_PROMPT_SOURCE_FREEZE_V2_FAIL",
+    "required_operational_pass": false,
+    "required_next_operation": "STOP_E1C_AND_RESOLVE_REMAINING_SOURCE_OR_SELECTION_AMBIGUITY_BEFORE_LIVE_OUTPUTS",
+    "required_live_predictions": false,
+    "expected_selected_missing_registry_row_count": 3,
+    "expected_selected_missing_behavior_hashes": [
+      "92a817c9b39fdd90365f14dcf8b6d8a6b534a3da4b8fba05f4ffc3df485dbec4",
+      "9fb9eab22b6d645141ffe9e82733ec9ebb80237a539f1e81555cbdf7a2891751"
+    ]
+  },
+  "harmbench_source": {
+    "repository": "centerforaisafety/HarmBench",
+    "revision": "8e1604d1171fe8a48d8febecd22f600e462bdcdd",
+    "tree_sha": "e28303aa064b3a4fdbe5698bc323e43306b7ab74",
+    "files": {
+      "data/classifier_val_sets/text_behaviors_val_set.json": "3d7d0a98742a36b5c7824aadcea433e42a045022",
+      "data/behavior_datasets/harmbench_behaviors_text_all.csv": "8a6b423d85e9acdc168c57a6a957755cfa86c4cb",
+      "data/behavior_datasets/harmbench_behaviors_multimodal_all.csv": "d39d6c6b4ad68e37e60a408d3181791b49740221"
+    }
+  },
+  "registry": {
+    "text_csv": "data/behavior_datasets/harmbench_behaviors_text_all.csv",
+    "multimodal_csv": "data/behavior_datasets/harmbench_behaviors_multimodal_all.csv",
+    "required_id_field": "BehaviorID",
+    "required_behavior_field": "Behavior",
+    "required_context_field": "ContextString",
+    "update_order": [
+      "text_csv",
+      "multimodal_csv"
+    ]
+  },
+  "validation": {
+    "path": "data/classifier_val_sets/text_behaviors_val_set.json",
+    "label_rule": "MAJORITY_OF_HUMAN_0_HUMAN_1_HUMAN_2"
+  },
+  "old_selection": {
+    "path": "data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_selection.safe.jsonl",
+    "required_record_count": 200,
+    "required_label_counts": {
+      "0": 100,
+      "1": 100
+    },
+    "required_record_ids_sha256": "8839e523fe353861a5ca69f7230f539e026044966867c8284251f750361b9356"
+  },
+  "new_selection": {
+    "output_filename": "e1c_harmbench_selection_v2.safe.jsonl",
+    "target_count": 200,
+    "per_label_target": 100,
+    "algorithm": "FILTER_TO_REGISTRY_RESOLVABLE_BEHAVIOR_IDS_THEN_LABEL_BALANCED_BEHAVIOR_ROUND_ROBIN_THEN_RECORD_HASH",
+    "expected_dropped_record_count": 3,
+    "expected_added_record_count": 3,
+    "all_selected_rows_must_resolve": true,
+    "selection_must_be_deterministic": true
+  },
+  "decision_gate": {
+    "on_pass": "FREEZE_E1C_PROMPT_SOURCE_V3_WITH_REPAIRED_SELECTION",
+    "on_fail": "STOP_E1C_AND_REPAIR_SELECTION_WITHOUT_LIVE_OUTPUTS"
+  },
+  "sealed_boundaries": {
+    "model_weight_downloaded": false,
+    "model_inference_performed": false,
+    "harmbench_live_predictions_generated": false,
+    "new_harmful_attack_outputs_generated": false,
+    "semantic_only_stage_a_opened": false,
+    "cross_regime_stage_a_opened": false,
+    "causal_oracle_opened": false,
+    "keep_only_oracle_opened": false,
+    "wavelet_used": false
+  }
+}

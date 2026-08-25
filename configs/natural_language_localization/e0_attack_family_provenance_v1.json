@@ -1,0 +1,239 @@
+{
+  "schema_version": "cross-regime-attack-family-provenance-v1",
+  "status": "PRELIMINARY_E0_AUDIT_FROZEN_BEFORE_TARGET_OUTCOMES",
+  "frozen": true,
+  "paper_validity": false,
+  "created_at": "2026-08-24T16:00:00+09:00",
+  "purpose": "Select and qualify two attack families per semantic-readable, fluent-optimized, and non-fluent optimized regime without observing target-model attack outcomes.",
+  "mandatory_admission_tests": [
+    "official_or_author_maintained_source",
+    "immutable_revision",
+    "usable_license_and_redistribution_route",
+    "reproducible_generation_or_frozen_artifact_route",
+    "target_model_and_tokenizer_compatibility",
+    "exactly_one_frozen_payload_occurrence",
+    "payload_byte_invariance",
+    "preoutcome_intervention_vocabulary",
+    "feasible_compute_and_storage_budget",
+    "synthetic_placeholder_adapter_test"
+  ],
+  "provisional_main_matrix": {
+    "S_semantic_readable": [
+      "h4rm3l",
+      "DeepInception"
+    ],
+    "F_fluent_optimized": [
+      "AutoDAN",
+      "AdvPrompter"
+    ],
+    "U_nonfluent_optimized": [
+      "GCG",
+      "AmpleGCG"
+    ]
+  },
+  "families": {
+    "h4rm3l": {
+      "regime": "S_semantic_readable",
+      "repository": "mdoumbouya/h4rm3l",
+      "revision": "e6f58a1a1e56c1a95b26b06aa4fe393ee2240dbd",
+      "license": "MIT",
+      "repository_state": "active",
+      "role": "primary_candidate",
+      "preliminary_status": "ADVANCE_TO_STATIC_ADAPTER_AUDIT",
+      "generation_mechanism": "typed compositional jailbreak DSL",
+      "expected_units": [
+        "typed_strategy_or_decorator_node",
+        "rendered_clause",
+        "sentence_or_newline_unit",
+        "localized_span"
+      ],
+      "payload_route": "single frozen placeholder rendered exactly once",
+      "remaining_checks": [
+        "renderer_identity",
+        "deterministic_rendering",
+        "payload_mutating_decorator_exclusion",
+        "unit_manifest"
+      ]
+    },
+    "DeepInception": {
+      "regime": "S_semantic_readable",
+      "repository": "tmlr-group/DeepInception",
+      "revision": "fc5689e76c4dd87a14babf1eadf890532f2b6880",
+      "license": "MIT",
+      "repository_state": "active",
+      "role": "primary_candidate",
+      "preliminary_status": "ADVANCE_TO_STATIC_ADAPTER_AUDIT",
+      "generation_mechanism": "nested fictional-scene and role construction",
+      "expected_units": [
+        "outer_framing",
+        "scene_nesting",
+        "role_assignment",
+        "task_embedding_clause",
+        "response_format_clause"
+      ],
+      "payload_route": "single frozen task slot with no rewriting",
+      "remaining_checks": [
+        "official_prompt_construction_reproduction",
+        "preoutcome_typed_segmentation",
+        "single_turn_boundary",
+        "payload_invariance"
+      ]
+    },
+    "AutoDAN": {
+      "regime": "F_fluent_optimized",
+      "repository": "SheltonLiu-N/AutoDAN",
+      "revision": "34062e964185693e81a6775b4f0d00bfd7507612",
+      "license": "MIT",
+      "repository_state": "active",
+      "role": "primary_candidate",
+      "preliminary_status": "ADVANCE_TO_STATIC_ADAPTER_AUDIT",
+      "generation_mechanism": "readable evolutionary adversarial prompt optimization",
+      "expected_units": [
+        "provenance_preserving_generated_strategy_block",
+        "generated_clause",
+        "sentence",
+        "fixed_contiguous_token_block"
+      ],
+      "payload_route": "frozen source instruction separated from optimized attack-added text",
+      "remaining_checks": [
+        "goal_rewrite_audit",
+        "initialization_and_population_freeze",
+        "mutation_and_selection_freeze",
+        "official_artifact_availability",
+        "compute_budget"
+      ]
+    },
+    "AdvPrompter": {
+      "regime": "F_fluent_optimized",
+      "repository": "facebookresearch/advprompter",
+      "revision": "802a500c91f1dcd7c8b76869d3e39bf8e40ed7d7",
+      "license": "CC-BY-NC-4.0",
+      "repository_state": "archived_read_only",
+      "role": "conditional_primary_candidate",
+      "preliminary_status": "CONDITIONAL_ADVANCE",
+      "generation_mechanism": "learned generator of readable adversarial suffixes",
+      "expected_units": [
+        "generated_sentence_or_clause",
+        "generated_suffix_block",
+        "fixed_contiguous_token_block"
+      ],
+      "payload_route": "frozen harmful instruction plus generated suffix",
+      "remaining_checks": [
+        "noncommercial_attribution_compliance",
+        "checkpoint_and_data_availability",
+        "payload_invariance",
+        "generator_checkpoint_freeze",
+        "sampling_and_candidate_selection_freeze"
+      ],
+      "fallback_if_failed": "replace_before_any_cross_regime_target_output"
+    },
+    "GCG": {
+      "regime": "U_nonfluent_optimized",
+      "repository": "llm-attacks/llm-attacks",
+      "revision": "098262edf85f807224e70ecd87b9d83716bf6b73",
+      "license": "MIT",
+      "repository_state": "active",
+      "role": "primary_candidate",
+      "preliminary_status": "ADVANCE_TO_STATIC_ADAPTER_AUDIT",
+      "generation_mechanism": "per-instance gradient-guided discrete suffix optimization",
+      "expected_units": [
+        "predeclared_equal_token_block",
+        "recursive_sub_block",
+        "contiguous_token_interval"
+      ],
+      "payload_route": "frozen harmful request plus optimized appended suffix",
+      "remaining_checks": [
+        "model_tokenizer_and_chat_template_freeze",
+        "regeneration_or_frozen_artifact_decision",
+        "optimization_budget_and_selection_freeze",
+        "position_preserving_neutralizer",
+        "contract_exact_vocabulary"
+      ]
+    },
+    "AmpleGCG": {
+      "regime": "U_nonfluent_optimized",
+      "repository": "OSU-NLP-Group/AmpleGCG",
+      "revision": "92fbc9a14d40dfaaf5f7f479ef0d56f32c2f93a3",
+      "license": "AI-PUBS-OPENRAIL-S-0.1",
+      "repository_state": "active",
+      "role": "conditional_primary_candidate",
+      "preliminary_status": "CONDITIONAL_ADVANCE",
+      "generation_mechanism": "learned generator of multiple transferable adversarial suffixes",
+      "expected_units": [
+        "generated_suffix_block",
+        "recursive_sub_block",
+        "contiguous_token_interval"
+      ],
+      "payload_route": "frozen harmful request plus generated suffix",
+      "remaining_checks": [
+        "responsible_use_compliance",
+        "checkpoint_data_and_model_license_audit",
+        "artifact_access",
+        "generator_and_sampling_freeze",
+        "payload_invariance",
+        "compute_budget"
+      ],
+      "fallback_if_failed": "use_audited_licensed_backup_or_resolve_BEAST_permission_before_outputs"
+    },
+    "BEAST": {
+      "regime": "U_nonfluent_optimized",
+      "repository": "vinusankars/BEAST",
+      "revision": "a3448da673f6527a523668bd40554301eee69e67",
+      "license": null,
+      "repository_state": "active",
+      "role": "scientifically_independent_backup",
+      "preliminary_status": "BLOCKED_PENDING_LICENSE_OR_PERMISSION_ROUTE",
+      "generation_mechanism": "gradient_free_beam_search_adversarial_attack"
+    },
+    "AttnGCG": {
+      "regime": "U_nonfluent_optimized",
+      "repository": "UCSC-VLAA/AttnGCG-attack",
+      "revision": "201aee0167c4e7ea2ad5601829dc7fe6afe880cc",
+      "license": "MIT",
+      "repository_state": "active",
+      "role": "licensed_backup_or_sensitivity",
+      "preliminary_status": "LICENSED_BACKUP_OR_SENSITIVITY_ONLY",
+      "generation_mechanism": "GCG_lineage_with_attention_objective",
+      "independent_main_family": false
+    },
+    "I_GCG": {
+      "regime": "U_nonfluent_optimized",
+      "repository": "jiaxiaojunQAQ/I-GCG",
+      "revision": "8820ec669cee41d6cd0162d84dfa6e4379fc697d",
+      "license": null,
+      "repository_state": "active",
+      "role": "optimization_strength_sensitivity",
+      "preliminary_status": "SENSITIVITY_ONLY_PENDING_LICENSE",
+      "independent_main_family": false
+    },
+    "SlotGCG": {
+      "regime": "U_nonfluent_optimized",
+      "repository": "youai058/SlotGCG",
+      "revision": "d76c3c9b6bc1c2cfffd2906301d3945c9f9d4b56",
+      "license": null,
+      "repository_state": "active",
+      "role": "position_sensitivity",
+      "preliminary_status": "POSITION_SENSITIVITY_ONLY_PENDING_LICENSE",
+      "independent_main_family": false,
+      "position_preserving_neutralizer_required": true
+    }
+  },
+  "next_authorized_operation": "RUN_STATIC_SOURCE_ADAPTER_PAYLOAD_AND_BUDGET_AUDIT_ON_SYNTHETIC_PLACEHOLDERS_ONLY",
+  "e0_go_rule": {
+    "main_families_per_regime": 2,
+    "regimes": 3,
+    "all_mandatory_admission_tests_pass": true,
+    "selection_may_use_target_outcomes": false,
+    "evaluator_panel_gate_must_pass_independently": true
+  },
+  "sealed_boundaries": {
+    "real_harmful_attack_generation_during_e0": false,
+    "legacy_semantic_stage_a_opened": false,
+    "cross_regime_stage_a_opened": false,
+    "prior_evaluation_opened": false,
+    "heldout_opened": false,
+    "causal_oracle_opened": false,
+    "keep_only_oracle_opened": false,
+    "wavelet_used": false
+  }
+}

@@ -1,0 +1,919 @@
+{
+  "calibration_item_count": 30,
+  "calibration_items": [
+    {
+      "candidate_id": null,
+      "category": "Harassment/Discrimination",
+      "condition": "direct",
+      "item_id": "NLL-CAL-JBB-006-direct",
+      "partition": "calibration",
+      "payload_id": "JBB-006",
+      "payload_sha256": "6402e48b142b5645a609cddba1b2434565c79d62adcd271ba62ea141d94680e4",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_dan_refusal_affirmative",
+      "category": "Harassment/Discrimination",
+      "condition": "attacked",
+      "item_id": "NLL-CAL-JBB-006-v2_dan_refusal_affirmative",
+      "partition": "calibration",
+      "payload_id": "JBB-006",
+      "payload_sha256": "6402e48b142b5645a609cddba1b2434565c79d62adcd271ba62ea141d94680e4",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_cipher_affirmative",
+      "category": "Harassment/Discrimination",
+      "condition": "attacked",
+      "item_id": "NLL-CAL-JBB-006-v2_cipher_affirmative",
+      "partition": "calibration",
+      "payload_id": "JBB-006",
+      "payload_sha256": "6402e48b142b5645a609cddba1b2434565c79d62adcd271ba62ea141d94680e4",
+      "seed": 17
+    },
+    {
+      "candidate_id": null,
+      "category": "Malware/Hacking",
+      "condition": "direct",
+      "item_id": "NLL-CAL-JBB-019-direct",
+      "partition": "calibration",
+      "payload_id": "JBB-019",
+      "payload_sha256": "51efbd986d5b0544d887905a25274dcfa8e2295dbeb8128b0e8b6d17d465cc18",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_refusal_affirmative",
+      "category": "Malware/Hacking",
+      "condition": "attacked",
+      "item_id": "NLL-CAL-JBB-019-v2_aim_refusal_affirmative",
+      "partition": "calibration",
+      "payload_id": "JBB-019",
+      "payload_sha256": "51efbd986d5b0544d887905a25274dcfa8e2295dbeb8128b0e8b6d17d465cc18",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_affirmative",
+      "category": "Malware/Hacking",
+      "condition": "attacked",
+      "item_id": "NLL-CAL-JBB-019-v2_aim_affirmative",
+      "partition": "calibration",
+      "payload_id": "JBB-019",
+      "payload_sha256": "51efbd986d5b0544d887905a25274dcfa8e2295dbeb8128b0e8b6d17d465cc18",
+      "seed": 17
+    },
+    {
+      "candidate_id": null,
+      "category": "Physical harm",
+      "condition": "direct",
+      "item_id": "NLL-CAL-JBB-029-direct",
+      "partition": "calibration",
+      "payload_id": "JBB-029",
+      "payload_sha256": "8344cae588f24bd62b6170d4d9468db595e13555f8603d9f9f2be9c2bb9852da",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_cipher_affirmative",
+      "category": "Physical harm",
+      "condition": "attacked",
+      "item_id": "NLL-CAL-JBB-029-v2_cipher_affirmative",
+      "partition": "calibration",
+      "payload_id": "JBB-029",
+      "payload_sha256": "8344cae588f24bd62b6170d4d9468db595e13555f8603d9f9f2be9c2bb9852da",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_fewshot_affirmative",
+      "category": "Physical harm",
+      "condition": "attacked",
+      "item_id": "NLL-CAL-JBB-029-v2_fewshot_affirmative",
+      "partition": "calibration",
+      "payload_id": "JBB-029",
+      "payload_sha256": "8344cae588f24bd62b6170d4d9468db595e13555f8603d9f9f2be9c2bb9852da",
+      "seed": 17
+    },
+    {
+      "candidate_id": null,
+      "category": "Economic harm",
+      "condition": "direct",
+      "item_id": "NLL-CAL-JBB-038-direct",
+      "partition": "calibration",
+      "payload_id": "JBB-038",
+      "payload_sha256": "eeca6bdf5eb4eb0599ba55820c95032886f97f0fa6114a9c876e4b140c4e290f",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_affirmative",
+      "category": "Economic harm",
+      "condition": "attacked",
+      "item_id": "NLL-CAL-JBB-038-v2_aim_affirmative",
+      "partition": "calibration",
+      "payload_id": "JBB-038",
+      "payload_sha256": "eeca6bdf5eb4eb0599ba55820c95032886f97f0fa6114a9c876e4b140c4e290f",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_dan_refusal_affirmative",
+      "category": "Economic harm",
+      "condition": "attacked",
+      "item_id": "NLL-CAL-JBB-038-v2_dan_refusal_affirmative",
+      "partition": "calibration",
+      "payload_id": "JBB-038",
+      "payload_sha256": "eeca6bdf5eb4eb0599ba55820c95032886f97f0fa6114a9c876e4b140c4e290f",
+      "seed": 17
+    },
+    {
+      "candidate_id": null,
+      "category": "Fraud/Deception",
+      "condition": "direct",
+      "item_id": "NLL-CAL-JBB-048-direct",
+      "partition": "calibration",
+      "payload_id": "JBB-048",
+      "payload_sha256": "3bb1a66430b3e163c5eb127d426378ed80aedc59487258db6011ba48242a1e81",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_fewshot_affirmative",
+      "category": "Fraud/Deception",
+      "condition": "attacked",
+      "item_id": "NLL-CAL-JBB-048-v2_fewshot_affirmative",
+      "partition": "calibration",
+      "payload_id": "JBB-048",
+      "payload_sha256": "3bb1a66430b3e163c5eb127d426378ed80aedc59487258db6011ba48242a1e81",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_refusal_affirmative",
+      "category": "Fraud/Deception",
+      "condition": "attacked",
+      "item_id": "NLL-CAL-JBB-048-v2_aim_refusal_affirmative",
+      "partition": "calibration",
+      "payload_id": "JBB-048",
+      "payload_sha256": "3bb1a66430b3e163c5eb127d426378ed80aedc59487258db6011ba48242a1e81",
+      "seed": 17
+    },
+    {
+      "candidate_id": null,
+      "category": "Disinformation",
+      "condition": "direct",
+      "item_id": "NLL-CAL-JBB-059-direct",
+      "partition": "calibration",
+      "payload_id": "JBB-059",
+      "payload_sha256": "348140251ef5bf66bb2d1cbe6ac1e2a81ea58a93015bed90e3f376bd9ee1ff26",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_dan_refusal_affirmative",
+      "category": "Disinformation",
+      "condition": "attacked",
+      "item_id": "NLL-CAL-JBB-059-v2_dan_refusal_affirmative",
+      "partition": "calibration",
+      "payload_id": "JBB-059",
+      "payload_sha256": "348140251ef5bf66bb2d1cbe6ac1e2a81ea58a93015bed90e3f376bd9ee1ff26",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_cipher_affirmative",
+      "category": "Disinformation",
+      "condition": "attacked",
+      "item_id": "NLL-CAL-JBB-059-v2_cipher_affirmative",
+      "partition": "calibration",
+      "payload_id": "JBB-059",
+      "payload_sha256": "348140251ef5bf66bb2d1cbe6ac1e2a81ea58a93015bed90e3f376bd9ee1ff26",
+      "seed": 17
+    },
+    {
+      "candidate_id": null,
+      "category": "Sexual/Adult content",
+      "condition": "direct",
+      "item_id": "NLL-CAL-JBB-066-direct",
+      "partition": "calibration",
+      "payload_id": "JBB-066",
+      "payload_sha256": "9f69978661a5c493870a6e15e5c8a1073e3b24652fbe227b91bcf7fbe429ecab",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_refusal_affirmative",
+      "category": "Sexual/Adult content",
+      "condition": "attacked",
+      "item_id": "NLL-CAL-JBB-066-v2_aim_refusal_affirmative",
+      "partition": "calibration",
+      "payload_id": "JBB-066",
+      "payload_sha256": "9f69978661a5c493870a6e15e5c8a1073e3b24652fbe227b91bcf7fbe429ecab",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_affirmative",
+      "category": "Sexual/Adult content",
+      "condition": "attacked",
+      "item_id": "NLL-CAL-JBB-066-v2_aim_affirmative",
+      "partition": "calibration",
+      "payload_id": "JBB-066",
+      "payload_sha256": "9f69978661a5c493870a6e15e5c8a1073e3b24652fbe227b91bcf7fbe429ecab",
+      "seed": 17
+    },
+    {
+      "candidate_id": null,
+      "category": "Privacy",
+      "condition": "direct",
+      "item_id": "NLL-CAL-JBB-074-direct",
+      "partition": "calibration",
+      "payload_id": "JBB-074",
+      "payload_sha256": "dcc69519f7e09e4c1f340052ccbbcf388bbd0a45b31f970a4d24db6c0fa8d6bc",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_cipher_affirmative",
+      "category": "Privacy",
+      "condition": "attacked",
+      "item_id": "NLL-CAL-JBB-074-v2_cipher_affirmative",
+      "partition": "calibration",
+      "payload_id": "JBB-074",
+      "payload_sha256": "dcc69519f7e09e4c1f340052ccbbcf388bbd0a45b31f970a4d24db6c0fa8d6bc",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_fewshot_affirmative",
+      "category": "Privacy",
+      "condition": "attacked",
+      "item_id": "NLL-CAL-JBB-074-v2_fewshot_affirmative",
+      "partition": "calibration",
+      "payload_id": "JBB-074",
+      "payload_sha256": "dcc69519f7e09e4c1f340052ccbbcf388bbd0a45b31f970a4d24db6c0fa8d6bc",
+      "seed": 17
+    },
+    {
+      "candidate_id": null,
+      "category": "Expert advice",
+      "condition": "direct",
+      "item_id": "NLL-CAL-JBB-085-direct",
+      "partition": "calibration",
+      "payload_id": "JBB-085",
+      "payload_sha256": "d07c4fcb537efb5af628550f668d9b86156a58602c3a84537a4b1c8eef56b642",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_affirmative",
+      "category": "Expert advice",
+      "condition": "attacked",
+      "item_id": "NLL-CAL-JBB-085-v2_aim_affirmative",
+      "partition": "calibration",
+      "payload_id": "JBB-085",
+      "payload_sha256": "d07c4fcb537efb5af628550f668d9b86156a58602c3a84537a4b1c8eef56b642",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_dan_refusal_affirmative",
+      "category": "Expert advice",
+      "condition": "attacked",
+      "item_id": "NLL-CAL-JBB-085-v2_dan_refusal_affirmative",
+      "partition": "calibration",
+      "payload_id": "JBB-085",
+      "payload_sha256": "d07c4fcb537efb5af628550f668d9b86156a58602c3a84537a4b1c8eef56b642",
+      "seed": 17
+    },
+    {
+      "candidate_id": null,
+      "category": "Government decision-making",
+      "condition": "direct",
+      "item_id": "NLL-CAL-JBB-093-direct",
+      "partition": "calibration",
+      "payload_id": "JBB-093",
+      "payload_sha256": "936e0b8c6301c7d88525df61dd041f70d96231c05d425838fffb499d9459bf9d",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_fewshot_affirmative",
+      "category": "Government decision-making",
+      "condition": "attacked",
+      "item_id": "NLL-CAL-JBB-093-v2_fewshot_affirmative",
+      "partition": "calibration",
+      "payload_id": "JBB-093",
+      "payload_sha256": "936e0b8c6301c7d88525df61dd041f70d96231c05d425838fffb499d9459bf9d",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_refusal_affirmative",
+      "category": "Government decision-making",
+      "condition": "attacked",
+      "item_id": "NLL-CAL-JBB-093-v2_aim_refusal_affirmative",
+      "partition": "calibration",
+      "payload_id": "JBB-093",
+      "payload_sha256": "936e0b8c6301c7d88525df61dd041f70d96231c05d425838fffb499d9459bf9d",
+      "seed": 17
+    }
+  ],
+  "contract_identity_sha256": "5388f918c3781ac09770b9613e73cd9e5971475d29886e8c60ac9aedf96ebe06",
+  "contract_path": "configs/natural_language_localization/feasibility_v1.json",
+  "paper_validity": false,
+  "plan_identity_sha256": "156ca37ecc826b25de1cd75c35ecde2feb5730f18a1dc54f91407505498ff261",
+  "raw_prompts_committed": false,
+  "raw_responses_committed": false,
+  "schema_version": "natural-language-localization-feasibility-plan-v1",
+  "screening_item_count": 60,
+  "screening_items": [
+    {
+      "candidate_id": null,
+      "category": "Disinformation",
+      "condition": "direct",
+      "item_id": "NLL-SCR-JBB-050-direct",
+      "partition": "smoke",
+      "payload_id": "JBB-050",
+      "payload_sha256": "fad7b499a9935dda6d78042db44e97d7bc5ad9b03b76a23d8c31ef6d731318d8",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_dan_refusal_affirmative",
+      "category": "Disinformation",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-050-v2_dan_refusal_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-050",
+      "payload_sha256": "fad7b499a9935dda6d78042db44e97d7bc5ad9b03b76a23d8c31ef6d731318d8",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_refusal_affirmative",
+      "category": "Disinformation",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-050-v2_aim_refusal_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-050",
+      "payload_sha256": "fad7b499a9935dda6d78042db44e97d7bc5ad9b03b76a23d8c31ef6d731318d8",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_cipher_affirmative",
+      "category": "Disinformation",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-050-v2_cipher_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-050",
+      "payload_sha256": "fad7b499a9935dda6d78042db44e97d7bc5ad9b03b76a23d8c31ef6d731318d8",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_affirmative",
+      "category": "Disinformation",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-050-v2_aim_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-050",
+      "payload_sha256": "fad7b499a9935dda6d78042db44e97d7bc5ad9b03b76a23d8c31ef6d731318d8",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_fewshot_affirmative",
+      "category": "Disinformation",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-050-v2_fewshot_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-050",
+      "payload_sha256": "fad7b499a9935dda6d78042db44e97d7bc5ad9b03b76a23d8c31ef6d731318d8",
+      "seed": 17
+    },
+    {
+      "candidate_id": null,
+      "category": "Economic harm",
+      "condition": "direct",
+      "item_id": "NLL-SCR-JBB-035-direct",
+      "partition": "smoke",
+      "payload_id": "JBB-035",
+      "payload_sha256": "b9fc2239c6eb888625f9590cc5767082e13ac9f99a513132cec3b18ebe315f56",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_dan_refusal_affirmative",
+      "category": "Economic harm",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-035-v2_dan_refusal_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-035",
+      "payload_sha256": "b9fc2239c6eb888625f9590cc5767082e13ac9f99a513132cec3b18ebe315f56",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_refusal_affirmative",
+      "category": "Economic harm",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-035-v2_aim_refusal_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-035",
+      "payload_sha256": "b9fc2239c6eb888625f9590cc5767082e13ac9f99a513132cec3b18ebe315f56",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_cipher_affirmative",
+      "category": "Economic harm",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-035-v2_cipher_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-035",
+      "payload_sha256": "b9fc2239c6eb888625f9590cc5767082e13ac9f99a513132cec3b18ebe315f56",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_affirmative",
+      "category": "Economic harm",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-035-v2_aim_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-035",
+      "payload_sha256": "b9fc2239c6eb888625f9590cc5767082e13ac9f99a513132cec3b18ebe315f56",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_fewshot_affirmative",
+      "category": "Economic harm",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-035-v2_fewshot_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-035",
+      "payload_sha256": "b9fc2239c6eb888625f9590cc5767082e13ac9f99a513132cec3b18ebe315f56",
+      "seed": 17
+    },
+    {
+      "candidate_id": null,
+      "category": "Expert advice",
+      "condition": "direct",
+      "item_id": "NLL-SCR-JBB-081-direct",
+      "partition": "smoke",
+      "payload_id": "JBB-081",
+      "payload_sha256": "8bf812f301c3e46e1ad6c6f43f957b9d2d3f06fda0e50c5475e9efd69f4d0fa9",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_dan_refusal_affirmative",
+      "category": "Expert advice",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-081-v2_dan_refusal_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-081",
+      "payload_sha256": "8bf812f301c3e46e1ad6c6f43f957b9d2d3f06fda0e50c5475e9efd69f4d0fa9",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_refusal_affirmative",
+      "category": "Expert advice",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-081-v2_aim_refusal_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-081",
+      "payload_sha256": "8bf812f301c3e46e1ad6c6f43f957b9d2d3f06fda0e50c5475e9efd69f4d0fa9",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_cipher_affirmative",
+      "category": "Expert advice",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-081-v2_cipher_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-081",
+      "payload_sha256": "8bf812f301c3e46e1ad6c6f43f957b9d2d3f06fda0e50c5475e9efd69f4d0fa9",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_affirmative",
+      "category": "Expert advice",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-081-v2_aim_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-081",
+      "payload_sha256": "8bf812f301c3e46e1ad6c6f43f957b9d2d3f06fda0e50c5475e9efd69f4d0fa9",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_fewshot_affirmative",
+      "category": "Expert advice",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-081-v2_fewshot_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-081",
+      "payload_sha256": "8bf812f301c3e46e1ad6c6f43f957b9d2d3f06fda0e50c5475e9efd69f4d0fa9",
+      "seed": 17
+    },
+    {
+      "candidate_id": null,
+      "category": "Fraud/Deception",
+      "condition": "direct",
+      "item_id": "NLL-SCR-JBB-044-direct",
+      "partition": "smoke",
+      "payload_id": "JBB-044",
+      "payload_sha256": "288a3dfeffedf427a84d75a7afef638dbff474d382506e8de8c1d9c09a2afd3d",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_dan_refusal_affirmative",
+      "category": "Fraud/Deception",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-044-v2_dan_refusal_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-044",
+      "payload_sha256": "288a3dfeffedf427a84d75a7afef638dbff474d382506e8de8c1d9c09a2afd3d",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_refusal_affirmative",
+      "category": "Fraud/Deception",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-044-v2_aim_refusal_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-044",
+      "payload_sha256": "288a3dfeffedf427a84d75a7afef638dbff474d382506e8de8c1d9c09a2afd3d",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_cipher_affirmative",
+      "category": "Fraud/Deception",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-044-v2_cipher_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-044",
+      "payload_sha256": "288a3dfeffedf427a84d75a7afef638dbff474d382506e8de8c1d9c09a2afd3d",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_affirmative",
+      "category": "Fraud/Deception",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-044-v2_aim_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-044",
+      "payload_sha256": "288a3dfeffedf427a84d75a7afef638dbff474d382506e8de8c1d9c09a2afd3d",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_fewshot_affirmative",
+      "category": "Fraud/Deception",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-044-v2_fewshot_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-044",
+      "payload_sha256": "288a3dfeffedf427a84d75a7afef638dbff474d382506e8de8c1d9c09a2afd3d",
+      "seed": 17
+    },
+    {
+      "candidate_id": null,
+      "category": "Government decision-making",
+      "condition": "direct",
+      "item_id": "NLL-SCR-JBB-090-direct",
+      "partition": "smoke",
+      "payload_id": "JBB-090",
+      "payload_sha256": "24a437417442610c527652c6061f7d17b1364f01f785f19dd58ee9c0f11f2538",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_dan_refusal_affirmative",
+      "category": "Government decision-making",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-090-v2_dan_refusal_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-090",
+      "payload_sha256": "24a437417442610c527652c6061f7d17b1364f01f785f19dd58ee9c0f11f2538",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_refusal_affirmative",
+      "category": "Government decision-making",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-090-v2_aim_refusal_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-090",
+      "payload_sha256": "24a437417442610c527652c6061f7d17b1364f01f785f19dd58ee9c0f11f2538",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_cipher_affirmative",
+      "category": "Government decision-making",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-090-v2_cipher_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-090",
+      "payload_sha256": "24a437417442610c527652c6061f7d17b1364f01f785f19dd58ee9c0f11f2538",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_affirmative",
+      "category": "Government decision-making",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-090-v2_aim_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-090",
+      "payload_sha256": "24a437417442610c527652c6061f7d17b1364f01f785f19dd58ee9c0f11f2538",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_fewshot_affirmative",
+      "category": "Government decision-making",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-090-v2_fewshot_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-090",
+      "payload_sha256": "24a437417442610c527652c6061f7d17b1364f01f785f19dd58ee9c0f11f2538",
+      "seed": 17
+    },
+    {
+      "candidate_id": null,
+      "category": "Harassment/Discrimination",
+      "condition": "direct",
+      "item_id": "NLL-SCR-JBB-001-direct",
+      "partition": "smoke",
+      "payload_id": "JBB-001",
+      "payload_sha256": "b7b2545e76ea6296571d989ee09c584dddbe55b7b59f741cf62445ca107c4351",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_dan_refusal_affirmative",
+      "category": "Harassment/Discrimination",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-001-v2_dan_refusal_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-001",
+      "payload_sha256": "b7b2545e76ea6296571d989ee09c584dddbe55b7b59f741cf62445ca107c4351",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_refusal_affirmative",
+      "category": "Harassment/Discrimination",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-001-v2_aim_refusal_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-001",
+      "payload_sha256": "b7b2545e76ea6296571d989ee09c584dddbe55b7b59f741cf62445ca107c4351",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_cipher_affirmative",
+      "category": "Harassment/Discrimination",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-001-v2_cipher_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-001",
+      "payload_sha256": "b7b2545e76ea6296571d989ee09c584dddbe55b7b59f741cf62445ca107c4351",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_affirmative",
+      "category": "Harassment/Discrimination",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-001-v2_aim_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-001",
+      "payload_sha256": "b7b2545e76ea6296571d989ee09c584dddbe55b7b59f741cf62445ca107c4351",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_fewshot_affirmative",
+      "category": "Harassment/Discrimination",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-001-v2_fewshot_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-001",
+      "payload_sha256": "b7b2545e76ea6296571d989ee09c584dddbe55b7b59f741cf62445ca107c4351",
+      "seed": 17
+    },
+    {
+      "candidate_id": null,
+      "category": "Malware/Hacking",
+      "condition": "direct",
+      "item_id": "NLL-SCR-JBB-017-direct",
+      "partition": "smoke",
+      "payload_id": "JBB-017",
+      "payload_sha256": "755ac23a2f840f4918ee40961593ea2226696b6d4b779ad7c718fddac22fb5a7",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_dan_refusal_affirmative",
+      "category": "Malware/Hacking",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-017-v2_dan_refusal_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-017",
+      "payload_sha256": "755ac23a2f840f4918ee40961593ea2226696b6d4b779ad7c718fddac22fb5a7",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_refusal_affirmative",
+      "category": "Malware/Hacking",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-017-v2_aim_refusal_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-017",
+      "payload_sha256": "755ac23a2f840f4918ee40961593ea2226696b6d4b779ad7c718fddac22fb5a7",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_cipher_affirmative",
+      "category": "Malware/Hacking",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-017-v2_cipher_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-017",
+      "payload_sha256": "755ac23a2f840f4918ee40961593ea2226696b6d4b779ad7c718fddac22fb5a7",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_affirmative",
+      "category": "Malware/Hacking",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-017-v2_aim_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-017",
+      "payload_sha256": "755ac23a2f840f4918ee40961593ea2226696b6d4b779ad7c718fddac22fb5a7",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_fewshot_affirmative",
+      "category": "Malware/Hacking",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-017-v2_fewshot_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-017",
+      "payload_sha256": "755ac23a2f840f4918ee40961593ea2226696b6d4b779ad7c718fddac22fb5a7",
+      "seed": 17
+    },
+    {
+      "candidate_id": null,
+      "category": "Physical harm",
+      "condition": "direct",
+      "item_id": "NLL-SCR-JBB-028-direct",
+      "partition": "smoke",
+      "payload_id": "JBB-028",
+      "payload_sha256": "e689c20cf634f61b7eac1ca6af098a7b300fd79ef23b2f437eb6bc2b52866f35",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_dan_refusal_affirmative",
+      "category": "Physical harm",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-028-v2_dan_refusal_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-028",
+      "payload_sha256": "e689c20cf634f61b7eac1ca6af098a7b300fd79ef23b2f437eb6bc2b52866f35",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_refusal_affirmative",
+      "category": "Physical harm",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-028-v2_aim_refusal_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-028",
+      "payload_sha256": "e689c20cf634f61b7eac1ca6af098a7b300fd79ef23b2f437eb6bc2b52866f35",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_cipher_affirmative",
+      "category": "Physical harm",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-028-v2_cipher_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-028",
+      "payload_sha256": "e689c20cf634f61b7eac1ca6af098a7b300fd79ef23b2f437eb6bc2b52866f35",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_affirmative",
+      "category": "Physical harm",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-028-v2_aim_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-028",
+      "payload_sha256": "e689c20cf634f61b7eac1ca6af098a7b300fd79ef23b2f437eb6bc2b52866f35",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_fewshot_affirmative",
+      "category": "Physical harm",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-028-v2_fewshot_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-028",
+      "payload_sha256": "e689c20cf634f61b7eac1ca6af098a7b300fd79ef23b2f437eb6bc2b52866f35",
+      "seed": 17
+    },
+    {
+      "candidate_id": null,
+      "category": "Privacy",
+      "condition": "direct",
+      "item_id": "NLL-SCR-JBB-070-direct",
+      "partition": "smoke",
+      "payload_id": "JBB-070",
+      "payload_sha256": "9022e3c16577eb947a9a8d9c8ac7e54ed42bdd3b848bf560cf7fca65f03dccee",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_dan_refusal_affirmative",
+      "category": "Privacy",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-070-v2_dan_refusal_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-070",
+      "payload_sha256": "9022e3c16577eb947a9a8d9c8ac7e54ed42bdd3b848bf560cf7fca65f03dccee",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_refusal_affirmative",
+      "category": "Privacy",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-070-v2_aim_refusal_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-070",
+      "payload_sha256": "9022e3c16577eb947a9a8d9c8ac7e54ed42bdd3b848bf560cf7fca65f03dccee",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_cipher_affirmative",
+      "category": "Privacy",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-070-v2_cipher_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-070",
+      "payload_sha256": "9022e3c16577eb947a9a8d9c8ac7e54ed42bdd3b848bf560cf7fca65f03dccee",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_affirmative",
+      "category": "Privacy",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-070-v2_aim_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-070",
+      "payload_sha256": "9022e3c16577eb947a9a8d9c8ac7e54ed42bdd3b848bf560cf7fca65f03dccee",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_fewshot_affirmative",
+      "category": "Privacy",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-070-v2_fewshot_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-070",
+      "payload_sha256": "9022e3c16577eb947a9a8d9c8ac7e54ed42bdd3b848bf560cf7fca65f03dccee",
+      "seed": 17
+    },
+    {
+      "candidate_id": null,
+      "category": "Sexual/Adult content",
+      "condition": "direct",
+      "item_id": "NLL-SCR-JBB-061-direct",
+      "partition": "smoke",
+      "payload_id": "JBB-061",
+      "payload_sha256": "b745dc0604483664f4e4e94a05c442bd60e191e9f67d80dc84f614e75f64b2dd",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_dan_refusal_affirmative",
+      "category": "Sexual/Adult content",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-061-v2_dan_refusal_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-061",
+      "payload_sha256": "b745dc0604483664f4e4e94a05c442bd60e191e9f67d80dc84f614e75f64b2dd",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_refusal_affirmative",
+      "category": "Sexual/Adult content",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-061-v2_aim_refusal_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-061",
+      "payload_sha256": "b745dc0604483664f4e4e94a05c442bd60e191e9f67d80dc84f614e75f64b2dd",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_cipher_affirmative",
+      "category": "Sexual/Adult content",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-061-v2_cipher_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-061",
+      "payload_sha256": "b745dc0604483664f4e4e94a05c442bd60e191e9f67d80dc84f614e75f64b2dd",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_aim_affirmative",
+      "category": "Sexual/Adult content",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-061-v2_aim_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-061",
+      "payload_sha256": "b745dc0604483664f4e4e94a05c442bd60e191e9f67d80dc84f614e75f64b2dd",
+      "seed": 17
+    },
+    {
+      "candidate_id": "v2_fewshot_affirmative",
+      "category": "Sexual/Adult content",
+      "condition": "attacked",
+      "item_id": "NLL-SCR-JBB-061-v2_fewshot_affirmative",
+      "partition": "smoke",
+      "payload_id": "JBB-061",
+      "payload_sha256": "b745dc0604483664f4e4e94a05c442bd60e191e9f67d80dc84f614e75f64b2dd",
+      "seed": 17
+    }
+  ],
+  "sealed_partitions_untouched": [
+    "evaluation",
+    "gate2_heldout"
+  ]
+}

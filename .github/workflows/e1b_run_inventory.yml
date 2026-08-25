@@ -1,0 +1,98 @@
+name: research-workflow-run-inventory
+
+on:
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/e1b_run_inventory.yml
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: research-workflow-run-inventory
+  cancel-in-progress: true
+
+jobs:
+  inventory:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      TARGET_BRANCH: agent/programmatic-agentharm-pivot
+      E1B_NAME: evaluator-panel-e1b-wildguard
+      DEEPINCEPTION_NAME: e0-deepinception-static-audit
+      OUTPUT_PATH: data/natural_language_localization/evaluator_panel_v1/research_workflow_inventory.safe.json
+    steps:
+      - name: Persist recent evaluator and E0 workflow runs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          all_runs="$(gh api --method GET \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "repos/${GITHUB_REPOSITORY}/actions/runs?branch=${TARGET_BRANCH}&per_page=100")"
+          safe="$(jq -n \
+            --arg recorded_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg e1b_name "$E1B_NAME" \
+            --arg deep_name "$DEEPINCEPTION_NAME" \
+            --argjson runs "$all_runs" '
+            def normalized($name): [
+              $runs.workflow_runs[]
+              | select(.name == $name)
+              | {
+                  id,
+                  run_number,
+                  run_attempt,
+                  event,
+                  head_sha,
+                  status,
+                  conclusion,
+                  created_at,
+                  updated_at,
+                  run_started_at,
+                  html_url,
+                  path
+                }
+            ];
+            {
+              schema_version: "research-workflow-inventory-safe-v2",
+              recorded_at: $recorded_at,
+              evaluator_panel_e1b_wildguard: {
+                runs: normalized($e1b_name)
+              },
+              e0_deepinception_static_audit: {
+                runs: normalized($deep_name)
+              },
+              scientific_contract_changed: false,
+              target_outputs_opened_by_inventory: false,
+              causal_oracle_opened_by_inventory: false,
+              wavelet_used_by_inventory: false
+            }
+          ')"
+          encoded="$(printf '%s\n' "$safe" | base64 -w0)"
+          current_sha="$(gh api \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "repos/${GITHUB_REPOSITORY}/contents/${OUTPUT_PATH}?ref=${TARGET_BRANCH}" \
+            --jq '.sha' 2>/dev/null || true)"
+          args=(
+            --method PUT
+            -H 'Accept: application/vnd.github+json'
+            -H 'X-GitHub-Api-Version: 2022-11-28'
+            "repos/${GITHUB_REPOSITORY}/contents/${OUTPUT_PATH}"
+            -f message='Record research workflow run inventory v2'
+            -f content="$encoded"
+            -f branch="$TARGET_BRANCH"
+          )
+          if [[ -n "$current_sha" ]]; then
+            args+=( -f sha="$current_sha" )
+          fi
+          gh api "${args[@]}" >/dev/null
+          echo '## E1B' >> "$GITHUB_STEP_SUMMARY"
+          jq -r '.evaluator_panel_e1b_wildguard.runs[:5][] | "- run \(.id): \(.status) / \(.conclusion // "pending"), head=\(.head_sha)"' <<<"$safe" >> "$GITHUB_STEP_SUMMARY"
+          echo '## DeepInception E0' >> "$GITHUB_STEP_SUMMARY"
+          jq -r '.e0_deepinception_static_audit.runs[:5][] | "- run \(.id): \(.status) / \(.conclusion // "pending"), head=\(.head_sha)"' <<<"$safe" >> "$GITHUB_STEP_SUMMARY"

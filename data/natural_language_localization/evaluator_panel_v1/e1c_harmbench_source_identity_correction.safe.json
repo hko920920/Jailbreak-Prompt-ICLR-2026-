@@ -1,0 +1,57 @@
+{
+  "schema_version": "evaluator-panel-e1c-source-identity-correction-safe-v1",
+  "evidence_class": "DEVELOPMENT",
+  "paper_validity": false,
+  "trigger_run": {
+    "run_id": 32740398974,
+    "head_sha": "d88fc778b43c2a37fe1e7299ff17cebbde9cb637",
+    "result_path": "data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_preflight.safe.json",
+    "status": "E1C_HARMBENCH_PREFLIGHT_FAIL",
+    "operational_pass": false
+  },
+  "failure_class": "STATIC_SOURCE_IDENTITY_TRANSCRIPTION_ERROR",
+  "authoritative_source": {
+    "repository": "centerforaisafety/HarmBench",
+    "revision": "8e1604d1171fe8a48d8febecd22f600e462bdcdd",
+    "tree_sha": "e28303aa064b3a4fdbe5698bc323e43306b7ab74",
+    "tree_match_in_trigger_run": true
+  },
+  "corrections": [
+    {
+      "path": "eval_utils.py",
+      "previous_expected_git_blob_sha": "de084a8fd403cdc087a1fcead916d750dd81f797",
+      "runner_observed_git_blob_sha": "be95edd9523de0cde2a7823217b26983d57c496b",
+      "pinned_github_git_blob_sha": "be95edd9523de0cde2a7823217b26983d57c496b",
+      "corrected": true
+    },
+    {
+      "path": "configs/model_configs/models.yaml",
+      "previous_expected_git_blob_sha": "0df08dc0ea6d791c851a434d4d691aff18bd46fe",
+      "runner_observed_git_blob_sha": "024dc7fd61233c6efcd8234bea648e0735d67b72",
+      "pinned_github_git_blob_sha": "024dc7fd61233c6efcd8234bea648e0735d67b72",
+      "corrected": true
+    }
+  ],
+  "unchanged": {
+    "harmbench_revision": true,
+    "harmbench_tree": true,
+    "validation_file_blob": true,
+    "official_classifier_repository": true,
+    "selection_algorithm": true,
+    "selection_target_count": true,
+    "label_balance": true,
+    "thresholds": true,
+    "parser": true,
+    "decision_gate": true
+  },
+  "observed_before_correction": {
+    "harmbench_live_predictions": false,
+    "new_harmful_attack_outputs": false,
+    "semantic_only_stage_a": false,
+    "cross_regime_stage_a": false,
+    "causal_oracle": false,
+    "keep_only_oracle": false,
+    "wavelet": false
+  },
+  "authorization": "RERUN_SAME_E1C_PREFLIGHT_WITH_CORRECTED_STATIC_BLOB_IDENTITIES"
+}

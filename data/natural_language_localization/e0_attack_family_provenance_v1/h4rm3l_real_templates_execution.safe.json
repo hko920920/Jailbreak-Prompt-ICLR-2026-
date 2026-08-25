@@ -1,0 +1,48 @@
+{
+  "schema_version": "e0-h4rm3l-real-templates-execution-v1",
+  "status": "E0_H4RM3L_REAL_TEMPLATES_EXECUTION_RECORDED",
+  "paper_validity": false,
+  "contract_commit": "f558d92cff01687ffc988cf9a1fc8598ea0a0627",
+  "implementation_commit": "ad7526151e2ac78068b97e02e0b2bc694e47e0e8",
+  "test_commit": "84a60b10d213b59c2ee3f9c624d886b21fa1024a",
+  "workflow_commit": "3ea1aa14f661fdbd2591f4660445f0b97beda52f",
+  "workflow_path": ".github/workflows/e0_h4rm3l_real_templates.yml",
+  "successful_run": {
+    "run_id": 32704914939,
+    "job_id": 97363836694,
+    "source_head": "3ea1aa14f661fdbd2591f4660445f0b97beda52f",
+    "conclusion": "success",
+    "artifact_id": 9511871076,
+    "artifact_name": "e0-h4rm3l-real-templates-safe",
+    "artifact_sha256": "2aeef3137c2ca010514c2ef283419ab9d2105ec23b4eaeaa0d34d39129b01510",
+    "full_result_sha256": "6108eb5be92cccd1e30d46b17342b9823a0827ecd237baae8f588ee3a2c9b9b5"
+  },
+  "result_summary": {
+    "operational_pass": true,
+    "programs_passed": 7,
+    "programs_total": 7,
+    "typed_component_count": 12,
+    "nonempty_subset_count": 19,
+    "neutralizer_count": 2,
+    "neutralized_variants_passed": 38,
+    "neutralized_variants_total": 38,
+    "manifest_partition_failures": 0,
+    "payload_occurrence_failures": 0,
+    "length_rule_failures": 0,
+    "model_prompting_attempted": false,
+    "target_model_called": false,
+    "attack_success_scored": false,
+    "real_harmful_payload_used": false,
+    "raw_template_or_rendered_text_committed": false
+  },
+  "scientific_interpretation": "The pinned h4rm3l implementation supports a deterministic, payload-preserving, typed intervention adapter for the seven predeclared actual semantic template programs. All component subsets are neutralizable under deletion and layout-preserving blanking. This freezes h4rm3l as one technically admissible Regime-S family; it does not establish target-model attack success or causal topology.",
+  "next_authorized_operation": "E0_DEEPINCEPTION_STATIC_SOURCE_TEMPLATE_AND_PAYLOAD_AUDIT",
+  "sealed_boundaries": {
+    "cross_regime_stage_a_opened": false,
+    "prior_evaluation_opened": false,
+    "heldout_opened": false,
+    "causal_oracle_opened": false,
+    "keep_only_oracle_opened": false,
+    "wavelet_used": false
+  }
+}

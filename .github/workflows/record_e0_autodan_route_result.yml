@@ -1,0 +1,149 @@
+name: record-e0-autodan-route-result
+
+on:
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/record_e0_autodan_route_result.yml
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: record-e0-autodan-route-result
+  cancel-in-progress: false
+
+jobs:
+  record:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      ACTIVE_BRANCH: agent/programmatic-agentharm-pivot
+      SOURCE_RUN_ID: "32715511529"
+      SOURCE_RUN_NUMBER: "2"
+      SOURCE_RUN_ATTEMPT: "1"
+      SOURCE_HEAD_SHA: f416aebaeed3c35eeddf07962df2f1b7ebec6c14
+      ARTIFACT_NAME: e0-autodan-route-budget-materialization-safe
+      ARTIFACT_ID: "9515735365"
+      ARTIFACT_DIGEST: sha256:786cfe6429dde19326a5368515cd2d82e78fb11ec66be61ab255619fdb9b0df1
+      SAFE_RESULT_SHA256: 1c35c10e1ae12f177ec5754d6c4a9c37d6952e60e55d86469a0e10596bc0e75a
+      RESULT_PATH: data/natural_language_localization/e0_attack_family_provenance_v1/autodan_route_budget_materialization.safe.json
+      EXECUTION_PATH: data/natural_language_localization/e0_attack_family_provenance_v1/autodan_route_budget_materialization_execution.safe.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.ACTIVE_BRANCH }}
+          fetch-depth: 0
+
+      - name: Download and verify safe source artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          source_dir="$RUNNER_TEMP/autodan-route-result"
+          mkdir -p "$source_dir"
+          gh run download "$SOURCE_RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --name "$ARTIFACT_NAME" \
+            --dir "$source_dir"
+          source_file="$source_dir/e0_autodan_route_budget_materialization.safe.json"
+          test -f "$source_file"
+          test "$(sha256sum "$source_file" | cut -d' ' -f1)" = "$SAFE_RESULT_SHA256"
+          python - "$source_file" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          value = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          assert value["status"] == (
+              "E0_AUTODAN_ROUTE_BUDGET_MATERIALIZATION_PASS_REMAIN_PREOUTPUT"
+          )
+          assert value["operational_pass"] is True
+          assert value["paper_validity"] is False
+          assert value["family_admitted_to_balanced_signal_screen"] is False
+          assert value["real_harmful_payload_used"] is False
+          assert value["target_model_weights_downloaded"] is False
+          assert value["target_model_called"] is False
+          assert value["target_model_generation_performed"] is False
+          assert value["external_api_called"] is False
+          assert value["cross_regime_stage_a_opened"] is False
+          assert value["causal_oracle_opened"] is False
+          assert value["wavelet_used"] is False
+          assert all(value["mandatory_checks"].values())
+          PY
+          echo "SOURCE_FILE=$source_file" >> "$GITHUB_ENV"
+
+      - name: Materialize immutable safe records
+        run: |
+          set -euo pipefail
+          mkdir -p "$(dirname "$RESULT_PATH")"
+          if [[ -f "$RESULT_PATH" ]]; then
+            test "$(sha256sum "$RESULT_PATH" | cut -d' ' -f1)" = "$SAFE_RESULT_SHA256"
+          else
+            cp "$SOURCE_FILE" "$RESULT_PATH"
+          fi
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          record = {
+              "schema_version": "e0-autodan-route-budget-materialization-execution-v1",
+              "status": "E0_AUTODAN_ROUTE_BUDGET_MATERIALIZATION_EXECUTION_RECORDED",
+              "paper_validity": False,
+              "workflow": "e0-autodan-route-budget-materialization",
+              "workflow_run_id": int(os.environ["SOURCE_RUN_ID"]),
+              "workflow_run_number": int(os.environ["SOURCE_RUN_NUMBER"]),
+              "workflow_run_attempt": int(os.environ["SOURCE_RUN_ATTEMPT"]),
+              "source_head_sha": os.environ["SOURCE_HEAD_SHA"],
+              "artifact_name": os.environ["ARTIFACT_NAME"],
+              "artifact_id": int(os.environ["ARTIFACT_ID"]),
+              "artifact_digest": os.environ["ARTIFACT_DIGEST"],
+              "safe_result_path": os.environ["RESULT_PATH"],
+              "safe_result_sha256": os.environ["SAFE_RESULT_SHA256"],
+              "decision": "E0_AUTODAN_ROUTE_BUDGET_MATERIALIZATION_PASS_REMAIN_PREOUTPUT",
+              "family": "AutoDAN",
+              "regime": "F_fluent_optimized",
+              "family_admitted_to_balanced_signal_screen": False,
+              "real_harmful_payload_used": False,
+              "target_model_weights_downloaded": False,
+              "target_model_called": False,
+              "target_model_generation_performed": False,
+              "cross_regime_stage_a_opened": False,
+              "prior_evaluation_opened": False,
+              "heldout_opened": False,
+              "causal_oracle_opened": False,
+              "keep_only_oracle_opened": False,
+              "wavelet_used": False,
+              "scientific_contract_changed": False,
+              "next_gate": "EVALUATOR_PANEL_GO_AND_FROZEN_BALANCED_SIGNAL_SCREEN_CONTRACT",
+          }
+          Path(os.environ["EXECUTION_PATH"]).write_text(
+              json.dumps(record, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Commit records to active research branch
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add "$RESULT_PATH" "$EXECUTION_PATH"
+          if git diff --cached --quiet; then
+            echo "Records already present with matching identity."
+            exit 0
+          fi
+          git commit -m "Record AutoDAN route budget materialization pass"
+          for attempt in 1 2 3; do
+            if git push origin "HEAD:${ACTIVE_BRANCH}"; then
+              exit 0
+            fi
+            git fetch origin "$ACTIVE_BRANCH"
+            git rebase "origin/${ACTIVE_BRANCH}"
+          done
+          echo "Unable to push immutable AutoDAN records after retries" >&2
+          exit 1

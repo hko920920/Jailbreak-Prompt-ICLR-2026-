@@ -1,0 +1,227 @@
+name: e0-deepinception-exact-rerender-v2
+
+on:
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/e0_deepinception_exact_rerender_v2.yml
+      - configs/natural_language_localization/e0_deepinception_exact_rerender_v2.json
+      - docs/E0_DEEPINCEPTION_EXACT_PAYLOAD_RERENDER_V2.md
+      - scripts/run_e0_deepinception_static_audit.py
+      - scripts/run_e0_deepinception_exact_rerender.py
+      - scripts/run_e0_deepinception_exact_rerender_v2.py
+      - tests/test_e0_deepinception_static_audit.py
+      - tests/test_e0_deepinception_exact_rerender.py
+      - tests/test_e0_deepinception_exact_rerender_v2.py
+      - data/natural_language_localization/e0_attack_family_provenance_v1/deepinception_payload_invariance_exception.safe.json
+      - data/natural_language_localization/e0_attack_family_provenance_v1/deepinception_exact_rerender.safe.json
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: e0-deepinception-exact-rerender-v2
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      SOURCE_REPOSITORY: https://github.com/tmlr-group/DeepInception.git
+      SOURCE_REVISION: fc5689e76c4dd87a14babf1eadf890532f2b6880
+      CONTRACT: configs/natural_language_localization/e0_deepinception_exact_rerender_v2.json
+      SAFE_OUTPUT: artifacts/e0-deepinception-exact-rerender-v2/e0_deepinception_exact_rerender_v2.safe.json
+      RECORD_PATH: data/natural_language_localization/e0_attack_family_provenance_v1/deepinception_exact_rerender_v2.safe.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install frozen audit dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'pytest==9.1.1' 'ruff==0.16.4'
+
+      - name: Validate predecessor records, code, tests, and contract
+        run: |
+          test -f data/natural_language_localization/e0_attack_family_provenance_v1/deepinception_payload_invariance_exception.safe.json
+          test -f data/natural_language_localization/e0_attack_family_provenance_v1/deepinception_exact_rerender.safe.json
+          ruff check \
+            scripts/run_e0_deepinception_static_audit.py \
+            scripts/run_e0_deepinception_exact_rerender.py \
+            scripts/run_e0_deepinception_exact_rerender_v2.py \
+            tests/test_e0_deepinception_static_audit.py \
+            tests/test_e0_deepinception_exact_rerender.py \
+            tests/test_e0_deepinception_exact_rerender_v2.py
+          pytest \
+            tests/test_e0_deepinception_static_audit.py \
+            tests/test_e0_deepinception_exact_rerender.py \
+            tests/test_e0_deepinception_exact_rerender_v2.py
+          python -m json.tool "$CONTRACT" >/dev/null
+          git diff --check
+
+      - name: Check out immutable DeepInception source
+        run: |
+          source_root="$RUNNER_TEMP/deepinception-source"
+          git init -q "$source_root"
+          git -C "$source_root" remote add origin "$SOURCE_REPOSITORY"
+          git -C "$source_root" fetch -q --depth 1 origin "$SOURCE_REVISION"
+          git -C "$source_root" checkout -q --detach FETCH_HEAD
+          test "$(git -C "$source_root" rev-parse HEAD)" = "$SOURCE_REVISION"
+          test -f "$source_root/main.py"
+          test -f "$source_root/res/data_main.json"
+          test -f "$source_root/LICENSE"
+          echo "SOURCE_ROOT=$source_root" >> "$GITHUB_ENV"
+
+      - name: Execute length-delimited exact-payload audit
+        id: execute
+        run: |
+          set +e
+          python scripts/run_e0_deepinception_exact_rerender_v2.py \
+            --config "$CONTRACT" \
+            --source-root "$SOURCE_ROOT" \
+            --output "$SAFE_OUTPUT"
+          code=$?
+          set -e
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          test -f "$SAFE_OUTPUT"
+
+      - name: Verify safe result and frozen claim boundary
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          result = json.loads(Path(os.environ["SAFE_OUTPUT"]).read_text())
+          assert result["status"] in {
+              "E0_DEEPINCEPTION_EXACT_RERENDER_V2_PASS_ADVANCE_TO_PARAMETER_AND_BALANCED_TEMPLATE_AUDIT",
+              "E0_DEEPINCEPTION_EXACT_RERENDER_V2_FAIL",
+          }
+          assert result["paper_validity"] is False
+          assert result["official_artifact_route_remains_failed"] is True
+          assert result["v1_two_suffix_parser_remains_failed"] is True
+          assert result["derived_route_label"] == (
+              "SOURCE_CONFORMANT_LENGTH_DELIMITED_EXACT_PAYLOAD_RERENDER"
+          )
+          assert result["slot_extraction_mode"] == (
+              "canonical_goal_length_delimited"
+          )
+          assert result[
+              "raw_source_goal_rendered_derived_or_synthetic_text_committed"
+          ] is False
+          assert result["real_harmful_output_generated"] is False
+          assert result["target_model_called"] is False
+          assert result["attack_success_scored"] is False
+          assert result["cross_regime_stage_a_opened"] is False
+          assert result["heldout_opened"] is False
+          assert result["causal_oracle_opened"] is False
+          assert result["keep_only_oracle_opened"] is False
+          assert result["wavelet_used"] is False
+          assert result["unit_count_per_row"] == 7
+          assert result["subset_count_per_row"] == 127
+          assert result["variant_count_per_row"] == 254
+
+          forbidden = {
+              "plain_attack",
+              "inception_attack",
+              "rendered_text",
+              "raw_prompt",
+              "raw_output",
+              "canonical_goal",
+              "source_embedded_payload",
+              "derived_prompt",
+              "synthetic_prompt",
+              "synthetic_payload",
+              "bridge",
+          }
+          stack = [result]
+          while stack:
+              value = stack.pop()
+              if isinstance(value, dict):
+                  leaked = forbidden.intersection(value)
+                  if leaked:
+                      raise SystemExit(f"unsafe raw-field keys: {sorted(leaked)}")
+                  stack.extend(value.values())
+              elif isinstance(value, list):
+                  stack.extend(value)
+          PY
+
+      - name: Persist safe v2 audit record
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          encoded="$(base64 -w0 < "$SAFE_OUTPUT")"
+          current_sha="$(gh api \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "repos/${GITHUB_REPOSITORY}/contents/${RECORD_PATH}?ref=agent/programmatic-agentharm-pivot" \
+            --jq '.sha' 2>/dev/null || true)"
+          args=(
+            --method PUT
+            -H 'Accept: application/vnd.github+json'
+            -H 'X-GitHub-Api-Version: 2022-11-28'
+            "repos/${GITHUB_REPOSITORY}/contents/${RECORD_PATH}"
+            -f message='Record DeepInception exact-rerender v2 audit'
+            -f content="$encoded"
+            -f branch='agent/programmatic-agentharm-pivot'
+          )
+          if [[ -n "$current_sha" ]]; then
+            args+=( -f sha="$current_sha" )
+          fi
+          gh api "${args[@]}" >/dev/null
+
+      - name: Publish safe summary
+        if: always()
+        run: |
+          if [[ -f "$SAFE_OUTPUT" ]]; then
+            python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          result = json.loads(Path(os.environ["SAFE_OUTPUT"]).read_text())
+          with Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a") as handle:
+              handle.write("# E0 DeepInception exact-rerender v2\n\n")
+              handle.write(f"- status: **{result['status']}**\n")
+              handle.write(
+                  f"- rows: **{result['row_pass_count']}/"
+                  f"{result['official_row_count']} passed**\n"
+              )
+              handle.write(
+                  f"- variants: **{result['total_variant_pass_count']}/"
+                  f"{result['total_variant_count']} passed**\n"
+              )
+              handle.write(
+                  f"- unique preserved bridges: **{result['unique_bridge_count']}**\n"
+              )
+              handle.write(
+                  "- source payload match modes: "
+                  f"**{result['source_payload_match_modes']}**\n"
+              )
+              handle.write("- official artifact route remains failed: **true**\n")
+              handle.write("- target model / attack scoring: **false / false**\n")
+              handle.write("- Stage A / oracle / wavelet: **closed / closed / closed**\n")
+          PY
+          fi
+
+      - name: Upload safe v2 audit artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e0-deepinception-exact-rerender-v2-safe
+          path: artifacts/e0-deepinception-exact-rerender-v2
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Enforce v2 audit decision
+        run: |
+          test "${{ steps.execute.outputs.exit_code }}" = "0"

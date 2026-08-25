@@ -1,0 +1,34 @@
+{
+  "schema_version": "evaluator-panel-e1a-execution-record-v1",
+  "status": "E1A_EXECUTION_RECORDED",
+  "paper_validity": false,
+  "source_head_sha": "c7c844df914c7c650c1a7eb5eb1a687f0278c22a",
+  "workflow_name": "evaluator-panel-e1a-static-hardening",
+  "workflow_run_id": 32689969429,
+  "workflow_run_number": 3,
+  "workflow_conclusion": "success",
+  "job_id": 97321778406,
+  "artifact": {
+    "id": 9506936451,
+    "name": "evaluator-panel-e1a-static-hardening-safe",
+    "digest": "sha256:c53ccabc1c912195c2029ca92f3b50f4698b8e7571a1a241fc02052e29151725",
+    "size_bytes": 1135,
+    "retention_expires_at": "2026-09-23T04:27:04Z",
+    "contained_result_sha256": "28a6929fe59b1b42f1c21c2692170eac16c649d97b90cb7a4560be9e9bba1351"
+  },
+  "result_path": "data/natural_language_localization/evaluator_panel_v1/e1a_static_hardening.safe.json",
+  "result_status": "EVALUATOR_PANEL_E1A_STATIC_HARDENING_PASS",
+  "static_checks_passed": 18,
+  "static_checks_total": 18,
+  "official_source_identity_verification": "PASS",
+  "wildguard_predecessor_primary_gate": "FAIL_PRESERVED",
+  "scientific_interpretation": "E1A verifies parser, sanitizer, canary, deterministic aggregation, source identity, and predecessor integrity only. It is not model-quality or external-validity evidence.",
+  "sealed_boundaries": {
+    "stage_a_opened": false,
+    "gate1_evaluation_30_opened": false,
+    "gate2_heldout_opened": false,
+    "causal_oracle_opened": false,
+    "wavelet_used": false
+  },
+  "next_authorized_operation": "E1B_WILDGUARD_LIVE_REPRODUCTION_AND_CANARIES"
+}

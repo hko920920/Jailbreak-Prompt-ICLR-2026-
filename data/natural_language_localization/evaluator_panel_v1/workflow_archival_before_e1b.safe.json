@@ -1,0 +1,36 @@
+{
+  "schema_version": "research-workflow-archival-v1",
+  "status": "TERMINAL_PATH_WORKFLOWS_ARCHIVED_BEFORE_E1B",
+  "recorded_at": "2026-08-24T14:23:14+09:00",
+  "reason": "The draft pull request carries a cumulative diff that repeatedly launched completed AgentHarm and calibration workflows, consuming runners needed by the active E1B WildGuard experiment.",
+  "scientific_contract_changed": false,
+  "measurement_thresholds_changed": false,
+  "historical_runs_and_artifacts_preserved": true,
+  "archival_mechanism": "same workflow name and concurrency group; cancel-in-progress true; archived job condition false",
+  "archived_workflows": [
+    ".github/workflows/programmatic_agentharm_runtime_smoke.yml",
+    ".github/workflows/programmatic_agentharm_candidate_sweep.yml",
+    ".github/workflows/programmatic_agentharm_development_sweep.yml",
+    ".github/workflows/programmatic_agentharm_copyright_diagnostic.yml",
+    ".github/workflows/programmatic_agentharm_llama31_second_model.yml",
+    ".github/workflows/natural_language_calibration_packet.yml",
+    ".github/workflows/evaluator_panel_e1a_static_hardening.yml"
+  ],
+  "active_workflows_preserved": [
+    ".github/workflows/ci.yml",
+    ".github/workflows/evaluator_panel_e1b_wildguard.yml"
+  ],
+  "evidence_references": [
+    "data/programmatic_agentharm/development/agentharm_terminal_decision.json",
+    "data/natural_language_localization/feasibility_v1/calibration_capture_v3.safe.json",
+    "data/natural_language_localization/evaluator_panel_v1/e1a_execution_record.safe.json"
+  ],
+  "sealed_boundaries": {
+    "stage_a_opened": false,
+    "gate1_evaluation_30_opened": false,
+    "gate2_heldout_opened": false,
+    "causal_oracle_opened": false,
+    "wavelet_used": false
+  },
+  "next_authorized_operation": "COMPLETE_E1B_WILDGUARD_REPRODUCTION_AND_CANARY_EVALUATION"
+}

@@ -1,0 +1,223 @@
+{
+  "causal_oracle_opened": false,
+  "config_sha256": "2f9404fd2b7bf05274061006251d8bcb5109fdb5c944ee1df65f4fb5312853f1",
+  "cross_regime_stage_a_opened": false,
+  "external_api_called": false,
+  "family": "GCG",
+  "family_admitted_to_balanced_signal_screen": false,
+  "harmless_block_audit": {
+    "all_intervals_pass": true,
+    "all_subsets_pass": true,
+    "block_count": 4,
+    "contiguous_interval_count": 10,
+    "control_lexical_units": 20,
+    "interval_records_sha256": "a2f5c22b78525e5182698dde84bdee1e8efe6fe19fc0121171ffad7220596356",
+    "nonempty_subset_count": 15,
+    "ranges": [
+      [
+        0,
+        5
+      ],
+      [
+        5,
+        10
+      ],
+      [
+        10,
+        15
+      ],
+      [
+        15,
+        20
+      ]
+    ],
+    "raw_composed_text_recorded": false,
+    "subset_records_sha256": "adf5db611b0c246aeed0f4b0d99d09deeb88f11f492b5c6eade80abe3c106fdc",
+    "synthetic_goal_sha256": "3f5f410de184f4e8c9f205e1538d1b1dc18e4bf99b5f890deb12b0a51e0159aa",
+    "units_per_block": 5
+  },
+  "heldout_opened": false,
+  "intervention_boundary": {
+    "actual_token_boundaries_must_be_frozen_after_target_tokenizer_selection": true,
+    "all_token_power_set_claim_allowed": false,
+    "contract_exact_vocabulary_only": true,
+    "deletion_is_auxiliary_only": true,
+    "position_preserving_neutral_replacement_required": true,
+    "primary_preliminary_unit": "EQUAL_CONTIGUOUS_CONTROL_BLOCK",
+    "refinement_units": [
+      "RECURSIVE_CONTROL_SUBBLOCK",
+      "CONTIGUOUS_CONTROL_TOKEN_INTERVAL"
+    ]
+  },
+  "keep_only_oracle_opened": false,
+  "mandatory_checks": {
+    "all_harmless_block_subsets_preserve_goal": true,
+    "all_harmless_intervals_preserve_length": true,
+    "all_source_blobs_match": true,
+    "control_only_candidate_replacement_verified": true,
+    "goal_control_separation_verified": true,
+    "main_budget_forwarding_verified": true,
+    "mit_license_present": true,
+    "no_target_or_real_harmful_payload": true,
+    "one_coordinate_topk_update_verified": true,
+    "pinned_revision_and_tree_match": true,
+    "template_defaults_match": true
+  },
+  "next_authorized_operation": "FREEZE_GCG_TOKENIZER_TEMPLATE_BUDGET_AND_POSITION_PRESERVING_NEUTRALIZER_AUDIT",
+  "observed_method_defaults": {
+    "GCGMultiPromptAttack.step": {
+      "allow_non_ascii": true,
+      "batch_size": 1024,
+      "control_weight": 0.1,
+      "filter_cand": true,
+      "opt_only": false,
+      "self": null,
+      "target_weight": 1,
+      "temp": 1,
+      "topk": 256,
+      "verbose": false
+    },
+    "GCGPromptManager.sample_control": {
+      "allow_non_ascii": true,
+      "batch_size": null,
+      "grad": null,
+      "self": null,
+      "temp": 1,
+      "topk": 256
+    }
+  },
+  "observed_template_defaults": {
+    "allow_non_ascii": false,
+    "anneal": false,
+    "attack": "gcg",
+    "batch_size": 512,
+    "control_init_lexical_units": 20,
+    "control_init_sha256": "874302c7217b90a7c3d47a1017d7f7c6a71a5dd07de18fed339cf47892a3249d",
+    "control_weight": 0.0,
+    "filter_cand": true,
+    "incr_control": false,
+    "n_steps": 500,
+    "stop_on_success": false,
+    "target_weight": 1.0,
+    "temp": 1,
+    "topk": 256
+  },
+  "operational_pass": true,
+  "paper_validity": false,
+  "prior_evaluation_opened": false,
+  "real_harmful_payload_used": false,
+  "regime": "U_nonfluent_optimized",
+  "safe_aggregate_sanitization": {
+    "control_init_identity_retained_as_sha256_and_lexical_count": true,
+    "raw_control_init_removed": true,
+    "scientific_contract_changed": false
+  },
+  "schema_version": "e0-gcg-static-audit-result-v1",
+  "source": {
+    "expected_revision": "098262edf85f807224e70ecd87b9d83716bf6b73",
+    "expected_tree_sha": "aa64fc78c0bed738c6952210cd0eb83d8bc0da9b",
+    "file_identities": [
+      {
+        "exists": true,
+        "expected_git_blob_sha": "eab9e7203b56594af2fabfc35d091b9dd546fd94",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "eab9e7203b56594af2fabfc35d091b9dd546fd94",
+        "path": "LICENSE",
+        "role": "license",
+        "sha256": "1e4bb8e2313ef9ff36033526503aa8837c80ba1d4c055c2e7d9977760028eec7",
+        "size_bytes": 1065
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "5563d6d1f3e65732377fae223782df5650a89d37",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "5563d6d1f3e65732377fae223782df5650a89d37",
+        "path": "experiments/configs/template.py",
+        "role": "template",
+        "sha256": "3f7dcde43c677cb72f2a39fc146463eceaa44e1fe61c1a1029b1f227065dc94f",
+        "size_bytes": 1391
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "13ccc8004ac0587a7ecce38095ae6bae55a6b7cc",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "13ccc8004ac0587a7ecce38095ae6bae55a6b7cc",
+        "path": "experiments/main.py",
+        "role": "main",
+        "sha256": "cf4ebd86d3a8c172cc11c049ce508d7e45c650036d8152f5c8fd7738de3a972c",
+        "size_bytes": 3212
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "bd67fca7e888fa1c427f7c1929f0f3eeca150a93",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "bd67fca7e888fa1c427f7c1929f0f3eeca150a93",
+        "path": "llm_attacks/base/attack_manager.py",
+        "role": "attack_manager",
+        "sha256": "7d8f6a7f9d8a1866acf7cf047e736357a474cd55f7f82c4e520c27247be88bd4",
+        "size_bytes": 63067
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "b9162e4bc9ccae72e0aed1a90e7694fbb3ade6d4",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "b9162e4bc9ccae72e0aed1a90e7694fbb3ade6d4",
+        "path": "llm_attacks/gcg/gcg_attack.py",
+        "role": "gcg_attack",
+        "sha256": "679825f430d1a6745a407195539c6a2143e1c75070063f739b211e9049be990f",
+        "size_bytes": 7218
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "81a3d2c60e7df61ba92ad2df4ef5e5697a52f609",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "81a3d2c60e7df61ba92ad2df4ef5e5697a52f609",
+        "path": "llm_attacks/minimal_gcg/opt_utils.py",
+        "role": "minimal_opt_utils",
+        "sha256": "82bbf7dddeaf7bff8c4d421849a9f77ea0e65cbe32db9ea0ea1fb277c664e56e",
+        "size_bytes": 7284
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "94d4aa77799b542e4d0cc29be0790758e8d6289d",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "94d4aa77799b542e4d0cc29be0790758e8d6289d",
+        "path": "llm_attacks/minimal_gcg/string_utils.py",
+        "role": "minimal_string_utils",
+        "sha256": "d02d57c9908f4f37e6040c023dc8fcbba5067ad57a8c057df8395c94faf13446",
+        "size_bytes": 6483
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "2c3597c13a38ed4544cf38fcf2433cde7fe1daeb",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "2c3597c13a38ed4544cf38fcf2433cde7fe1daeb",
+        "path": "setup.py",
+        "role": "setup",
+        "sha256": "bf863daf1daaf40274c6a980c55c9053d71ecc4cdc0c80a28ea0a283a784a5aa",
+        "size_bytes": 1436
+      }
+    ],
+    "license": "MIT",
+    "observed_revision": "098262edf85f807224e70ecd87b9d83716bf6b73",
+    "observed_tree_sha": "aa64fc78c0bed738c6952210cd0eb83d8bc0da9b",
+    "repository": "llm-attacks/llm-attacks",
+    "revision_match": true,
+    "tree_match": true
+  },
+  "source_semantics": {
+    "candidate_filtering_present": true,
+    "candidate_logits_replace_only_control_slice": true,
+    "goal_and_control_have_distinct_fields": true,
+    "goal_and_control_have_distinct_token_slices": true,
+    "gradient_is_computed_for_control_slice": true,
+    "gradient_topk_candidate_sampling_present": true,
+    "main_passes_frozen_budget_to_attack_run": true,
+    "one_coordinate_is_replaced_per_sampled_candidate": true
+  },
+  "status": "E0_GCG_STATIC_AUDIT_PASS_ADVANCE_TO_TOKENIZER_TEMPLATE_BUDGET_AUDIT",
+  "target_model_called": false,
+  "target_model_generation_performed": false,
+  "target_model_weights_downloaded": false,
+  "wavelet_used": false
+}

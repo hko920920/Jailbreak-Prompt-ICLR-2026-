@@ -1,0 +1,70 @@
+{
+  "schema_version": "evaluator-panel-e1c-prompt-source-freeze-v1",
+  "status": "FROZEN_BEFORE_E1C_PROMPT_SOURCE_EXTRACTION",
+  "frozen": true,
+  "paper_validity": false,
+  "evidence_class": "PROTOCOL",
+  "predecessors": {
+    "e1c_preflight": {
+      "result_path": "data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_preflight.safe.json",
+      "required_status": "E1C_HARMBENCH_PREFLIGHT_PASS",
+      "required_operational_pass": true
+    },
+    "runtime_artifact_v2": {
+      "result_path": "data/natural_language_localization/evaluator_panel_v1/e1c_runtime_artifact_probe_v2.safe.json",
+      "required_status": "E1C_RUNTIME_ARTIFACT_V2_PROBE_PASS",
+      "required_operational_pass": true,
+      "required_next_operation": "FREEZE_E1C_HARMBENCH_LIVE_REPRODUCTION_AND_CANARY_CONTRACT_WITH_RUNTIME_V2_IDENTITY"
+    }
+  },
+  "harmbench_source": {
+    "repository": "centerforaisafety/HarmBench",
+    "revision": "8e1604d1171fe8a48d8febecd22f600e462bdcdd",
+    "tree_sha": "e28303aa064b3a4fdbe5698bc323e43306b7ab74",
+    "files": {
+      "notebooks/run_classifier_val_set.ipynb": "f6b3cf674ec940d2384e277d77867f2293489595",
+      "eval_utils.py": "be95edd9523de0cde2a7823217b26983d57c496b",
+      "data/classifier_val_sets/text_behaviors_val_set.json": "3d7d0a98742a36b5c7824aadcea433e42a045022",
+      "data/behavior_datasets/harmbench_behaviors_text_all.csv": "8a6b423d85e9acdc168c57a6a957755cfa86c4cb"
+    }
+  },
+  "notebook_effective_execution": {
+    "expected_test_classifier_path": "cais/HarmBench-Llama-2-13b-cls",
+    "expected_val_classifier_path": "cais/HarmBench-Mistral-7b-val-cls",
+    "expected_classifier_path": "cais/HarmBench-Mistral-7b-val-cls",
+    "expected_loaded_model_argument": "cais/HarmBench-Llama-2-13b-cls",
+    "expected_effective_prompt_family": "MISTRAL_CLS_PROMPT",
+    "expected_model_prompt_family_mismatch": true,
+    "expected_temperature": 0.0,
+    "expected_max_tokens": 1,
+    "cached_prediction_field": "cls"
+  },
+  "production_execution": {
+    "prompt_source_file": "eval_utils.py",
+    "prompt_family": "LLAMA2_CLS_PROMPT",
+    "decoder_temperature": 0.0,
+    "decoder_max_tokens": 1,
+    "not_assumed_equivalent_to_notebook_effective_prompt": true
+  },
+  "dataset_checks": {
+    "all_validation_rows_have_binary_cached_cls": true,
+    "all_validation_behavior_ids_exist_in_behavior_csv": true,
+    "raw_test_case_or_generation_text_may_enter_safe_result": false,
+    "raw_prompt_template_may_enter_safe_result": false
+  },
+  "decision_gate": {
+    "on_pass": "FREEZE_E1C_HARMBENCH_LIVE_CONTRACT_FROM_EXTRACTED_PROMPT_IDENTITIES",
+    "on_fail": "STOP_E1C_AND_RESOLVE_OFFICIAL_SOURCE_AMBIGUITY_BEFORE_LIVE_OUTPUTS"
+  },
+  "sealed_boundaries": {
+    "model_weight_downloaded": false,
+    "model_inference_performed": false,
+    "harmbench_live_predictions_generated": false,
+    "new_harmful_attack_outputs_generated": false,
+    "semantic_only_stage_a_opened": false,
+    "cross_regime_stage_a_opened": false,
+    "causal_oracle_opened": false,
+    "keep_only_oracle_opened": false,
+    "wavelet_used": false
+  }
+}

@@ -1,0 +1,210 @@
+name: e0-gcg-static-adapter-audit
+
+# User-triggered rerun with post-execution safe-aggregate sanitization only.
+on:
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/e0_gcg_static_adapter_audit.yml
+      - configs/natural_language_localization/e0_gcg_static_audit_v1.json
+      - docs/E0_GCG_STATIC_ADAPTER_AUDIT_V1.md
+      - scripts/run_e0_gcg_static_audit.py
+      - tests/test_e0_gcg_static_audit.py
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: e0-gcg-static-adapter-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      ACTIVE_BRANCH: agent/programmatic-agentharm-pivot
+      GCG_REPOSITORY: https://github.com/llm-attacks/llm-attacks.git
+      GCG_REVISION: 098262edf85f807224e70ecd87b9d83716bf6b73
+      GCG_TREE_SHA: aa64fc78c0bed738c6952210cd0eb83d8bc0da9b
+      CONTRACT: configs/natural_language_localization/e0_gcg_static_audit_v1.json
+      SAFE_OUTPUT: data/natural_language_localization/e0_attack_family_provenance_v1/gcg_static_audit.safe.json
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.ACTIVE_BRANCH }}
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install and validate frozen audit implementation
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install 'pytest==9.1.1' 'ruff==0.16.4'
+          ruff check \
+            scripts/run_e0_gcg_static_audit.py \
+            tests/test_e0_gcg_static_audit.py
+          pytest -q tests/test_e0_gcg_static_audit.py
+          python -m json.tool "$CONTRACT" >/dev/null
+          git diff --check
+
+      - name: Check out exact GCG source revision
+        run: |
+          set -euo pipefail
+          source_root="$RUNNER_TEMP/gcg-source"
+          git init -q "$source_root"
+          git -C "$source_root" remote add origin "$GCG_REPOSITORY"
+          git -C "$source_root" fetch -q --depth 1 origin "$GCG_REVISION"
+          git -C "$source_root" checkout -q --detach FETCH_HEAD
+          test "$(git -C "$source_root" rev-parse HEAD)" = "$GCG_REVISION"
+          test "$(git -C "$source_root" rev-parse HEAD^{tree})" = "$GCG_TREE_SHA"
+          echo "GCG_SOURCE_ROOT=$source_root" >> "$GITHUB_ENV"
+
+      - name: Execute harmless static source and block-boundary audit
+        run: |
+          set -euo pipefail
+          python scripts/run_e0_gcg_static_audit.py \
+            --config "$CONTRACT" \
+            --source-root "$GCG_SOURCE_ROOT" \
+            --output "$SAFE_OUTPUT"
+
+      - name: Sanitize safe aggregate representation
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          path = Path(os.environ["SAFE_OUTPUT"])
+          result = json.loads(path.read_text(encoding="utf-8"))
+          defaults = result["observed_template_defaults"]
+          removed = defaults.pop("control_init", None)
+          if not isinstance(removed, str) or not removed:
+              raise SystemExit("expected upstream control_init was not present before sanitization")
+          assert defaults["control_init_lexical_units"] == 20
+          assert len(defaults["control_init_sha256"]) == 64
+          result["safe_aggregate_sanitization"] = {
+              "raw_control_init_removed": True,
+              "control_init_identity_retained_as_sha256_and_lexical_count": True,
+              "scientific_contract_changed": False,
+          }
+          path.write_text(
+              json.dumps(result, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Verify pass result and sealed boundary
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          result = json.loads(Path(os.environ["SAFE_OUTPUT"]).read_text())
+          assert result["status"] == (
+              "E0_GCG_STATIC_AUDIT_PASS_ADVANCE_TO_TOKENIZER_TEMPLATE_BUDGET_AUDIT"
+          )
+          assert result["operational_pass"] is True
+          assert result["paper_validity"] is False
+          assert all(result["mandatory_checks"].values())
+          assert result["safe_aggregate_sanitization"]["raw_control_init_removed"] is True
+          assert result["family_admitted_to_balanced_signal_screen"] is False
+          assert result["real_harmful_payload_used"] is False
+          assert result["target_model_weights_downloaded"] is False
+          assert result["target_model_called"] is False
+          assert result["target_model_generation_performed"] is False
+          assert result["external_api_called"] is False
+          assert result["cross_regime_stage_a_opened"] is False
+          assert result["prior_evaluation_opened"] is False
+          assert result["heldout_opened"] is False
+          assert result["causal_oracle_opened"] is False
+          assert result["keep_only_oracle_opened"] is False
+          assert result["wavelet_used"] is False
+          assert result["harmless_block_audit"]["nonempty_subset_count"] == 15
+          assert result["harmless_block_audit"]["contiguous_interval_count"] == 10
+
+          forbidden = {
+              "raw_prompt",
+              "raw_response",
+              "raw_output",
+              "harmful_payload",
+              "composed_text",
+              "synthetic_goal",
+              "control_init",
+          }
+          stack = [result]
+          while stack:
+              value = stack.pop()
+              if isinstance(value, dict):
+                  leaked = forbidden.intersection(value)
+                  if leaked:
+                      raise SystemExit(f"unsafe raw fields: {sorted(leaked)}")
+                  stack.extend(value.values())
+              elif isinstance(value, list):
+                  stack.extend(value)
+          PY
+
+      - name: Upload safe GCG audit artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: e0-gcg-static-adapter-safe
+          path: ${{ env.SAFE_OUTPUT }}
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Commit immutable safe result
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add "$SAFE_OUTPUT"
+          if git diff --cached --quiet; then
+            echo "GCG safe audit record already present."
+            exit 0
+          fi
+          git commit -m "Record GCG harmless static adapter audit"
+          for attempt in 1 2 3; do
+            git fetch origin "$ACTIVE_BRANCH"
+            git rebase "origin/$ACTIVE_BRANCH"
+            if git push origin "HEAD:$ACTIVE_BRANCH"; then
+              exit 0
+            fi
+          done
+          echo "Unable to persist GCG safe audit record" >&2
+          exit 1
+
+      - name: Publish safe summary
+        if: always()
+        run: |
+          if [[ -f "$SAFE_OUTPUT" ]]; then
+            python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          result = json.loads(Path(os.environ["SAFE_OUTPUT"]).read_text())
+          block = result["harmless_block_audit"]
+          with Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a") as handle:
+              handle.write("# E0 GCG static adapter audit\n\n")
+              handle.write(f"- status: **{result['status']}**\n")
+              handle.write(
+                  f"- source identities: **{result['mandatory_checks']['all_source_blobs_match']}**\n"
+              )
+              handle.write(
+                  f"- harmless block subsets: **{block['nonempty_subset_count']} / pass**\n"
+              )
+              handle.write(
+                  f"- harmless intervals: **{block['contiguous_interval_count']} / pass**\n"
+              )
+              handle.write("- raw control text retained: **false**\n")
+              handle.write("- target model / real harmful payload: **false / false**\n")
+              handle.write("- Stage A / oracle / wavelet: **closed / closed / closed**\n")
+          PY
+          fi

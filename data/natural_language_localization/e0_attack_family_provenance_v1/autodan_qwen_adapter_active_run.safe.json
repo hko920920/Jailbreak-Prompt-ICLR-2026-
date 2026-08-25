@@ -1,0 +1,19 @@
+{
+  "schema_version": "e0-autodan-qwen-adapter-active-run-v1",
+  "status": "E0_AUTODAN_QWEN_ADAPTER_SMOKE_IN_PROGRESS",
+  "paper_validity": false,
+  "source_head_sha": "95212522884a1707f776ef1a8e2537140bba4022",
+  "workflow": "e0-autodan-qwen-adapter-smoke",
+  "workflow_run_id": 32713133181,
+  "workflow_run_number": 3,
+  "workflow_run_attempt": 1,
+  "scientific_contract_changed": false,
+  "real_harmful_payload_used": false,
+  "target_model_weights_downloaded": false,
+  "target_model_called": false,
+  "target_model_generation_performed": false,
+  "cross_regime_stage_a_opened": false,
+  "causal_oracle_opened": false,
+  "wavelet_used": false,
+  "next_authorized_operation": "COMPLETE_OR_DIAGNOSE_THIS_SYNTHETIC_ADAPTER_SMOKE"
+}

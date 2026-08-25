@@ -1,0 +1,74 @@
+{
+  "schema_version": "evaluator-panel-e1c-runtime-artifact-probe-v2",
+  "status": "FROZEN_BEFORE_E1C_RUNTIME_ARTIFACT_V2_METADATA_QUERY",
+  "frozen": true,
+  "paper_validity": false,
+  "evidence_class": "PROTOCOL",
+  "predecessors": {
+    "e1c_preflight": {
+      "result_path": "data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_preflight.safe.json",
+      "required_status": "E1C_HARMBENCH_PREFLIGHT_PASS",
+      "required_operational_pass": true
+    },
+    "candidate_1_rejection": {
+      "result_path": "data/natural_language_localization/evaluator_panel_v1/e1c_runtime_artifact_probe.safe.json",
+      "required_status": "E1C_RUNTIME_ARTIFACT_PROBE_FAIL",
+      "required_operational_pass": false,
+      "required_next_operation": "SELECT_NEW_RUNTIME_ARTIFACT_BEFORE_ANY_E1C_LIVE_OUTPUT",
+      "rejected_repository": "tensorblock/HarmBench-Llama-2-13b-cls-GGUF",
+      "rejection_reason": "PINNED_REPOSITORY_REVISION_DID_NOT_CONTAIN_THE_MODEL_CARD_LISTED_Q4_K_M_FILE"
+    }
+  },
+  "official_source_model": {
+    "repository": "cais/HarmBench-Llama-2-13b-cls",
+    "revision": "bda705349d1144fa618770bea64d99ce54e3835b"
+  },
+  "candidate_runtime_artifact": {
+    "repository": "mradermacher/HarmBench-Llama-2-13b-cls-GGUF",
+    "filename_selection": {
+      "required_prefix": "HarmBench-Llama-2-13b-cls.",
+      "required_suffix": ".Q4_K_M.gguf",
+      "required_match_count": 1
+    },
+    "quantization": "Q4_K_M",
+    "minimum_size_bytes": 7500000000,
+    "maximum_size_bytes": 8300000000,
+    "immutable_repository_revision_required": true,
+    "file_sha256_required": true,
+    "silent_artifact_substitution_allowed": false,
+    "fallback_quantization_allowed_without_new_contract": false,
+    "provenance_claim": "COMMUNITY_STATIC_QUANTIZATION_OF_OFFICIAL_SOURCE_REQUIRING_EMPIRICAL_REPRODUCTION"
+  },
+  "runtime": {
+    "repository": "ggml-org/llama.cpp",
+    "revision": "0177dcc7300bad8914bb838baabce87899812491",
+    "release_tag": "b10441",
+    "release_asset": "llama-b10441-bin-ubuntu-x64.tar.gz",
+    "reused_from_qualified_e1b_runtime": true
+  },
+  "probe_checks": {
+    "candidate_repository_accessible": true,
+    "candidate_revision_immutable": true,
+    "selection_rule_has_exactly_one_match": true,
+    "file_size_within_frozen_bounds": true,
+    "file_sha256_visible": true,
+    "model_card_names_official_source": true,
+    "model_card_names_selected_file": true,
+    "model_card_states_static_quantization": true,
+    "no_model_weight_download": true,
+    "no_model_inference": true
+  },
+  "decision_gate": {
+    "on_pass": "FREEZE_E1C_HARMBENCH_LIVE_REPRODUCTION_AND_CANARY_CONTRACT_WITH_RUNTIME_V2_IDENTITY",
+    "on_fail": "SELECT_NEW_RUNTIME_ARTIFACT_BEFORE_ANY_E1C_LIVE_OUTPUT"
+  },
+  "sealed_boundaries": {
+    "harmbench_live_predictions_generated": false,
+    "new_harmful_attack_outputs_generated": false,
+    "semantic_only_stage_a_opened": false,
+    "cross_regime_stage_a_opened": false,
+    "causal_oracle_opened": false,
+    "keep_only_oracle_opened": false,
+    "wavelet_used": false
+  }
+}

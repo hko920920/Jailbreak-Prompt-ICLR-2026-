@@ -1,0 +1,121 @@
+name: evaluator-panel-e1c-runtime-artifact-probe-v2
+
+# Static metadata only. No model weights or inference are opened by this workflow.
+on:
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/evaluator_panel_e1c_runtime_artifact_probe_v2.yml
+      - configs/natural_language_localization/evaluator_panel_e1c_runtime_artifact_probe_v2.json
+      - scripts/run_evaluator_panel_e1c_runtime_probe_v2.py
+      - tests/test_evaluator_panel_e1c_runtime_probe_v2.py
+      - data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_preflight.safe.json
+      - data/natural_language_localization/evaluator_panel_v1/e1c_runtime_artifact_probe.safe.json
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: evaluator-panel-e1c-runtime-artifact-probe-v2
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      CONFIG: configs/natural_language_localization/evaluator_panel_e1c_runtime_artifact_probe_v2.json
+      SAFE_DIR: artifacts/evaluator-panel-e1c-runtime-artifact-probe-v2/safe
+      SAFE_RESULT: artifacts/evaluator-panel-e1c-runtime-artifact-probe-v2/safe/e1c_runtime_artifact_probe_v2.safe.json
+      RECORD_RESULT: data/natural_language_localization/evaluator_panel_v1/e1c_runtime_artifact_probe_v2.safe.json
+      PIP_NO_CACHE_DIR: "1"
+      HF_HUB_DISABLE_TELEMETRY: "1"
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install probe-only dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install \
+            'huggingface_hub>=0.24,<2' \
+            'pytest>=8.2' \
+            'ruff>=0.6'
+
+      - name: Validate frozen v2 probe implementation
+        run: |
+          ruff check \
+            scripts/run_evaluator_panel_e1c_runtime_probe_v2.py \
+            tests/test_evaluator_panel_e1c_runtime_probe_v2.py
+          python -m pytest -q tests/test_evaluator_panel_e1c_runtime_probe_v2.py
+
+      - name: Query immutable runtime artifact v2 metadata
+        id: probe
+        shell: bash
+        run: |
+          mkdir -p "$SAFE_DIR"
+          set +e
+          python scripts/run_evaluator_panel_e1c_runtime_probe_v2.py \
+            --root . \
+            --config "$CONFIG" \
+            --safe-output "$SAFE_RESULT"
+          code=$?
+          set -e
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          test -f "$SAFE_RESULT"
+
+      - name: Audit safe v2 probe boundaries
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          result = json.loads(Path(os.environ["SAFE_RESULT"]).read_text(encoding="utf-8"))
+          assert result["model_weight_downloaded"] is False
+          assert result["model_inference_performed"] is False
+          assert result["harmbench_live_predictions_generated"] is False
+          assert result["new_harmful_attack_outputs_generated"] is False
+          assert result["cross_regime_stage_a_opened"] is False
+          assert result["causal_oracle_opened"] is False
+          assert result["keep_only_oracle_opened"] is False
+          assert result["wavelet_used"] is False
+          assert len(result["matching_files"]) <= 1
+          PY
+
+      - name: Record safe runtime artifact v2 identity
+        run: |
+          mkdir -p "$(dirname "$RECORD_RESULT")"
+          cp "$SAFE_RESULT" "$RECORD_RESULT"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$RECORD_RESULT"
+          if git diff --cached --quiet; then
+            echo "Runtime artifact v2 probe result is already current."
+          else
+            git commit -m "Record E1C runtime artifact v2 probe result"
+            git push origin HEAD:agent/programmatic-agentharm-pivot
+          fi
+
+      - name: Upload safe runtime artifact v2 probe
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evaluator-panel-e1c-runtime-artifact-probe-v2-safe
+          path: ${{ env.SAFE_DIR }}
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Enforce runtime artifact v2 probe gate
+        if: always()
+        run: |
+          test "${{ steps.probe.outputs.exit_code }}" = "0"
