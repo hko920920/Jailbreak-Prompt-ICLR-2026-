@@ -1,19 +1,26 @@
-name: temporary-freeze-e1c-harmbench-live-contract
+name: evaluator-panel-e1c-harmbench-live-contract-freeze
 
-# One-shot static materialization. No model weights or inference.
-"on":
+# Static contract materialization only. No model weights or inference.
+on:
   push:
     branches:
       - agent/programmatic-agentharm-pivot
     paths:
-      - .github/workflows/_temporary_freeze_e1c_harmbench_live_contract.yml
+      - .github/workflows/evaluator_panel_e1c_harmbench_live_contract_freeze.yml
+      - configs/natural_language_localization/evaluator_panel_e1c_harmbench_live_contract_v1.json
+      - scripts/run_evaluator_panel_e1c_harmbench_live_contract_freeze.py
+      - tests/test_evaluator_panel_e1c_harmbench_live_contract_freeze.py
+      - docs/EVALUATOR_PANEL_E1C_HARMBENCH_LIVE_CONTRACT_V1.md
+      - data/natural_language_localization/evaluator_panel_v1/e1c_prompt_source_freeze_v3.safe.json
+      - data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_prompt_manifest_v3.safe.jsonl
+      - data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_selection_v2.safe.jsonl
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: temporary-freeze-e1c-harmbench-live-contract
+  group: evaluator-panel-e1c-harmbench-live-contract-freeze
   cancel-in-progress: false
 
 jobs:
@@ -24,8 +31,6 @@ jobs:
       TARGET_BRANCH: agent/programmatic-agentharm-pivot
       HARM_BENCH_REVISION: 8e1604d1171fe8a48d8febecd22f600e462bdcdd
       SOURCE_ROOT: upstream/HarmBench
-      BUNDLE_PATH: .agent/e1c_live_contract_nonworkflow.tgz
-      BUNDLE_SHA256: da2b6e8beb13fab43bb0b35c1fef2bebc41e70d0f6cea35a9460248ee9f2bf15
       CONTRACT: configs/natural_language_localization/evaluator_panel_e1c_harmbench_live_contract_v1.json
       SAFE_DIR: artifacts/evaluator-panel-e1c-harmbench-live-contract/safe
       SAFE_RESULT: artifacts/evaluator-panel-e1c-harmbench-live-contract/safe/e1c_harmbench_live_contract.safe.json
@@ -34,10 +39,9 @@ jobs:
       PIP_NO_CACHE_DIR: "1"
 
     steps:
-      - name: Check out current research branch
+      - name: Check out research repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ env.TARGET_BRANCH }}
           fetch-depth: 0
 
       - name: Check out immutable HarmBench source
@@ -52,14 +56,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
-      - name: Verify and extract frozen contract bundle
-        run: |
-          set -euo pipefail
-          test -f "$BUNDLE_PATH"
-          test "$(sha256sum "$BUNDLE_PATH" | cut -d' ' -f1)" = "$BUNDLE_SHA256"
-          tar -tzf "$BUNDLE_PATH" >/dev/null
-          tar -xzf "$BUNDLE_PATH" -C .
 
       - name: Validate frozen implementation
         run: |
@@ -77,7 +73,7 @@ jobs:
         run: |
           test "$(git -C "$SOURCE_ROOT" rev-parse HEAD)" = "$HARM_BENCH_REVISION"
 
-      - name: Materialize thresholds and request identities
+      - name: Materialize live thresholds and request identities
         id: freeze
         shell: bash
         run: |
@@ -93,7 +89,7 @@ jobs:
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
           test -f "$SAFE_RESULT"
 
-      - name: Audit safe result and sealed boundary
+      - name: Audit safe frozen result
         if: always()
         run: |
           python - <<'PY'
@@ -115,14 +111,6 @@ jobs:
           assert result["causal_oracle_opened"] is False
           assert result["keep_only_oracle_opened"] is False
           assert result["wavelet_used"] is False
-          if result["operational_pass"] is True:
-              assert result["status"] == (
-                  "E1C_HARMBENCH_LIVE_CONTRACT_FREEZE_PASS"
-              )
-              assert result["next_authorized_operation"] == (
-                  "EXECUTE_E1C_HARMBENCH_LIVE_REPRODUCTION_AND_"
-                  "INJECTION_CANARIES"
-              )
           serialized = path.read_text(encoding="utf-8").lower()
           for forbidden in (
               '"test_case"',
@@ -132,18 +120,17 @@ jobs:
               '"rendered_prompt"',
           ):
               assert forbidden not in serialized
+          if result["operational_pass"] is True:
+              assert result["status"] == (
+                  "E1C_HARMBENCH_LIVE_CONTRACT_FREEZE_PASS"
+              )
+              assert result["next_authorized_operation"] == (
+                  "EXECUTE_E1C_HARMBENCH_LIVE_REPRODUCTION_AND_"
+                  "INJECTION_CANARIES"
+              )
           PY
 
-      - name: Upload safe contract artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: evaluator-panel-e1c-harmbench-live-contract-safe
-          path: ${{ env.SAFE_DIR }}
-          if-no-files-found: error
-          retention-days: 30
-
-      - name: Commit non-workflow contract files and safe result
+      - name: Commit immutable safe contract result
         if: always()
         run: |
           mkdir -p "$(dirname "$RECORD_RESULT")"
@@ -179,35 +166,39 @@ jobs:
               encoding="utf-8",
           )
           PY
-
-          git rm "$BUNDLE_PATH"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add \
-            configs/natural_language_localization/evaluator_panel_e1c_harmbench_live_contract_v1.json \
-            scripts/run_evaluator_panel_e1c_harmbench_live_contract_freeze.py \
-            tests/test_evaluator_panel_e1c_harmbench_live_contract_freeze.py \
-            docs/EVALUATOR_PANEL_E1C_HARMBENCH_LIVE_CONTRACT_V1.md \
-            "$RECORD_RESULT" \
-            "$RUN_RECORD"
-          git commit -m "Freeze E1C HarmBench live qualification contract"
-
-          git fetch origin "$TARGET_BRANCH"
-          panel_dir=data/natural_language_localization/evaluator_panel_v1
-          frozen_inputs=(
-            "$panel_dir/e1c_prompt_source_freeze_v3.safe.json"
-            "$panel_dir/e1c_harmbench_prompt_manifest_v3.safe.jsonl"
-            "$panel_dir/e1c_harmbench_selection_v2.safe.jsonl"
-          )
-          if ! git diff --quiet "$GITHUB_SHA" "origin/$TARGET_BRANCH" -- \
-            "${frozen_inputs[@]}"; then
-            echo "Frozen predecessor changed while contract was computed." >&2
-            exit 1
+          git add "$RECORD_RESULT" "$RUN_RECORD"
+          if git diff --cached --quiet; then
+            echo "Live-contract records are already current."
+          else
+            git commit -m "Record E1C HarmBench live contract"
+            git fetch origin "$TARGET_BRANCH"
+            panel_dir=data/natural_language_localization/evaluator_panel_v1
+            frozen_inputs=(
+              "$panel_dir/e1c_prompt_source_freeze_v3.safe.json"
+              "$panel_dir/e1c_harmbench_prompt_manifest_v3.safe.jsonl"
+              "$panel_dir/e1c_harmbench_selection_v2.safe.jsonl"
+            )
+            if ! git diff --quiet HEAD "origin/$TARGET_BRANCH" -- \
+              "${frozen_inputs[@]}"; then
+              echo "Frozen predecessor changed while contract was computed." >&2
+              exit 1
+            fi
+            git rebase "origin/$TARGET_BRANCH"
+            git push origin "HEAD:$TARGET_BRANCH"
           fi
-          git rebase "origin/$TARGET_BRANCH"
-          git push origin "HEAD:$TARGET_BRANCH"
 
-      - name: Enforce static contract gate
+      - name: Upload safe contract artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evaluator-panel-e1c-harmbench-live-contract-safe
+          path: ${{ env.SAFE_DIR }}
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Enforce static live-contract gate
         if: always()
         run: |
           test "${{ steps.freeze.outputs.exit_code }}" = "0"
