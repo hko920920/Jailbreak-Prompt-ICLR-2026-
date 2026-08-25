@@ -38,7 +38,7 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Reassemble, verify, and extract frozen live implementation
+      - name: Reassemble, verify, extract, and apply lint-only repair
         run: |
           set -euo pipefail
           chunks=(
@@ -54,6 +54,19 @@ jobs:
           test "$(sha256sum "$ARCHIVE" | cut -d' ' -f1)" = "$ARCHIVE_SHA256"
           tar -tzf "$ARCHIVE" >/dev/null
           tar -xzf "$ARCHIVE" -C .
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("scripts/run_evaluator_panel_e1c_harmbench_live.py")
+          text = path.read_text(encoding="utf-8")
+          needle = (
+              '    source = as_object(contract["harmbench_source"], '
+              'where="harmbench_source")\n'
+          )
+          if text.count(needle) != 1:
+              raise SystemExit("expected exactly one frozen unused-source assignment")
+          path.write_text(text.replace(needle, ""), encoding="utf-8")
+          PY
 
       - name: Validate implementation before commit
         run: |
