@@ -2,17 +2,17 @@
   "causal_oracle_opened": false,
   "event": "push",
   "harmbench_live_predictions_generated": false,
-  "head_sha_at_start": "cb987d7ef845314dbf6ddba063de220f1dfb4994",
+  "head_sha_at_start": "ecc5e4b174c3e5340d13076ae15ede8949b93b66",
   "model_inference_performed": false,
   "model_weight_downloaded": false,
   "new_harmful_attack_outputs_generated": false,
   "operational_pass": true,
   "result_sha256": "9113edf2e073e917536393fe72b3ce28a7043ec0d9f67eaf54b296a53782a61f",
   "run_attempt": 1,
-  "run_id": 32818319737,
+  "run_id": 32818514719,
   "schema_version": "e1c-harmbench-live-contract-run-safe-v1",
   "stage_a_opened": false,
   "status": "E1C_HARMBENCH_LIVE_CONTRACT_FREEZE_PASS",
   "wavelet_used": false,
-  "workflow": "temporary-freeze-e1c-harmbench-live-contract"
+  "workflow": "evaluator-panel-e1c-harmbench-live-contract-freeze"
 }
