@@ -37,9 +37,9 @@ jobs:
       CONTRACT: configs/natural_language_localization/evaluator_panel_e1c_harmbench_live_contract_v1.json
       SAFE_DIR: artifacts/evaluator-panel-e1c-harmbench-live/safe
       SAFE_RESULT: artifacts/evaluator-panel-e1c-harmbench-live/safe/e1c_harmbench_live.safe.json
-      PRIVATE_DIR: ${{ runner.temp }}/e1c-harmbench-private
-      MODEL_DIR: ${{ runner.temp }}/e1c-harmbench-model
-      TOOLS_DIR: ${{ runner.temp }}/e1c-harmbench-tools
+      PRIVATE_DIR: /tmp/e1c-harmbench-private
+      MODEL_DIR: /tmp/e1c-harmbench-model
+      TOOLS_DIR: /tmp/e1c-harmbench-tools
       SERVER_URL: http://127.0.0.1:8081
       RECORD_ROOT: data/natural_language_localization/evaluator_panel_v1
       RECORD_DIR: data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_live
