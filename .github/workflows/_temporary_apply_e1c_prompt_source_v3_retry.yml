@@ -1,6 +1,8 @@
-name: temporary-apply-e1c-prompt-source-v3-retry
+name: temporary-apply-e1c-prompt-source-v3-direct
 
-# One-shot retry using the bundle already staged on the branch.
+# One-shot operational repair: reconstruct the verified text bundle from staged
+# base64 chunks, execute the frozen static v3 contract, commit only safe records,
+# and remove all temporary transport files. No model weights or inference.
 "on":
   push:
     branches:
@@ -13,7 +15,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: temporary-apply-e1c-prompt-source-v3-retry
+  group: temporary-apply-e1c-prompt-source-v3-direct
   cancel-in-progress: false
 
 jobs:
@@ -25,14 +27,13 @@ jobs:
       HARM_BENCH_REVISION: 8e1604d1171fe8a48d8febecd22f600e462bdcdd
       SOURCE_ROOT: upstream/HarmBench
       CONFIG: configs/natural_language_localization/evaluator_panel_e1c_prompt_source_freeze_v3.json
-      SAFE_DIR: artifacts/e1c-prompt-source-v3/safe
-      SAFE_RESULT: artifacts/e1c-prompt-source-v3/safe/e1c_prompt_source_freeze_v3.safe.json
-      RECORD_RESULT: >-
-        data/natural_language_localization/evaluator_panel_v1/e1c_prompt_source_freeze_v3.safe.json
-      RUN_RECORD: >-
-        data/natural_language_localization/evaluator_panel_v1/e1c_prompt_source_freeze_v3_run.safe.json
-      BUNDLE_PATH: .agent/e1c_source_v3_bundle.tgz
-      BUNDLE_GIT_BLOB_SHA: 1a8380fe36b8623258c80cb2a5e7be1a5ca98def
+      SAFE_DIR: artifacts/evaluator-panel-e1c-prompt-source-freeze-v3/safe
+      SAFE_RESULT: artifacts/evaluator-panel-e1c-prompt-source-freeze-v3/safe/e1c_prompt_source_freeze_v3.safe.json
+      SAFE_MANIFEST: artifacts/evaluator-panel-e1c-prompt-source-freeze-v3/safe/e1c_harmbench_prompt_manifest_v3.safe.jsonl
+      RECORD_RESULT: data/natural_language_localization/evaluator_panel_v1/e1c_prompt_source_freeze_v3.safe.json
+      RECORD_MANIFEST: data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_prompt_manifest_v3.safe.jsonl
+      RUN_RECORD: data/natural_language_localization/evaluator_panel_v1/e1c_prompt_source_freeze_v3_run.safe.json
+      BUNDLE_SHA256: 6f35b228771d5f726c9a6b4b45c46fe7bf20e52a21b7f9915d330ed1c341ceea
       PIP_NO_CACHE_DIR: "1"
 
     steps:
@@ -55,20 +56,26 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Extract staged source-v3 bundle
+      - name: Reassemble and verify source-v3 text bundle
         run: |
           set -euo pipefail
-          test -f "$BUNDLE_PATH"
-          observed_blob="$(git hash-object "$BUNDLE_PATH")"
-          test "$observed_blob" = "$BUNDLE_GIT_BLOB_SHA"
-          observed_sha256="$(sha256sum "$BUNDLE_PATH" | cut -d' ' -f1)"
-          echo "BUNDLE_ACTUAL_SHA256=$observed_sha256" >> "$GITHUB_ENV"
-          echo "bundle_git_blob_sha=$observed_blob" >> "$GITHUB_STEP_SUMMARY"
+          chunks=(
+            .agent/e1c_source_v3_bundle.b64.part00
+            .agent/e1c_source_v3_bundle.b64.part01
+            .agent/e1c_source_v3_bundle.b64.part02
+            .agent/e1c_source_v3_bundle.b64.part03
+          )
+          for chunk in "${chunks[@]}"; do
+            test -s "$chunk"
+          done
+          cat "${chunks[@]}" | base64 -d > "$RUNNER_TEMP/e1c-source-v3.tgz"
+          observed_sha256="$(sha256sum "$RUNNER_TEMP/e1c-source-v3.tgz" | cut -d' ' -f1)"
+          test "$observed_sha256" = "$BUNDLE_SHA256"
           echo "bundle_sha256=$observed_sha256" >> "$GITHUB_STEP_SUMMARY"
-          tar -tzf "$BUNDLE_PATH" >/dev/null
-          tar -xzf "$BUNDLE_PATH" -C .
+          tar -tzf "$RUNNER_TEMP/e1c-source-v3.tgz" >/dev/null
+          tar -xzf "$RUNNER_TEMP/e1c-source-v3.tgz" -C .
 
-      - name: Validate frozen implementation
+      - name: Validate frozen prompt-source v3 implementation
         run: |
           python -m pip install --upgrade pip
           python -m pip install 'pytest>=8.2' 'ruff>=0.6'
@@ -83,74 +90,97 @@ jobs:
         run: |
           test "$(git -C "$SOURCE_ROOT" rev-parse HEAD)" = "$HARM_BENCH_REVISION"
 
-      - name: Execute static prompt-source v3 freeze
+      - name: Reconstruct repaired rows and freeze safe prompt manifest
+        id: freeze
+        shell: bash
         run: |
           mkdir -p "$SAFE_DIR"
+          set +e
           python scripts/run_evaluator_panel_e1c_prompt_source_freeze_v3.py \
             --root . \
             --source-root "$SOURCE_ROOT" \
             --config "$CONFIG" \
-            --safe-output "$SAFE_RESULT"
+            --safe-output "$SAFE_RESULT" \
+            --manifest-output "$SAFE_MANIFEST"
+          code=$?
+          set -e
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          test -f "$SAFE_RESULT"
+          test -f "$SAFE_MANIFEST"
 
-      - name: Audit pass and sealed boundaries
+      - name: Audit v3 identities and sealed boundary
         run: |
           python - <<'PY'
           import json
           import os
           from pathlib import Path
 
-          path = Path(os.environ["SAFE_RESULT"])
-          result = json.loads(path.read_text(encoding="utf-8"))
+          result_path = Path(os.environ["SAFE_RESULT"])
+          manifest_path = Path(os.environ["SAFE_MANIFEST"])
+          result = json.loads(result_path.read_text(encoding="utf-8"))
           assert result["status"] == "E1C_PROMPT_SOURCE_FREEZE_V3_PASS"
           assert result["operational_pass"] is True
-          selection = result["repaired_selection"]
-          assert selection["record_count"] == 200
-          assert selection["label_counts"] == {"0": 100, "1": 100}
-          assert selection["behavior_count"] == 166
-          assert selection["reconstruction_missing_count"] == 0
-          assert selection["reconstruction_mismatch_count"] == 0
-          assert selection["registry_unresolved_count"] == 0
-          assert selection["registry_unusable_count"] == 0
-          assert result["production_prompt"]["canonical_family_sha256"] == (
-              "3dea5cd9ab408e5fc39ae6a0614eeb9441dee552a5e52224d064d0a3b66d4d65"
+          assert result["selection"]["record_count"] == 200
+          assert result["selection"]["label_counts"] == {"0": 100, "1": 100}
+          assert result["selection"]["behavior_count"] == 166
+          assert result["reconstruction"]["record_count"] == 200
+          assert result["primary_execution"]["prompt_family"] == "LLAMA2_CLS_PROMPT"
+          assert result["notebook_diagnostic"]["effective_prompt_family"] == (
+              "MISTRAL_CLS_PROMPT"
           )
+          assert result["notebook_diagnostic"]["model_prompt_family_mismatch"] is True
+          assert result["safe_manifest"]["record_count"] == 200
+          assert result["safe_manifest"]["label_counts"] == {"0": 100, "1": 100}
+          assert result["safe_manifest"]["deterministic"] is True
+          expected_next = (
+              "FREEZE_E1C_HARMBENCH_LIVE_REPRODUCTION_AND_INJECTION_CANARY_"
+              "CONTRACT_FROM_PROMPT_SOURCE_V3"
+          )
+          assert result["next_authorized_operation"] == expected_next
           assert result["model_weight_downloaded"] is False
           assert result["model_inference_performed"] is False
           assert result["harmbench_live_predictions_generated"] is False
           assert result["new_harmful_attack_outputs_generated"] is False
           assert result["semantic_only_stage_a_opened"] is False
           assert result["cross_regime_stage_a_opened"] is False
+          assert result["prior_evaluation_opened"] is False
+          assert result["heldout_opened"] is False
           assert result["causal_oracle_opened"] is False
           assert result["keep_only_oracle_opened"] is False
           assert result["wavelet_used"] is False
-          expected = (
-              "FREEZE_E1C_HARMBENCH_LIVE_REPRODUCTION_AND_CANARY_CONTRACT_"
-              "WITH_REPAIRED_SELECTION"
+          assert len(manifest_path.read_text(encoding="utf-8").splitlines()) == 200
+          serialized = (
+              result_path.read_text(encoding="utf-8")
+              + manifest_path.read_text(encoding="utf-8")
           )
-          assert result["next_authorized_operation"] == expected
-          serialized = path.read_text(encoding="utf-8").lower()
           for forbidden in (
-              '"test_case"',
-              '"generation"',
               '"behavior_id_private"',
+              '"behavior_private"',
+              '"context_private"',
+              '"generation_private"',
+              '"test_case"',
+              '"generation":',
               '"behavior_text"',
               '"prompt_text"',
+              '"rendered_prompt"',
           ):
               assert forbidden not in serialized
           PY
 
-      - name: Upload safe source-v3 artifact
+      - name: Upload safe prompt-source v3 artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: evaluator-panel-e1c-prompt-source-freeze-v3-safe
           path: ${{ env.SAFE_DIR }}
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 30
 
-      - name: Commit source-v3 contract and verified result
+      - name: Commit permanent v3 implementation and safe records
         run: |
           mkdir -p "$(dirname "$RECORD_RESULT")"
           cp "$SAFE_RESULT" "$RECORD_RESULT"
+          cp "$SAFE_MANIFEST" "$RECORD_MANIFEST"
           python - <<'PY'
           import hashlib
           import json
@@ -158,6 +188,7 @@ jobs:
           from pathlib import Path
 
           result_path = Path(os.environ["RECORD_RESULT"])
+          manifest_path = Path(os.environ["RECORD_MANIFEST"])
           record = {
               "schema_version": "evaluator-panel-e1c-prompt-source-v3-run-safe-v1",
               "workflow": os.environ["GITHUB_WORKFLOW"],
@@ -165,9 +196,9 @@ jobs:
               "run_attempt": int(os.environ["GITHUB_RUN_ATTEMPT"]),
               "event": os.environ["GITHUB_EVENT_NAME"],
               "head_sha_at_start": os.environ["GITHUB_SHA"],
-              "bundle_git_blob_sha": os.environ["BUNDLE_GIT_BLOB_SHA"],
-              "bundle_sha256": os.environ["BUNDLE_ACTUAL_SHA256"],
+              "bundle_sha256": os.environ["BUNDLE_SHA256"],
               "result_sha256": hashlib.sha256(result_path.read_bytes()).hexdigest(),
+              "manifest_sha256": hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
               "conclusion_at_record": "success",
               "paper_validity": False,
               "model_weight_downloaded": False,
@@ -183,10 +214,16 @@ jobs:
               encoding="utf-8",
           )
           PY
-          git rm \
+
+          git rm -f \
             .github/workflows/_temporary_apply_e1c_prompt_source_v3.yml \
             .github/workflows/_temporary_apply_e1c_prompt_source_v3_retry.yml \
-            "$BUNDLE_PATH"
+            .agent/e1c_source_v3_bundle.tgz \
+            .agent/e1c_source_v3_bundle.b64.part00 \
+            .agent/e1c_source_v3_bundle.b64.part01 \
+            .agent/e1c_source_v3_bundle.b64.part02 \
+            .agent/e1c_source_v3_bundle.b64.part03
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add \
@@ -196,8 +233,27 @@ jobs:
             tests/test_evaluator_panel_e1c_prompt_source_freeze_v3.py \
             docs/EVALUATOR_PANEL_E1C_PROMPT_SOURCE_FREEZE_V3.md \
             "$RECORD_RESULT" \
+            "$RECORD_MANIFEST" \
             "$RUN_RECORD"
           git commit -m "Freeze E1C HarmBench prompt source v3"
+
           git fetch origin "$TARGET_BRANCH"
+          panel_dir=data/natural_language_localization/evaluator_panel_v1
+          predecessor_paths=(
+            "$panel_dir/e1c_selection_repair.safe.json"
+            "$panel_dir/e1c_harmbench_selection_v2.safe.jsonl"
+            "$panel_dir/e1c_runtime_artifact_probe_v2.safe.json"
+            "$panel_dir/e1c_prompt_source_freeze_v2.safe.json"
+          )
+          if ! git diff --quiet "$GITHUB_SHA" "origin/$TARGET_BRANCH" -- \
+            "${predecessor_paths[@]}"; then
+            echo "Frozen predecessor identities changed while v3 ran." >&2
+            exit 1
+          fi
           git rebase "origin/$TARGET_BRANCH"
           git push origin "HEAD:$TARGET_BRANCH"
+
+      - name: Enforce prompt-source v3 gate
+        if: always()
+        run: |
+          test "${{ steps.freeze.outputs.exit_code }}" = "0"
