@@ -94,3 +94,8 @@ The step keeps all of the following closed:
 - pass: authorize `E1D_ACTIONABILITY_COMPONENT_QUALIFICATION`;
 - scientific fail: exclude or repair the HarmBench axis without opening Stage A;
 - operational fail: repair runtime implementation only under the same frozen contract.
+
+## Execution trigger
+
+The frozen live workflow was explicitly triggered after the one-shot installer, lint,
+and predecessor-identity checks completed successfully. No scientific parameter changed.
