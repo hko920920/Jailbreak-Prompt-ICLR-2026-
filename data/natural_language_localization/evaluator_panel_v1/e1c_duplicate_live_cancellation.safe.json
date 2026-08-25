@@ -1,0 +1,27 @@
+{
+  "schema_version": "e1c-duplicate-live-cancellation-safe-v1",
+  "classification": "OPERATIONAL_DUPLICATE_CANCELLATION_NOT_SCIENTIFIC_FAILURE",
+  "primary_run": {
+    "id": 32822371869,
+    "status_at_cancellation": "in_progress",
+    "conclusion_at_cancellation": "pending"
+  },
+  "duplicate_run": {
+    "id": 32833530955,
+    "status_before": "pending",
+    "conclusion_before": "pending",
+    "cancellation_requested": true,
+    "status_after": "completed",
+    "conclusion_after": "cancelled"
+  },
+  "model_changed": false,
+  "data_changed": false,
+  "selection_changed": false,
+  "thresholds_changed": false,
+  "parser_changed": false,
+  "stage_a_opened": false,
+  "heldout_opened": false,
+  "causal_oracle_opened": false,
+  "keep_only_oracle_opened": false,
+  "wavelet_used": false
+}
