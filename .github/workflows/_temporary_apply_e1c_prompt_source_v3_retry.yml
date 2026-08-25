@@ -176,12 +176,12 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
 
-      - name: Commit permanent v3 implementation and safe records
+      - name: Commit verified v3 non-workflow files and safe records
         run: |
           mkdir -p "$(dirname "$RECORD_RESULT")"
           cp "$SAFE_RESULT" "$RECORD_RESULT"
           cp "$SAFE_MANIFEST" "$RECORD_MANIFEST"
-          python - <<'PY'
+          python - <<'PYRUN'
           import hashlib
           import json
           import os
@@ -213,11 +213,13 @@ jobs:
               json.dumps(record, indent=2, sort_keys=True) + "\n",
               encoding="utf-8",
           )
-          PY
+          PYRUN
 
+          # The GitHub Actions token may not create or delete workflow files.
+          # Remove the extracted permanent workflow only from this worktree; it
+          # will be committed separately through the connector after this push.
+          rm -f .github/workflows/evaluator_panel_e1c_prompt_source_freeze_v3.yml
           git rm -f \
-            .github/workflows/_temporary_apply_e1c_prompt_source_v3.yml \
-            .github/workflows/_temporary_apply_e1c_prompt_source_v3_retry.yml \
             .agent/e1c_source_v3_bundle.tgz \
             .agent/e1c_source_v3_bundle.b64.part00 \
             .agent/e1c_source_v3_bundle.b64.part01 \
@@ -227,7 +229,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add \
-            .github/workflows/evaluator_panel_e1c_prompt_source_freeze_v3.yml \
             configs/natural_language_localization/evaluator_panel_e1c_prompt_source_freeze_v3.json \
             scripts/run_evaluator_panel_e1c_prompt_source_freeze_v3.py \
             tests/test_evaluator_panel_e1c_prompt_source_freeze_v3.py \
@@ -235,7 +236,7 @@ jobs:
             "$RECORD_RESULT" \
             "$RECORD_MANIFEST" \
             "$RUN_RECORD"
-          git commit -m "Freeze E1C HarmBench prompt source v3"
+          git commit -m "Record E1C HarmBench prompt-source v3 pass"
 
           git fetch origin "$TARGET_BRANCH"
           panel_dir=data/natural_language_localization/evaluator_panel_v1
