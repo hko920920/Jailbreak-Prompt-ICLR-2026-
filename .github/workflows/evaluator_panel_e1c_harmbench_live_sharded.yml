@@ -1,0 +1,436 @@
+name: evaluator-panel-e1c-harmbench-live-sharded
+
+# Runtime-only remediation after the single-run 240-minute evaluation timeout.
+# Model, selection, prompt, seed, parser, thresholds, and 448-request denominator stay frozen.
+"on":
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/evaluator_panel_e1c_harmbench_live_sharded.yml
+      - configs/natural_language_localization/evaluator_panel_e1c_runtime_sharding_v1.json
+      - scripts/run_evaluator_panel_e1c_harmbench_sharded.py
+      - scripts/run_evaluator_panel_e1c_harmbench_worker_ci.sh
+      - tests/test_evaluator_panel_e1c_harmbench_sharded.py
+      - docs/EVALUATOR_PANEL_E1C_RUNTIME_SHARDING_V1.md
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: evaluator-panel-e1c-harmbench-live-sharded
+  cancel-in-progress: false
+
+env:
+  TARGET_BRANCH: agent/programmatic-agentharm-pivot
+  LIVE_CONTRACT: configs/natural_language_localization/evaluator_panel_e1c_harmbench_live_contract_v1.json
+  REMEDIATION: configs/natural_language_localization/evaluator_panel_e1c_runtime_sharding_v1.json
+  HARM_BENCH_REVISION: 8e1604d1171fe8a48d8febecd22f600e462bdcdd
+  PIP_NO_CACHE_DIR: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  TOKENIZERS_PARALLELISM: "false"
+
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out frozen remediation commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate runtime-only remediation
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'pytest>=8.2' 'ruff>=0.6'
+          ruff check \
+            scripts/run_evaluator_panel_e1c_harmbench_sharded.py \
+            tests/test_evaluator_panel_e1c_harmbench_sharded.py
+          python -m pytest -q tests/test_evaluator_panel_e1c_harmbench_sharded.py
+          python -m py_compile scripts/run_evaluator_panel_e1c_harmbench_sharded.py
+          bash -n scripts/run_evaluator_panel_e1c_harmbench_worker_ci.sh
+          python -m json.tool "$REMEDIATION" >/dev/null
+          python scripts/run_evaluator_panel_e1c_harmbench_sharded.py validate \
+            --root . \
+            --remediation "$REMEDIATION" \
+            --safe-output /tmp/e1c-runtime-sharding-validation.safe.json
+          test "$(jq -r '.status' /tmp/e1c-runtime-sharding-validation.safe.json)" = \
+            "E1C_RUNTIME_SHARDING_VALIDATION_PASS"
+          git diff --check
+
+  full-shards:
+    needs: preflight
+    runs-on: ubuntu-24.04
+    timeout-minutes: 210
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+    env:
+      ROOT: ${{ github.workspace }}
+      SOURCE_ROOT: upstream/HarmBench
+      SAFE_DIR: artifacts/e1c-harmbench-sharded/full-${{ matrix.shard }}
+      PRIVATE_DIR: /tmp/e1c-harmbench-sharded-full-${{ matrix.shard }}
+      MODEL_DIR: /tmp/e1c-harmbench-model-${{ matrix.shard }}
+      TOOLS_DIR: /tmp/e1c-harmbench-tools-${{ matrix.shard }}
+      SERVER_URL: http://127.0.0.1:8081
+      WORKER_KIND: full-shard
+      SHARD_INDEX: ${{ matrix.shard }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Check out frozen remediation commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+
+      - name: Check out immutable HarmBench source
+        uses: actions/checkout@v4
+        with:
+          repository: centerforaisafety/HarmBench
+          ref: ${{ env.HARM_BENCH_REVISION }}
+          path: ${{ env.SOURCE_ROOT }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Execute frozen 50-request full-selection shard
+        run: bash scripts/run_evaluator_panel_e1c_harmbench_worker_ci.sh
+
+      - name: Audit terminal shard output
+        if: always()
+        run: |
+          summary="$SAFE_DIR/full_shard_$(printf '%02d' "$SHARD_INDEX")_summary.safe.json"
+          test -f "$summary"
+          test "$(jq -r '.status' "$summary")" = "E1C_HARMBENCH_FULL_SHARD_PASS"
+          test "$(jq -r '.record_count' "$summary")" = "25"
+          test "$(jq -r '.request_count' "$summary")" = "50"
+          test "$(jq -r '.raw_text_recorded' "$summary")" = "false"
+
+      - name: Upload safe full-selection shard
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e1c-harmbench-full-shard-${{ matrix.shard }}
+          path: ${{ env.SAFE_DIR }}
+          if-no-files-found: warn
+          retention-days: 30
+
+  merge-full:
+    needs: full-shards
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      SAFE_DIR: artifacts/e1c-harmbench-sharded/merged-full
+    steps:
+      - name: Check out frozen remediation commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Download all eight safe full-selection shards
+        uses: actions/download-artifact@v4
+        with:
+          pattern: e1c-harmbench-full-shard-*
+          path: /tmp/e1c-full-shards
+          merge-multiple: true
+
+      - name: Merge exact 400-request full-selection output
+        run: |
+          mkdir -p "$SAFE_DIR"
+          python scripts/run_evaluator_panel_e1c_harmbench_sharded.py merge-full \
+            --root . \
+            --remediation "$REMEDIATION" \
+            --input-dir /tmp/e1c-full-shards \
+            --safe-output-dir "$SAFE_DIR"
+          test "$(jq -r '.status' \
+            "$SAFE_DIR/harmbench_full_merge_summary.safe.json")" = \
+            "E1C_HARMBENCH_FULL_MERGE_PASS"
+          test "$(jq -r '.request_count' \
+            "$SAFE_DIR/harmbench_full_merge_summary.safe.json")" = "400"
+          test "$(jq -r '.request_count' \
+            "$SAFE_DIR/harmbench_raw_official_template_metrics.safe.json")" = "200"
+          test "$(jq -r '.request_count' \
+            "$SAFE_DIR/harmbench_hardened_production_template_metrics.safe.json")" = "200"
+
+      - name: Upload merged safe full-selection output
+        uses: actions/upload-artifact@v4
+        with:
+          name: e1c-harmbench-merged-full
+          path: ${{ env.SAFE_DIR }}
+          if-no-files-found: error
+          retention-days: 30
+
+  auxiliary:
+    needs: merge-full
+    runs-on: ubuntu-24.04
+    timeout-minutes: 210
+    env:
+      ROOT: ${{ github.workspace }}
+      SOURCE_ROOT: upstream/HarmBench
+      SAFE_DIR: artifacts/e1c-harmbench-sharded/auxiliary
+      PRIVATE_DIR: /tmp/e1c-harmbench-sharded-auxiliary
+      MODEL_DIR: /tmp/e1c-harmbench-model-auxiliary
+      TOOLS_DIR: /tmp/e1c-harmbench-tools-auxiliary
+      SERVER_URL: http://127.0.0.1:8081
+      WORKER_KIND: auxiliary
+      MERGED_HARDENED: /tmp/e1c-merged-full/harmbench_hardened_production_template.safe.jsonl
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Check out frozen remediation commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+
+      - name: Check out immutable HarmBench source
+        uses: actions/checkout@v4
+        with:
+          repository: centerforaisafety/HarmBench
+          ref: ${{ env.HARM_BENCH_REVISION }}
+          path: ${{ env.SOURCE_ROOT }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Download merged hardened predictions
+        uses: actions/download-artifact@v4
+        with:
+          name: e1c-harmbench-merged-full
+          path: /tmp/e1c-merged-full
+
+      - name: Execute frozen 48-request repeatability and canary block
+        run: bash scripts/run_evaluator_panel_e1c_harmbench_worker_ci.sh
+
+      - name: Audit terminal auxiliary output
+        if: always()
+        run: |
+          summary="$SAFE_DIR/harmbench_auxiliary_summary.safe.json"
+          test -f "$summary"
+          test "$(jq -r '.status' "$summary")" = \
+            "E1C_HARMBENCH_AUXILIARY_PASS"
+          test "$(jq -r '.repeatability_request_count' "$summary")" = "24"
+          test "$(jq -r '.canary_request_count' "$summary")" = "24"
+          test "$(jq -r '.total_request_count' "$summary")" = "48"
+
+      - name: Upload safe auxiliary output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e1c-harmbench-auxiliary
+          path: ${{ env.SAFE_DIR }}
+          if-no-files-found: warn
+          retention-days: 30
+
+  finalize:
+    needs:
+      - merge-full
+      - auxiliary
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      SAFE_DIR: artifacts/e1c-harmbench-sharded/final
+      SAFE_RESULT: artifacts/e1c-harmbench-sharded/final/e1c_harmbench_live_sharded.safe.json
+      RECORD_ROOT: data/natural_language_localization/evaluator_panel_v1
+      RECORD_DIR: data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_live_sharded
+      RECORD_RESULT: data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_live_sharded.safe.json
+      RUN_RECORD: data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_live_sharded_run.safe.json
+    steps:
+      - name: Check out frozen remediation commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Download exact merged and auxiliary safe outputs
+        uses: actions/download-artifact@v4
+        with:
+          pattern: e1c-harmbench-*
+          path: /tmp/e1c-sharded-final-input
+          merge-multiple: true
+
+      - name: Apply the original frozen E1C scientific gate
+        run: |
+          mkdir -p "$SAFE_DIR"
+          cp -a /tmp/e1c-sharded-final-input/. "$SAFE_DIR"/
+          set +e
+          python scripts/run_evaluator_panel_e1c_harmbench_live.py finalize \
+            --root . \
+            --contract "$LIVE_CONTRACT" \
+            --safe-output-dir "$SAFE_DIR" \
+            --runtime-sha256 \
+              45f6c4dc9e86d540a2e153f57852673f54732704a3039b1426ce46b1e436f578 \
+            --runtime-size-bytes 7865957120 \
+            --safe-output "$SAFE_RESULT"
+          finalize_code=$?
+          set -e
+          if [[ "$finalize_code" != "0" && "$finalize_code" != "2" ]]; then
+            exit "$finalize_code"
+          fi
+
+      - name: Audit exact 448-request terminal result and privacy boundary
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          safe_dir = Path(os.environ["SAFE_DIR"])
+          result = json.loads(
+              Path(os.environ["SAFE_RESULT"]).read_text(encoding="utf-8")
+          )
+          assert result["status"] in {
+              "E1C_HARMBENCH_COMPONENT_PASS",
+              "E1C_HARMBENCH_COMPONENT_SCIENTIFIC_FAIL",
+          }
+          assert result["operational_pass"] is True
+          assert result["paper_validity"] is False
+          assert result["raw_official_diagnostic"]["request_count"] == 200
+          assert result["hardened_production_gate"]["request_count"] == 200
+          assert result["repeatability"]["count"] == 24
+          assert result["injection_canaries"]["request_count"] == 24
+          assert json.loads(
+              (safe_dir / "harmbench_full_merge_summary.safe.json").read_text()
+          )["request_count"] == 400
+          assert json.loads(
+              (safe_dir / "harmbench_auxiliary_summary.safe.json").read_text()
+          )["total_request_count"] == 48
+          assert result["new_harmful_attack_outputs_generated"] is False
+          assert result["semantic_only_stage_a_opened"] is False
+          assert result["cross_regime_stage_a_opened"] is False
+          assert result["heldout_opened"] is False
+          assert result["causal_oracle_opened"] is False
+          assert result["keep_only_oracle_opened"] is False
+          assert result["wavelet_used"] is False
+
+          forbidden = (
+              '"raw_output":',
+              '"prompt":',
+              '"raw_prompt_private":',
+              '"hardened_prompt_private":',
+              '"generation_private":',
+              '"behavior_private":',
+              '"context_private":',
+              '"test_case":',
+              '"generation":',
+              '"behavior_text":',
+          )
+          for path in safe_dir.rglob("*"):
+              if not path.is_file():
+                  continue
+              text = path.read_text(encoding="utf-8").lower()
+              for token in forbidden:
+                  assert token not in text, (path, token)
+          PY
+
+      - name: Upload complete safe sharded E1C artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: evaluator-panel-e1c-harmbench-live-sharded-safe
+          path: ${{ env.SAFE_DIR }}
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Commit terminal safe sharded records
+        run: |
+          rm -rf "$RECORD_DIR"
+          mkdir -p "$RECORD_DIR" "$RECORD_ROOT"
+          cp -a "$SAFE_DIR"/. "$RECORD_DIR"/
+          cp "$SAFE_RESULT" "$RECORD_RESULT"
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          result_path = Path(os.environ["RECORD_RESULT"])
+          result = json.loads(result_path.read_text(encoding="utf-8"))
+          record_dir = Path(os.environ["RECORD_DIR"])
+          files = sorted(
+              path for path in record_dir.rglob("*") if path.is_file()
+          )
+          run_record = {
+              "schema_version": "e1c-harmbench-live-sharded-run-safe-v1",
+              "workflow": os.environ["GITHUB_WORKFLOW"],
+              "run_id": int(os.environ["GITHUB_RUN_ID"]),
+              "run_attempt": int(os.environ["GITHUB_RUN_ATTEMPT"]),
+              "event": os.environ["GITHUB_EVENT_NAME"],
+              "head_sha_at_start": os.environ["GITHUB_SHA"],
+              "terminal_status": result["status"],
+              "operational_pass": result["operational_pass"],
+              "scientific_pass": result["scientific_pass"],
+              "next_authorized_operation": result["next_authorized_operation"],
+              "request_count": 448,
+              "full_shard_count": 8,
+              "result_sha256": hashlib.sha256(
+                  result_path.read_bytes()
+              ).hexdigest(),
+              "safe_file_count": len(files),
+              "safe_file_manifest_sha256": hashlib.sha256(
+                  "\n".join(
+                      f"{path.relative_to(record_dir)}:"
+                      f"{hashlib.sha256(path.read_bytes()).hexdigest()}"
+                      for path in files
+                  ).encode("utf-8")
+              ).hexdigest(),
+              "paper_validity": False,
+              "new_harmful_attack_outputs_generated": False,
+              "stage_a_opened": False,
+              "heldout_opened": False,
+              "causal_oracle_opened": False,
+              "keep_only_oracle_opened": False,
+              "wavelet_used": False,
+              "raw_text_recorded": False,
+          }
+          Path(os.environ["RUN_RECORD"]).write_text(
+              json.dumps(run_record, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+          git config user.name "github-actions[bot]"
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$RECORD_DIR" "$RECORD_RESULT" "$RUN_RECORD"
+          git commit -m "Record sharded E1C HarmBench qualification result"
+          git fetch origin "$TARGET_BRANCH"
+          frozen_inputs=(
+            configs/natural_language_localization/evaluator_panel_e1c_harmbench_live_contract_v1.json
+            configs/natural_language_localization/evaluator_panel_e1c_runtime_sharding_v1.json
+            data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_live_contract.safe.json
+            data/natural_language_localization/evaluator_panel_v1/e1c_prompt_source_freeze_v3.safe.json
+            data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_prompt_manifest_v3.safe.jsonl
+            data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_selection_v2.safe.jsonl
+            scripts/run_evaluator_panel_e1c_harmbench_live.py
+            scripts/run_evaluator_panel_e1c_harmbench_sharded.py
+            scripts/run_evaluator_panel_e1c_harmbench_worker_ci.sh
+          )
+          if ! git diff --quiet "$GITHUB_SHA" "origin/$TARGET_BRANCH" -- \
+            "${frozen_inputs[@]}"; then
+            echo "Frozen sharded E1C inputs changed during execution." >&2
+            exit 1
+          fi
+          git rebase "origin/$TARGET_BRANCH"
+          git push origin "HEAD:$TARGET_BRANCH"
