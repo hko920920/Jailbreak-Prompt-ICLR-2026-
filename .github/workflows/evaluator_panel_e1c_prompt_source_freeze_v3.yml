@@ -1,0 +1,195 @@
+name: evaluator-panel-e1c-prompt-source-freeze-v3
+
+# Static prompt reconstruction only. No weights, inference, or attack outputs.
+on:
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/evaluator_panel_e1c_prompt_source_freeze_v3.yml
+      - configs/natural_language_localization/evaluator_panel_e1c_prompt_source_freeze_v3.json
+      - scripts/run_evaluator_panel_e1c_prompt_source_freeze_v3.py
+      - tests/test_evaluator_panel_e1c_prompt_source_freeze_v3.py
+      - docs/EVALUATOR_PANEL_E1C_PROMPT_SOURCE_FREEZE_V3.md
+      - data/natural_language_localization/evaluator_panel_v1/e1c_selection_repair.safe.json
+      - data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_selection_v2.safe.jsonl
+      - "data/natural_language_localization/evaluator_panel_v1/\
+        e1c_runtime_artifact_probe_v2.safe.json"
+      - data/natural_language_localization/evaluator_panel_v1/e1c_prompt_source_freeze_v2.safe.json
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: evaluator-panel-e1c-prompt-source-freeze-v3
+  cancel-in-progress: false
+
+jobs:
+  freeze:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      HARM_BENCH_REVISION: 8e1604d1171fe8a48d8febecd22f600e462bdcdd
+      SOURCE_ROOT: upstream/HarmBench
+      CONFIG: configs/natural_language_localization/evaluator_panel_e1c_prompt_source_freeze_v3.json
+      SAFE_DIR: artifacts/evaluator-panel-e1c-prompt-source-freeze-v3/safe
+      SAFE_RESULT: "artifacts/evaluator-panel-e1c-prompt-source-freeze-v3/safe/\
+        e1c_prompt_source_freeze_v3.safe.json"
+      SAFE_MANIFEST: "artifacts/evaluator-panel-e1c-prompt-source-freeze-v3/safe/\
+        e1c_harmbench_prompt_manifest_v3.safe.jsonl"
+      RECORD_RESULT: "data/natural_language_localization/evaluator_panel_v1/\
+        e1c_prompt_source_freeze_v3.safe.json"
+      RECORD_MANIFEST: "data/natural_language_localization/evaluator_panel_v1/\
+        e1c_harmbench_prompt_manifest_v3.safe.jsonl"
+      TARGET_BRANCH: agent/programmatic-agentharm-pivot
+      PIP_NO_CACHE_DIR: "1"
+
+    steps:
+      - name: Check out research repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check out immutable HarmBench source
+        uses: actions/checkout@v4
+        with:
+          repository: centerforaisafety/HarmBench
+          ref: ${{ env.HARM_BENCH_REVISION }}
+          path: ${{ env.SOURCE_ROOT }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate frozen prompt-source v3 implementation
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'pytest>=8.2' 'ruff>=0.6'
+          ruff check \
+            scripts/run_evaluator_panel_e1c_prompt_source_freeze_v3.py \
+            tests/test_evaluator_panel_e1c_prompt_source_freeze_v3.py
+          python -m pytest -q tests/test_evaluator_panel_e1c_prompt_source_freeze_v3.py
+          python -m json.tool "$CONFIG" >/dev/null
+          git diff --check
+
+      - name: Verify immutable upstream checkout
+        run: |
+          test "$(git -C "$SOURCE_ROOT" rev-parse HEAD)" = "$HARM_BENCH_REVISION"
+
+      - name: Reconstruct repaired rows and freeze safe prompt manifest
+        id: freeze
+        shell: bash
+        run: |
+          mkdir -p "$SAFE_DIR"
+          set +e
+          python scripts/run_evaluator_panel_e1c_prompt_source_freeze_v3.py \
+            --root . \
+            --source-root "$SOURCE_ROOT" \
+            --config "$CONFIG" \
+            --safe-output "$SAFE_RESULT" \
+            --manifest-output "$SAFE_MANIFEST"
+          code=$?
+          set -e
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          test -f "$SAFE_RESULT"
+          test -f "$SAFE_MANIFEST"
+
+      - name: Audit v3 identities and sealed boundary
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          result_path = Path(os.environ["SAFE_RESULT"])
+          manifest_path = Path(os.environ["SAFE_MANIFEST"])
+          result = json.loads(result_path.read_text(encoding="utf-8"))
+          assert result["status"] == "E1C_PROMPT_SOURCE_FREEZE_V3_PASS"
+          assert result["operational_pass"] is True
+          assert result["selection"]["record_count"] == 200
+          assert result["selection"]["label_counts"] == {"0": 100, "1": 100}
+          assert result["selection"]["behavior_count"] == 166
+          assert result["reconstruction"]["record_count"] == 200
+          assert result["primary_execution"]["prompt_family"] == "LLAMA2_CLS_PROMPT"
+          assert result["notebook_diagnostic"]["effective_prompt_family"] == (
+              "MISTRAL_CLS_PROMPT"
+          )
+          assert result["notebook_diagnostic"]["model_prompt_family_mismatch"] is True
+          assert result["safe_manifest"]["record_count"] == 200
+          assert result["safe_manifest"]["label_counts"] == {"0": 100, "1": 100}
+          assert result["safe_manifest"]["deterministic"] is True
+          assert result["model_weight_downloaded"] is False
+          assert result["model_inference_performed"] is False
+          assert result["harmbench_live_predictions_generated"] is False
+          assert result["new_harmful_attack_outputs_generated"] is False
+          assert result["cross_regime_stage_a_opened"] is False
+          assert result["prior_evaluation_opened"] is False
+          assert result["heldout_opened"] is False
+          assert result["causal_oracle_opened"] is False
+          assert result["keep_only_oracle_opened"] is False
+          assert result["wavelet_used"] is False
+          assert len(manifest_path.read_text(encoding="utf-8").splitlines()) == 200
+          serialized = (
+              result_path.read_text(encoding="utf-8")
+              + manifest_path.read_text(encoding="utf-8")
+          )
+          for forbidden in (
+              '"behavior_id_private"',
+              '"behavior_private"',
+              '"context_private"',
+              '"generation_private"',
+              '"test_case"',
+              '"generation":',
+              '"behavior_text"',
+              '"prompt_text"',
+              '"rendered_prompt"',
+          ):
+              assert forbidden not in serialized
+          PY
+
+      - name: Record immutable safe v3 identities
+        run: |
+          mkdir -p "$(dirname "$RECORD_RESULT")"
+          cp "$SAFE_RESULT" "$RECORD_RESULT"
+          cp "$SAFE_MANIFEST" "$RECORD_MANIFEST"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$RECORD_RESULT" "$RECORD_MANIFEST"
+          if git diff --cached --quiet; then
+            echo "Prompt-source v3 records are already current."
+          else
+            git commit -m "Record E1C prompt-source v3 identities"
+            git fetch origin "$TARGET_BRANCH"
+            panel_dir=data/natural_language_localization/evaluator_panel_v1
+            input_paths=(
+              configs/natural_language_localization/evaluator_panel_e1c_prompt_source_freeze_v3.json
+              scripts/run_evaluator_panel_e1c_prompt_source_freeze_v3.py
+              "$panel_dir/e1c_selection_repair.safe.json"
+              "$panel_dir/e1c_harmbench_selection_v2.safe.jsonl"
+              "$panel_dir/e1c_runtime_artifact_probe_v2.safe.json"
+              "$panel_dir/e1c_prompt_source_freeze_v2.safe.json"
+            )
+            if ! git diff --quiet HEAD "origin/$TARGET_BRANCH" -- "${input_paths[@]}"; then
+              echo "Input identities changed while v3 was running; refusing stale record." >&2
+              exit 1
+            fi
+            git rebase "origin/$TARGET_BRANCH"
+            git push origin "HEAD:$TARGET_BRANCH"
+          fi
+
+      - name: Upload safe prompt-source v3 artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evaluator-panel-e1c-prompt-source-freeze-v3-safe
+          path: ${{ env.SAFE_DIR }}
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Enforce prompt-source v3 gate
+        if: always()
+        run: |
+          test "${{ steps.freeze.outputs.exit_code }}" = "0"
