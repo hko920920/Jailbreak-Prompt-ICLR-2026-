@@ -1,0 +1,175 @@
+{
+  "causal_oracle_opened": false,
+  "checks": {
+    "all_reconstructed_record_ids_unique": true,
+    "all_selection_rows_reconstructed": true,
+    "manifest_deterministic": true,
+    "manifest_fields_match_contract": true,
+    "manifest_label_counts_match": true,
+    "manifest_output_filename_matches": true,
+    "manifest_record_count_matches": true,
+    "manifest_record_identity_matches_selection": true,
+    "no_live_predictions": true,
+    "no_model_inference": true,
+    "no_model_weight_download": true,
+    "notebook_diagnostic_matches_predecessor": true,
+    "primary_and_notebook_prompt_families_are_distinct": true,
+    "primary_model_matches_runtime_source": true,
+    "primary_prompt_summary_matches": true,
+    "runtime_artifact_identity_present": true,
+    "selection_behavior_count_matches": true,
+    "selection_file_sha256_matches": true,
+    "selection_label_counts_match": true,
+    "selection_record_count_matches": true,
+    "selection_record_identity_matches": true,
+    "selection_safe_rows_identity_matches": true,
+    "source_files_match": true,
+    "source_tree_matches": true
+  },
+  "contract_sha256": "db2c5663737c87aae4d41d2610b6b5b27f5da61d88bdc65f488ba85f6c7df7f8",
+  "cross_regime_stage_a_opened": false,
+  "evidence_class": "DEVELOPMENT",
+  "harmbench_live_predictions_generated": false,
+  "heldout_opened": false,
+  "keep_only_oracle_opened": false,
+  "model_inference_performed": false,
+  "model_weight_downloaded": false,
+  "new_harmful_attack_outputs_generated": false,
+  "next_authorized_operation": "FREEZE_E1C_HARMBENCH_LIVE_REPRODUCTION_AND_INJECTION_CANARY_CONTRACT_FROM_PROMPT_SOURCE_V3",
+  "notebook_diagnostic": {
+    "cached_cls_is_primary_reference": false,
+    "classifier_path": "cais/HarmBench-Mistral-7b-val-cls",
+    "effective_prompt_canonical_sha256": "21b308f9f5b4cbb27fc6cd63e1e014b38ffe900320bfcd7efb290516568e628f",
+    "effective_prompt_family": "MISTRAL_CLS_PROMPT",
+    "human_majority_is_primary_reference": true,
+    "loaded_model_argument": "cais/HarmBench-Llama-2-13b-cls",
+    "model_prompt_family_mismatch": true,
+    "role": "PROVENANCE_DIAGNOSTIC_NOT_PRIMARY_LIVE_EXECUTION"
+  },
+  "operational_pass": true,
+  "paper_validity": false,
+  "primary_execution": {
+    "decoder_max_tokens": 1,
+    "decoder_temperature": 0.0,
+    "model_repository": "cais/HarmBench-Llama-2-13b-cls",
+    "model_revision": "bda705349d1144fa618770bea64d99ce54e3835b",
+    "prompt_family": "LLAMA2_CLS_PROMPT",
+    "prompt_source_file": "eval_utils.py",
+    "prompt_summary": {
+      "canonical_family_sha256": "3dea5cd9ab408e5fc39ae6a0614eeb9441dee552a5e52224d064d0a3b66d4d65",
+      "field_names": [
+        "description",
+        "prompt",
+        "prompt_contextual"
+      ],
+      "prompt_contextual_length": 1401,
+      "prompt_contextual_sha256": "5d6bb9e3cf4d1e5f3f7620093113222ee115af75b0b2913f00e4c7225ec9f219",
+      "prompt_length": 1359,
+      "prompt_sha256": "788f4f6aa1491c433c4da76c9140cfc30966cea3ff3875c4d0fcb336d92f60e0",
+      "raw_prompt_recorded": false
+    },
+    "runtime_artifact": {
+      "filename": "HarmBench-Llama-2-13b-cls.Q4_K_M.gguf",
+      "repository": "mradermacher/HarmBench-Llama-2-13b-cls-GGUF",
+      "revision": "e1ff40dd31c7a3ebd38326f6d684b849ca18c434",
+      "sha256": "45f6c4dc9e86d540a2e153f57852673f54732704a3039b1426ce46b1e436f578",
+      "size": 7865957120
+    }
+  },
+  "prior_evaluation_opened": false,
+  "reconstruction": {
+    "combined_registry_count": 510,
+    "multimodal_registry_count": 110,
+    "raw_behavior_generation_or_context_recorded": false,
+    "record_count": 200,
+    "text_registry_count": 400,
+    "validation_index_count": 602
+  },
+  "safe_manifest": {
+    "canonical_rows_sha256": "3e7245aa7d60190638db5f89aeb5933536478dce4663dc6a68efc6e197bf4283",
+    "contextual_record_count": 61,
+    "deterministic": true,
+    "file_sha256": "f74b4801959a4bf8123fbdcdda6b8b29851023d9356bdb8355063766ad953983",
+    "label_counts": {
+      "0": 100,
+      "1": 100
+    },
+    "plain_record_count": 139,
+    "raw_text_recorded": false,
+    "record_count": 200,
+    "record_ids_sha256": "c02d697f27c6507691f55d2eaff63b760da0b6bce33f5756279b53d2a433979b",
+    "template_counts": {
+      "prompt": 139,
+      "prompt_contextual": 61
+    }
+  },
+  "schema_version": "evaluator-panel-e1c-prompt-source-freeze-v3-result-v1",
+  "selection": {
+    "behavior_count": 166,
+    "file_sha256": "8e897219ce0fa12cd10a95091275f4f22c4528748f15ef1f601ceef4fd834510",
+    "label_counts": {
+      "0": 100,
+      "1": 100
+    },
+    "raw_records_recorded": false,
+    "record_count": 200,
+    "record_ids_sha256": "c02d697f27c6507691f55d2eaff63b760da0b6bce33f5756279b53d2a433979b",
+    "safe_rows_sha256": "84acea4be52616456427fb92607322f074a9e3dc89cd4829b9037f2a846c3e7b"
+  },
+  "semantic_only_stage_a_opened": false,
+  "source": {
+    "expected_tree_sha": "e28303aa064b3a4fdbe5698bc323e43306b7ab74",
+    "files": [
+      {
+        "exists": true,
+        "expected_git_blob_sha": "d39d6c6b4ad68e37e60a408d3181791b49740221",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "d39d6c6b4ad68e37e60a408d3181791b49740221",
+        "path": "data/behavior_datasets/harmbench_behaviors_multimodal_all.csv",
+        "sha256": "0a4dd6bd0df2a52d1d9ee25f3d018af49b52b61ee2ccdaaac16b9660f753145d",
+        "size_bytes": 137713
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "8a6b423d85e9acdc168c57a6a957755cfa86c4cb",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "8a6b423d85e9acdc168c57a6a957755cfa86c4cb",
+        "path": "data/behavior_datasets/harmbench_behaviors_text_all.csv",
+        "sha256": "8d81accedd38eaaf8b760618622bb888417d1fd0c86eba65c427a16f1cbb4afc",
+        "size_bytes": 198850
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "3d7d0a98742a36b5c7824aadcea433e42a045022",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "3d7d0a98742a36b5c7824aadcea433e42a045022",
+        "path": "data/classifier_val_sets/text_behaviors_val_set.json",
+        "sha256": "e740727b6874e492063e097122a9916833d57f9bd2ce3e86713ec188741a41c8",
+        "size_bytes": 1875939
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "be95edd9523de0cde2a7823217b26983d57c496b",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "be95edd9523de0cde2a7823217b26983d57c496b",
+        "path": "eval_utils.py",
+        "sha256": "46f1db751866848834d45d5128a18d4cc0a820828e89796ab51bc605d10c7058",
+        "size_bytes": 16658
+      },
+      {
+        "exists": true,
+        "expected_git_blob_sha": "f6b3cf674ec940d2384e277d77867f2293489595",
+        "git_blob_match": true,
+        "observed_git_blob_sha": "f6b3cf674ec940d2384e277d77867f2293489595",
+        "path": "notebooks/run_classifier_val_set.ipynb",
+        "sha256": "2f3dab25208e0a06c7d415c80fbae7405f2d529eaef7ade510ac8fe2723dbd4c",
+        "size_bytes": 18617
+      }
+    ],
+    "observed_tree_sha": "e28303aa064b3a4fdbe5698bc323e43306b7ab74",
+    "repository": "centerforaisafety/HarmBench",
+    "revision": "8e1604d1171fe8a48d8febecd22f600e462bdcdd"
+  },
+  "status": "E1C_PROMPT_SOURCE_FREEZE_V3_PASS",
+  "wavelet_used": false
+}

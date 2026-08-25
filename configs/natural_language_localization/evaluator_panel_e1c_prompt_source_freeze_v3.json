@@ -57,7 +57,7 @@
     "files": {
       "eval_utils.py": "be95edd9523de0cde2a7823217b26983d57c496b",
       "notebooks/run_classifier_val_set.ipynb": "f6b3cf674ec940d2384e277d77867f2293489595",
-      "data/classifier_val_sets/text_behaviors_val_set.json": "3d7d0a98742a36b5c7823217b26983d57c496b",
+      "data/classifier_val_sets/text_behaviors_val_set.json": "3d7d0a98742a36b5c7824aadcea433e42a045022",
       "data/behavior_datasets/harmbench_behaviors_text_all.csv": "8a6b423d85e9acdc168c57a6a957755cfa86c4cb",
       "data/behavior_datasets/harmbench_behaviors_multimodal_all.csv": "d39d6c6b4ad68e37e60a408d3181791b49740221"
     }

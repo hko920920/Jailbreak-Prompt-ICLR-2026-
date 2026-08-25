@@ -1,0 +1,20 @@
+{
+  "bundle_sha256": "6f35b228771d5f726c9a6b4b45c46fe7bf20e52a21b7f9915d330ed1c341ceea",
+  "causal_oracle_opened": false,
+  "conclusion_at_record": "success",
+  "event": "push",
+  "harmbench_live_predictions_generated": false,
+  "head_sha_at_start": "611644e3f8a6c87cd5a63aac442e62c96339c65a",
+  "manifest_sha256": "f74b4801959a4bf8123fbdcdda6b8b29851023d9356bdb8355063766ad953983",
+  "model_inference_performed": false,
+  "model_weight_downloaded": false,
+  "new_harmful_attack_outputs_generated": false,
+  "paper_validity": false,
+  "result_sha256": "0bdec1f4216d1279b5aaf83ad7dc3ca7e15a7406868950ec4caa6caa837a10c2",
+  "run_attempt": 1,
+  "run_id": 32816486743,
+  "schema_version": "evaluator-panel-e1c-prompt-source-v3-run-safe-v1",
+  "stage_a_opened": false,
+  "wavelet_used": false,
+  "workflow": "temporary-apply-e1c-prompt-source-v3-direct"
+}
