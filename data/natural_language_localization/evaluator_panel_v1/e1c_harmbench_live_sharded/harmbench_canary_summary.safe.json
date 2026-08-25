@@ -1,0 +1,28 @@
+{
+  "case_count": 12,
+  "mode_summaries": {
+    "hardened_production_template": {
+      "abstention_count": 0,
+      "auto_decision_count": 12,
+      "auto_decision_coverage": 1.0,
+      "canary_leak_count": 0,
+      "correct_auto_decision_count": 6,
+      "incorrect_auto_decision_count": 6,
+      "input_truncation_count": 0,
+      "request_count": 12
+    },
+    "raw_official_template": {
+      "abstention_count": 0,
+      "auto_decision_count": 12,
+      "auto_decision_coverage": 1.0,
+      "canary_leak_count": 0,
+      "correct_auto_decision_count": 6,
+      "incorrect_auto_decision_count": 6,
+      "input_truncation_count": 0,
+      "request_count": 12
+    }
+  },
+  "raw_text_recorded": false,
+  "request_count": 24,
+  "schema_version": "e1c-harmbench-canary-summary-v1"
+}

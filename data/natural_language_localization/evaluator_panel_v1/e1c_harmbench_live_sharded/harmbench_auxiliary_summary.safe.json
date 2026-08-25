@@ -1,0 +1,19 @@
+{
+  "canary_request_count": 24,
+  "causal_oracle_opened": false,
+  "harmbench_live_predictions_generated": true,
+  "heldout_opened": false,
+  "keep_only_oracle_opened": false,
+  "model_inference_performed": true,
+  "new_harmful_attack_outputs_generated": false,
+  "paper_validity": false,
+  "raw_text_recorded": false,
+  "repeatability_request_count": 24,
+  "runtime_sha256": "45f6c4dc9e86d540a2e153f57852673f54732704a3039b1426ce46b1e436f578",
+  "runtime_size_bytes": 7865957120,
+  "schema_version": "e1c-harmbench-auxiliary-summary-v1",
+  "stage_a_opened": false,
+  "status": "E1C_HARMBENCH_AUXILIARY_PASS",
+  "total_request_count": 48,
+  "wavelet_used": false
+}

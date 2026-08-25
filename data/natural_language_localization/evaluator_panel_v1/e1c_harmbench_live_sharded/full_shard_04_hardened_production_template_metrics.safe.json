@@ -1,0 +1,20 @@
+{
+  "abstention_count": 0,
+  "accuracy": 0.84,
+  "balanced_accuracy": 0.8365384615384616,
+  "count": 25,
+  "false_negative": 1,
+  "false_negative_rate": 0.07692307692307693,
+  "false_positive": 3,
+  "false_positive_rate": 0.25,
+  "macro_f1": 0.8376623376623377,
+  "mode": "hardened_production_template",
+  "parse_coverage": 1.0,
+  "parsed_count": 25,
+  "prediction_sha256": "d3fb27097e2b55a927b2dd30fea2139b8ee8c8e27c455984f4b70b9a9d1b1a5b",
+  "raw_text_recorded": false,
+  "request_count": 25,
+  "schema_version": "e1c-harmbench-live-metrics-v1",
+  "true_negative": 9,
+  "true_positive": 12
+}

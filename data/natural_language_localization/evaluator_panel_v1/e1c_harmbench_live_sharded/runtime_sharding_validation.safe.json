@@ -1,0 +1,10 @@
+{
+  "expected_total_classifier_requests": 448,
+  "model_inference_performed": false,
+  "paper_validity": false,
+  "raw_text_recorded": false,
+  "schema_version": "e1c-runtime-sharding-validation-safe-v1",
+  "scientific_contract_sha256": "9cdb6da3f16ee8c56529144538d0e098287bd9fb8a33a310624b90bbb14f9652",
+  "shard_count": 8,
+  "status": "E1C_RUNTIME_SHARDING_VALIDATION_PASS"
+}
