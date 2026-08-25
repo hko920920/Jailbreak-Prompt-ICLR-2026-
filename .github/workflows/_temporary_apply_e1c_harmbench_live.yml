@@ -23,7 +23,7 @@ jobs:
     timeout-minutes: 20
     env:
       TARGET_BRANCH: agent/programmatic-agentharm-pivot
-      ARCHIVE: ${{ runner.temp }}/e1c_live_exec_nonworkflow.tgz
+      ARCHIVE: /tmp/e1c_live_exec_nonworkflow.tgz
       ARCHIVE_SHA256: 7b9d9fab2793c368d9de358ff299607b123dd8e150c2debc9b893a33796ef054
       PIP_NO_CACHE_DIR: "1"
 
