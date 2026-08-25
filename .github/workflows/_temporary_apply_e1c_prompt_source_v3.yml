@@ -31,10 +31,9 @@ jobs:
         data/natural_language_localization/evaluator_panel_v1/e1c_prompt_source_freeze_v3.safe.json
       RUN_RECORD: >-
         data/natural_language_localization/evaluator_panel_v1/e1c_prompt_source_freeze_v3_run.safe.json
-      BUNDLE_BLOB_SHA: 1a8380fe36b8623258c80cb2a5e7be1a5ca98def
+      BUNDLE_PATH: .agent/e1c_source_v3_bundle.tgz
       BUNDLE_SHA256: 013362a1e402386dc773d32eaf29f879e84b9358bd59e742dc8ba28d8eb8ae33
       PIP_NO_CACHE_DIR: "1"
-      GH_TOKEN: ${{ github.token }}
 
     steps:
       - name: Check out research branch
@@ -58,17 +57,9 @@ jobs:
 
       - name: Materialize frozen source-v3 bundle
         run: |
-          gh api \
-            -H 'Accept: application/vnd.github+json' \
-            -H 'X-GitHub-Api-Version: 2022-11-28' \
-            "/repos/$GITHUB_REPOSITORY/git/blobs/$BUNDLE_BLOB_SHA" \
-            --jq '.content' \
-            | tr -d '\n' \
-            | base64 -d \
-            > "$RUNNER_TEMP/e1c-source-v3.tgz"
-          test "$(sha256sum "$RUNNER_TEMP/e1c-source-v3.tgz" | cut -d' ' -f1)" = \
-            "$BUNDLE_SHA256"
-          tar -xzf "$RUNNER_TEMP/e1c-source-v3.tgz" -C .
+          test -f "$BUNDLE_PATH"
+          test "$(sha256sum "$BUNDLE_PATH" | cut -d' ' -f1)" = "$BUNDLE_SHA256"
+          tar -xzf "$BUNDLE_PATH" -C .
 
       - name: Validate frozen implementation
         run: |
@@ -180,7 +171,9 @@ jobs:
               encoding="utf-8",
           )
           PY
-          git rm .github/workflows/_temporary_apply_e1c_prompt_source_v3.yml
+          git rm \
+            .github/workflows/_temporary_apply_e1c_prompt_source_v3.yml \
+            "$BUNDLE_PATH"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add \
