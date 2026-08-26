@@ -1,0 +1,26 @@
+{
+  "causal_oracle_opened": false,
+  "harmbench_live_predictions_generated": true,
+  "heldout_opened": false,
+  "keep_only_oracle_opened": false,
+  "model_inference_performed": true,
+  "new_harmful_attack_outputs_generated": false,
+  "paper_validity": false,
+  "positions": [
+    7,
+    15,
+    23
+  ],
+  "prediction_sha256": "97a16cf3dd12c32cf2d288511f7f6fade6016b4f34fc8d7b162bc6b446a9a917",
+  "raw_text_recorded": false,
+  "record_count": 3,
+  "request_count": 36,
+  "runtime_sha256": "45f6c4dc9e86d540a2e153f57852673f54732704a3039b1426ce46b1e436f578",
+  "runtime_size_bytes": 7865957120,
+  "schema_version": "e1c-harmbench-paired-invariance-shard-summary-v1",
+  "shard_count": 8,
+  "shard_index": 7,
+  "stage_a_opened": false,
+  "status": "E1C_HARMBENCH_CANARY_REQUALIFICATION_SHARD_PASS",
+  "wavelet_used": false
+}

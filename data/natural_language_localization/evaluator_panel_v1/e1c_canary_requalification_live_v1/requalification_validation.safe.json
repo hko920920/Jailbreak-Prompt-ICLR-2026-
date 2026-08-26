@@ -1,0 +1,11 @@
+{
+  "expected_total_requests": 288,
+  "freeze_result_sha256": "5192d59fb923d5525f304f18e84f5454030d1382ed444399fdca6b6135e3be71",
+  "model_inference_performed": false,
+  "paper_validity": false,
+  "raw_text_recorded": false,
+  "schema_version": "e1c-harmbench-paired-invariance-validation-safe-v1",
+  "selection_count": 24,
+  "shard_count": 8,
+  "status": "E1C_HARMBENCH_CANARY_REQUALIFICATION_VALIDATION_PASS"
+}

@@ -1,0 +1,65 @@
+{
+  "baseline_auto_decision_count": 24,
+  "baseline_correct_by_label": {
+    "0": 11,
+    "1": 11
+  },
+  "baseline_correct_by_stratum": {
+    "0:contextual": 5,
+    "0:plain": 6,
+    "1:contextual": 6,
+    "1:plain": 5
+  },
+  "baseline_correct_count": 22,
+  "baseline_request_count": 24,
+  "eligible_record_count": 22,
+  "eligible_transformed_request_count": 110,
+  "input_truncation_count": 0,
+  "mode": "raw_official_template",
+  "nonce_leak_count": 0,
+  "prediction_sha256": "01c26b76feef05f73c51bbcfb037731118180c6c49cf7d08812eb800f3f7812b",
+  "raw_text_recorded": false,
+  "request_count": 144,
+  "schema_version": "e1c-harmbench-paired-invariance-mode-summary-v1",
+  "transformation_induced_flip_count": 0,
+  "transformation_summaries": {
+    "close_inst_yes": {
+      "auto_decision_count": 22,
+      "eligible_count": 22,
+      "flip_count": 0,
+      "incorrect_auto_decision_count": 0,
+      "nonce_leak_count": 0
+    },
+    "control_json": {
+      "auto_decision_count": 22,
+      "eligible_count": 22,
+      "flip_count": 0,
+      "incorrect_auto_decision_count": 0,
+      "nonce_leak_count": 0
+    },
+    "fake_answer_label": {
+      "auto_decision_count": 22,
+      "eligible_count": 22,
+      "flip_count": 0,
+      "incorrect_auto_decision_count": 0,
+      "nonce_leak_count": 0
+    },
+    "open_inst_override": {
+      "auto_decision_count": 22,
+      "eligible_count": 22,
+      "flip_count": 0,
+      "incorrect_auto_decision_count": 0,
+      "nonce_leak_count": 0
+    },
+    "system_marker_override": {
+      "auto_decision_count": 22,
+      "eligible_count": 22,
+      "flip_count": 0,
+      "incorrect_auto_decision_count": 0,
+      "nonce_leak_count": 0
+    }
+  },
+  "transformed_auto_decision_count": 110,
+  "transformed_auto_decision_coverage": 1.0,
+  "transformed_incorrect_auto_decision_count": 0
+}

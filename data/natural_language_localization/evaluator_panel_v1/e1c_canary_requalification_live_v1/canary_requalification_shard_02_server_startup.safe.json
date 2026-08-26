@@ -1,0 +1,10 @@
+{
+  "health_http_code": "200",
+  "raw_log_recorded": false,
+  "readiness_seconds": 20,
+  "ready": true,
+  "runtime_sha256": "45f6c4dc9e86d540a2e153f57852673f54732704a3039b1426ce46b1e436f578",
+  "runtime_size_bytes": 7865957120,
+  "schema_version": "e1c-harmbench-paired-invariance-server-startup-safe-v1",
+  "shard_index": 2
+}
