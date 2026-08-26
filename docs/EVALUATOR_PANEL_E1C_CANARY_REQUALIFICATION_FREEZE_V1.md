@@ -70,3 +70,7 @@ freeze performs no model download or inference. The live run generates no new
 attack output and keeps semantic-only Stage A, cross-regime Stage A, prior and
 held-out evaluation, causal cut-set analysis, keep-only analysis, and wavelet
 search closed.
+
+The corrected static freeze was explicitly retriggered after commit
+`efc6472c3d833e04098268051d09c6035b5e9ea5` removed the unsupported predecessor
+output-length assumption. This line changes no scientific condition.
