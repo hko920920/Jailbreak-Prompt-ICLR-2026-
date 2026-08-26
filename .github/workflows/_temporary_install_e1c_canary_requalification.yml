@@ -1,0 +1,127 @@
+name: temporary-install-e1c-canary-requalification
+
+"on":
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/_temporary_install_e1c_canary_requalification.yml
+      - .github/e1c_canary_requalification_bundle/**
+
+permissions:
+  contents: write
+
+concurrency:
+  group: temporary-install-e1c-canary-requalification
+  cancel-in-progress: false
+
+env:
+  TARGET_BRANCH: agent/programmatic-agentharm-pivot
+
+jobs:
+  install:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out exact installer commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Materialize verified implementation bundle
+        run: |
+          parts=.github/e1c_canary_requalification_bundle
+          cat "$parts"/part-* > /tmp/e1c-canary-requalification.tar.xz.b64
+          base64 -d /tmp/e1c-canary-requalification.tar.xz.b64 > \
+            /tmp/e1c-canary-requalification.tar.xz
+          test "$(sha256sum /tmp/e1c-canary-requalification.tar.xz | cut -d' ' -f1)" = \
+            "91b3d97d18477f3af114222bf7edc9ed8e24e38e4e5866b0b5d70c657fa05135"
+          rm -rf /tmp/e1c-canary-requalification-bundle
+          mkdir -p /tmp/e1c-canary-requalification-bundle
+          tar -xJf /tmp/e1c-canary-requalification.tar.xz -C \
+            /tmp/e1c-canary-requalification-bundle
+          cd /tmp/e1c-canary-requalification-bundle
+          
+      - name: Install and validate corrected freeze plus live pipeline
+        run: |
+          bundle=/tmp/e1c-canary-requalification-bundle
+          while IFS= read -r path; do
+            relative="${path#$bundle/}"
+            mkdir -p "$(dirname "$relative")"
+            cp "$path" "$relative"
+          done < <(find "$bundle" -type f ! -name MANIFEST.sha256 | sort)
+
+          python -m pip install --upgrade pip
+          python -m pip install 'pytest>=8.2' 'ruff>=0.6' 'pyyaml>=6.0'
+          ruff check \
+            scripts/run_evaluator_panel_e1c_canary_requalification_freeze.py \
+            scripts/run_evaluator_panel_e1c_canary_requalification_live.py \
+            tests/test_evaluator_panel_e1c_canary_requalification_freeze.py \
+            tests/test_evaluator_panel_e1c_canary_requalification_live.py
+          python -m pytest -q \
+            tests/test_evaluator_panel_e1c_canary_requalification_freeze.py \
+            tests/test_evaluator_panel_e1c_canary_requalification_live.py
+          python -m py_compile \
+            scripts/run_evaluator_panel_e1c_canary_requalification_freeze.py \
+            scripts/run_evaluator_panel_e1c_canary_requalification_live.py
+          bash -n \
+            scripts/run_evaluator_panel_e1c_canary_requalification_worker_ci.sh
+          python -m json.tool \
+            configs/natural_language_localization/evaluator_panel_e1c_canary_requalification_freeze_v1.json \
+            >/dev/null
+          python - <<'PY'
+          from pathlib import Path
+          import yaml
+          for path in (
+              Path('.github/workflows/evaluator_panel_e1c_canary_requalification_freeze.yml'),
+              Path('.github/workflows/evaluator_panel_e1c_canary_requalification_live.yml'),
+          ):
+              value = yaml.safe_load(path.read_text(encoding='utf-8'))
+              assert isinstance(value, dict)
+              assert 'jobs' in value
+          PY
+          git diff --check
+
+      - name: Commit corrected pipeline and remove temporary installer
+        run: |
+          git rm -r -- \
+            .github/workflows/_temporary_install_e1c_canary_requalification.yml \
+            .github/e1c_canary_requalification_bundle
+          git add \
+            .github/workflows/evaluator_panel_e1c_canary_requalification_freeze.yml \
+            .github/workflows/evaluator_panel_e1c_canary_requalification_live.yml \
+            configs/natural_language_localization/evaluator_panel_e1c_canary_requalification_freeze_v1.json \
+            scripts/run_evaluator_panel_e1c_canary_requalification_freeze.py \
+            scripts/run_evaluator_panel_e1c_canary_requalification_live.py \
+            scripts/run_evaluator_panel_e1c_canary_requalification_worker_ci.sh \
+            tests/test_evaluator_panel_e1c_canary_requalification_freeze.py \
+            tests/test_evaluator_panel_e1c_canary_requalification_live.py \
+            docs/EVALUATOR_PANEL_E1C_CANARY_REQUALIFICATION_FREEZE_V1.md \
+            docs/EVALUATOR_PANEL_E1C_CANARY_REQUALIFICATION_LIVE_V1.md
+          git config user.name "github-actions[bot]"
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m \
+            "Fix and launch E1C paired-invariance requalification"
+          git fetch origin "$TARGET_BRANCH"
+          frozen_inputs=(
+            configs/natural_language_localization/evaluator_panel_e1c_harmbench_live_contract_v1.json
+            scripts/run_evaluator_panel_e1c_harmbench_preflight.py
+            scripts/run_evaluator_panel_e1c_prompt_source_freeze_v3.py
+            scripts/run_evaluator_panel_e1c_harmbench_live.py
+            data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_live_sharded.safe.json
+            data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_live_sharded/harmbench_canaries.safe.jsonl
+            data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_selection_v2.safe.jsonl
+          )
+          if ! git diff --quiet "$GITHUB_SHA" "origin/$TARGET_BRANCH" -- \
+            "${frozen_inputs[@]}"; then
+            echo "Frozen E1C predecessor changed during installation." >&2
+            exit 1
+          fi
+          git rebase "origin/$TARGET_BRANCH"
+          git push origin "HEAD:$TARGET_BRANCH"
