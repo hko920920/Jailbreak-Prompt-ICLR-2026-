@@ -1,0 +1,39 @@
+{
+  "schema_version": "e1c-canary-requalification-trigger-repair-safe-v2",
+  "classification": "OPERATIONAL_TRIGGER_REPAIR_NOT_SCIENTIFIC_FAILURE",
+  "failed_attempts": [
+    {
+      "run_id": 32925146558,
+      "stage": "workflow_dispatch_lookup",
+      "reason": "feature-branch workflow was not present on the default branch",
+      "model_inference_performed": false
+    },
+    {
+      "run_id": 32925751778,
+      "stage": "workflow_file_update_push",
+      "reason": "GitHub Actions token lacked workflows permission",
+      "model_inference_performed": false
+    }
+  ],
+  "repair_method": "MODE_ONLY_PUSH_TRIGGER_ON_FROZEN_RESULT_PATH",
+  "trigger_path": "data/natural_language_localization/evaluator_panel_v1/e1c_canary_requalification_freeze_v1.safe.json",
+  "trigger_blob_sha_preserved": "67ed0fd5ca74cd77f154cf2ebf447d2a06ac3ea0",
+  "mode_before": "100644",
+  "mode_after": "100755",
+  "file_content_changed": false,
+  "scientific_contract_changed": false,
+  "model_changed": false,
+  "selection_changed": false,
+  "prompt_changed": false,
+  "thresholds_changed": false,
+  "parser_changed": false,
+  "paired_invariance_request_denominator": 288,
+  "new_harmful_attack_outputs_generated": false,
+  "semantic_only_stage_a_opened": false,
+  "cross_regime_stage_a_opened": false,
+  "heldout_opened": false,
+  "causal_oracle_opened": false,
+  "keep_only_oracle_opened": false,
+  "wavelet_used": false,
+  "raw_text_recorded": false
+}
