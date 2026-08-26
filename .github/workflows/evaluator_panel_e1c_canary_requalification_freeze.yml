@@ -1,0 +1,214 @@
+name: evaluator-panel-e1c-canary-requalification-freeze
+
+"on":
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/evaluator_panel_e1c_canary_requalification_freeze.yml
+      - configs/natural_language_localization/evaluator_panel_e1c_canary_requalification_freeze_v1.json
+      - scripts/run_evaluator_panel_e1c_canary_requalification_freeze.py
+      - tests/test_evaluator_panel_e1c_canary_requalification_freeze.py
+      - docs/EVALUATOR_PANEL_E1C_CANARY_REQUALIFICATION_FREEZE_V1.md
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: evaluator-panel-e1c-canary-requalification-freeze
+  cancel-in-progress: false
+
+env:
+  TARGET_BRANCH: agent/programmatic-agentharm-pivot
+  SOURCE_ROOT: upstream/HarmBench
+  CONFIG: configs/natural_language_localization/evaluator_panel_e1c_canary_requalification_freeze_v1.json
+  SAFE_DIR: artifacts/e1c-canary-requalification-freeze/safe
+  SAFE_RESULT: artifacts/e1c-canary-requalification-freeze/safe/e1c_canary_requalification_freeze_v1.safe.json
+  SAFE_SELECTION: artifacts/e1c-canary-requalification-freeze/safe/e1c_canary_requalification_selection_v1.safe.jsonl
+  RECORD_ROOT: data/natural_language_localization/evaluator_panel_v1
+  RECORD_RESULT: data/natural_language_localization/evaluator_panel_v1/e1c_canary_requalification_freeze_v1.safe.json
+  RECORD_SELECTION: data/natural_language_localization/evaluator_panel_v1/e1c_canary_requalification_selection_v1.safe.jsonl
+  RUN_RECORD: data/natural_language_localization/evaluator_panel_v1/e1c_canary_requalification_freeze_v1_run.safe.json
+
+jobs:
+  freeze:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out exact freeze implementation commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: Check out immutable HarmBench source
+        uses: actions/checkout@v4
+        with:
+          repository: centerforaisafety/HarmBench
+          ref: 8e1604d1171fe8a48d8febecd22f600e462bdcdd
+          path: ${{ env.SOURCE_ROOT }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate adjudication and freeze implementation
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'pytest>=8.2' 'ruff>=0.6'
+          ruff check \
+            scripts/run_evaluator_panel_e1c_canary_requalification_freeze.py \
+            tests/test_evaluator_panel_e1c_canary_requalification_freeze.py
+          python -m pytest -q \
+            tests/test_evaluator_panel_e1c_canary_requalification_freeze.py
+          python -m py_compile \
+            scripts/run_evaluator_panel_e1c_canary_requalification_freeze.py
+          python -m json.tool "$CONFIG" >/dev/null
+          test "$(git -C "$SOURCE_ROOT" rev-parse HEAD)" = \
+            "8e1604d1171fe8a48d8febecd22f600e462bdcdd"
+          git diff --check
+
+      - name: Adjudicate old canary and freeze unused human-labeled pairs
+        run: |
+          mkdir -p "$SAFE_DIR"
+          python scripts/run_evaluator_panel_e1c_canary_requalification_freeze.py \
+            --root . \
+            --source-root "$SOURCE_ROOT" \
+            --config "$CONFIG" \
+            --safe-output "$SAFE_RESULT" \
+            --selection-output "$SAFE_SELECTION"
+
+      - name: Audit pass and sealed boundaries
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          result_path = Path(os.environ["SAFE_RESULT"])
+          selection_path = Path(os.environ["SAFE_SELECTION"])
+          result = json.loads(result_path.read_text(encoding="utf-8"))
+          rows = [
+              json.loads(line)
+              for line in selection_path.read_text(encoding="utf-8").splitlines()
+              if line.strip()
+          ]
+          assert result["status"] == "E1C_CANARY_REQUALIFICATION_FREEZE_PASS"
+          assert result["operational_pass"] is True
+          assert result["original_e1c_scientific_fail_preserved"] is True
+          assert result["retroactive_pass_claimed"] is False
+          assert result["construct_adjudication"][
+              "demonstrated_prompt_injection_failure"
+          ] is False
+          assert result["new_selection"]["record_count"] == 24
+          assert result["new_selection"]["label_counts"] == {"0": 12, "1": 12}
+          assert result["new_selection"]["template_counts"] == {
+              "contextual": 12,
+              "plain": 12,
+          }
+          assert result["new_selection"]["prior_selection_overlap_count"] == 0
+          assert result["new_selection"]["shard_record_counts"] == {
+              str(index): 3 for index in range(8)
+          }
+          assert len(rows) == 24
+          assert result["model_weight_downloaded"] is False
+          assert result["model_inference_performed"] is False
+          assert result["harmbench_live_predictions_generated"] is False
+          assert result["new_harmful_attack_outputs_generated"] is False
+          assert result["semantic_only_stage_a_opened"] is False
+          assert result["cross_regime_stage_a_opened"] is False
+          assert result["heldout_opened"] is False
+          assert result["causal_oracle_opened"] is False
+          assert result["keep_only_oracle_opened"] is False
+          assert result["wavelet_used"] is False
+          assert result["next_authorized_operation"] == (
+              "EXECUTE_E1C_HARMBENCH_PAIRED_INVARIANCE_REQUALIFICATION"
+          )
+          serialized = (
+              result_path.read_text(encoding="utf-8")
+              + "\n"
+              + selection_path.read_text(encoding="utf-8")
+          ).lower()
+          for forbidden in (
+              '"generation":',
+              '"test_case":',
+              '"behavior_id_private":',
+              '"prompt":',
+              '"raw_output":',
+          ):
+              assert forbidden not in serialized
+          PY
+
+      - name: Upload safe freeze artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: evaluator-panel-e1c-canary-requalification-freeze-safe
+          path: ${{ env.SAFE_DIR }}
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Commit adjudication and frozen selection
+        run: |
+          mkdir -p "$RECORD_ROOT"
+          cp "$SAFE_RESULT" "$RECORD_RESULT"
+          cp "$SAFE_SELECTION" "$RECORD_SELECTION"
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          result = Path(os.environ["RECORD_RESULT"])
+          selection = Path(os.environ["RECORD_SELECTION"])
+          record = {
+              "schema_version": "e1c-canary-requalification-freeze-run-safe-v1",
+              "workflow": os.environ["GITHUB_WORKFLOW"],
+              "run_id": int(os.environ["GITHUB_RUN_ID"]),
+              "run_attempt": int(os.environ["GITHUB_RUN_ATTEMPT"]),
+              "head_sha_at_start": os.environ["GITHUB_SHA"],
+              "terminal_status": "E1C_CANARY_REQUALIFICATION_FREEZE_PASS",
+              "result_sha256": hashlib.sha256(result.read_bytes()).hexdigest(),
+              "selection_sha256": hashlib.sha256(selection.read_bytes()).hexdigest(),
+              "paper_validity": False,
+              "model_inference_performed": False,
+              "new_harmful_attack_outputs_generated": False,
+              "stage_a_opened": False,
+              "heldout_opened": False,
+              "causal_oracle_opened": False,
+              "keep_only_oracle_opened": False,
+              "wavelet_used": False,
+          }
+          Path(os.environ["RUN_RECORD"]).write_text(
+              json.dumps(record, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$RECORD_RESULT" "$RECORD_SELECTION" "$RUN_RECORD"
+          if git diff --cached --quiet; then
+            echo "Frozen canary requalification records are already current."
+            exit 0
+          fi
+          git commit -m "Freeze E1C paired-invariance canary requalification"
+          git fetch origin "$TARGET_BRANCH"
+          frozen_inputs=(
+            configs/natural_language_localization/evaluator_panel_e1c_canary_requalification_freeze_v1.json
+            configs/natural_language_localization/evaluator_panel_e1c_harmbench_live_contract_v1.json
+            scripts/run_evaluator_panel_e1c_harmbench_preflight.py
+            scripts/run_evaluator_panel_e1c_prompt_source_freeze_v3.py
+            scripts/run_evaluator_panel_e1c_harmbench_live.py
+            data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_live_sharded.safe.json
+            data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_live_sharded/harmbench_canaries.safe.jsonl
+            data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_selection_v2.safe.jsonl
+          )
+          if ! git diff --quiet "$GITHUB_SHA" "origin/$TARGET_BRANCH" -- \
+            "${frozen_inputs[@]}"; then
+            echo "Frozen predecessor changed during canary freeze." >&2
+            exit 1
+          fi
+          git rebase "origin/$TARGET_BRANCH"
+          git push origin "HEAD:$TARGET_BRANCH"
