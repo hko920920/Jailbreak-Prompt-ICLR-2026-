@@ -1,0 +1,30 @@
+name: temporary-dispatch-e1c-canary-requalification-live
+
+"on":
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/_temporary_dispatch_e1c_canary_requalification_live.yml
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: temporary-dispatch-e1c-canary-requalification-live
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Dispatch frozen 288-request live workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run \
+            evaluator_panel_e1c_canary_requalification_live.yml \
+            --repo hko920920/Jailbreak-Prompt-ICLR-2026- \
+            --ref agent/programmatic-agentharm-pivot
