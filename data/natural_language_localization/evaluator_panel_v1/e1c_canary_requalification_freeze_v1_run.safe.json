@@ -1,0 +1,18 @@
+{
+  "causal_oracle_opened": false,
+  "head_sha_at_start": "913f5395ec569e63fe1c8d0497bed73d82e4d1d9",
+  "heldout_opened": false,
+  "keep_only_oracle_opened": false,
+  "model_inference_performed": false,
+  "new_harmful_attack_outputs_generated": false,
+  "paper_validity": false,
+  "result_sha256": "883fdc2b1bbe42291f4b9e8bca7a60241454c89ab515b19964db4506864e4a64",
+  "run_attempt": 1,
+  "run_id": 32925022626,
+  "schema_version": "e1c-canary-requalification-freeze-run-safe-v1",
+  "selection_sha256": "e603add875e767842eba0f780fdbdf611caae4ac1bed0e635f28e84cf33d8cd7",
+  "stage_a_opened": false,
+  "terminal_status": "E1C_CANARY_REQUALIFICATION_FREEZE_PASS",
+  "wavelet_used": false,
+  "workflow": "evaluator-panel-e1c-canary-requalification-freeze"
+}
