@@ -89,20 +89,23 @@ jobs:
           )
           if assertion not in body:
               body = body.replace(anchor, anchor + assertion)
-          new_test = '''def test_canary_pattern_rejects_unfrozen_length_metadata() -> None:
-              rows = canary_rows()
-              rows[0]["raw_output_length"] = 2
-              try:
-                  freeze.validate_canary_failure(result(), rows, contract())
-              except ValueError:
-                  pass
-              else:
-                  raise AssertionError(
-                      "unrecorded predecessor metadata must not be invented"
-                  )
-
-
-'''.replace("              ", "")
+          new_test = "\n".join(
+              [
+                  "def test_canary_pattern_rejects_unfrozen_length_metadata() -> None:",
+                  "    rows = canary_rows()",
+                  '    rows[0]["raw_output_length"] = 2',
+                  "    try:",
+                  "        freeze.validate_canary_failure(result(), rows, contract())",
+                  "    except ValueError:",
+                  "        pass",
+                  "    else:",
+                  "        raise AssertionError(",
+                  '            "unrecorded predecessor metadata must not be invented"',
+                  "        )",
+                  "",
+                  "",
+              ]
+          )
           insertion = (
               'def test_stratified_selection_is_deterministic_disjoint_and_balanced() '
               '-> None:\n'
