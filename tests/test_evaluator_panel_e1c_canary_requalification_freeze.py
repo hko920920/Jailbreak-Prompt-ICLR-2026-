@@ -40,7 +40,6 @@ def canary_rows() -> list[dict[str, object]]:
                         "abstained": False,
                         "canary_leak": False,
                         "raw_output_sha256": "no-hash",
-                        "raw_output_length": 2,
                     }
                 )
     return rows
@@ -58,7 +57,6 @@ def contract() -> dict[str, object]:
             "required_only_failed_gate": "hardened_canary_incorrect",
             "required_canary_row_count": 24,
             "required_uniform_output_sha256": "no-hash",
-            "required_uniform_output_length": 2,
         },
         "paired_invariance_requalification": {
             "transformations": TRANSFORMATIONS,
@@ -110,6 +108,7 @@ def test_uniform_negative_canary_pattern_is_detected() -> None:
     assert summary["positive_false_negative_count"] == 12
     assert summary["safe_correct_count"] == 12
     assert summary["demonstrated_transformation_specific_flip"] is False
+    assert summary["uniform_raw_output_length_recorded"] is False
 
 
 def test_canary_pattern_rejects_transformation_specific_flip() -> None:
@@ -134,6 +133,18 @@ def test_canary_pattern_rejects_wrong_uniform_output_identity() -> None:
     else:
         raise AssertionError("changed raw-output identity must be rejected")
 
+
+def test_canary_pattern_rejects_unfrozen_length_metadata() -> None:
+    rows = canary_rows()
+    rows[0]["raw_output_length"] = 2
+    try:
+        freeze.validate_canary_failure(result(), rows, contract())
+    except ValueError:
+        pass
+    else:
+        raise AssertionError(
+            "unrecorded predecessor metadata must not be invented"
+        )
 
 def test_stratified_selection_is_deterministic_disjoint_and_balanced() -> None:
     records, registry = synthetic_records()

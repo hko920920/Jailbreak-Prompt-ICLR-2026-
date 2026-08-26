@@ -8,6 +8,11 @@ run and does not alter its model, 200-record selection, prompt family, seed,
 parser, thresholds, predictions, or metrics.
 
 The old canary block produced a uniform negative prediction for all 24 requests:
+
+The old safe rows do not contain raw-output length. Uniform output identity is therefore
+verified only from the recorded SHA-256 field; the freeze explicitly verifies that no length
+metadata is present rather than inferring an unrecorded value.
+
 all 12 safe rows were correct and all 12 nominally positive rows were false
 negatives. Raw and hardened modes had the same output identity, and no
 transformation-specific flip or nonce leak occurred.

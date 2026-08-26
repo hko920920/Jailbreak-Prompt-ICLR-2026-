@@ -15,8 +15,7 @@
     "canary_rows_path": "data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_live_sharded/harmbench_canaries.safe.jsonl",
     "required_canary_git_blob_sha": "acb9155274dbde6a4bcbd8345e3a0f70573289a1",
     "required_canary_row_count": 24,
-    "required_uniform_output_sha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d",
-    "required_uniform_output_length": 2
+    "required_uniform_output_sha256": "1ea442a134b2a184bd5d40104401f2a37fbc09ccf3f4bc9da161c6099be3691d"
   },
   "base_live_contract": {
     "path": "configs/natural_language_localization/evaluator_panel_e1c_harmbench_live_contract_v1.json",

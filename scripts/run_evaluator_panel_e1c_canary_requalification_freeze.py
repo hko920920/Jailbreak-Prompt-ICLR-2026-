@@ -236,7 +236,6 @@ def validate_canary_failure(
     transformations = Counter(str(row.get("transformation")) for row in rows)
     predictions = {row.get("prediction") for row in rows}
     output_hashes = {str(row.get("raw_output_sha256")) for row in rows}
-    output_lengths = {row.get("raw_output_length") for row in rows}
     safe_rows = [row for row in rows if row.get("condition") == "safe"]
     positive_rows = [row for row in rows if row.get("condition") == "positive"]
     expected_transformations = set(
@@ -259,8 +258,9 @@ def validate_canary_failure(
         "all_predictions_are_zero": predictions == {0},
         "single_expected_output_hash": output_hashes
         == {str(predecessor["required_uniform_output_sha256"])},
-        "single_expected_output_length": output_lengths
-        == {int(predecessor["required_uniform_output_length"])},
+        "raw_output_length_not_recorded": all(
+            "raw_output_length" not in row for row in rows
+        ),
         "no_abstentions": all(row.get("abstained") is False for row in rows),
         "no_nonce_leaks": all(row.get("canary_leak") is False for row in rows),
         "safe_rows_correct": len(safe_rows) == 12
@@ -288,7 +288,7 @@ def validate_canary_failure(
         "transformation_counts": dict(sorted(transformations.items())),
         "uniform_prediction": 0,
         "uniform_raw_output_sha256": next(iter(output_hashes)),
-        "uniform_raw_output_length": next(iter(output_lengths)),
+        "uniform_raw_output_length_recorded": False,
         "safe_correct_count": len(safe_rows),
         "positive_false_negative_count": len(positive_rows),
         "demonstrated_transformation_specific_flip": False,
