@@ -1,0 +1,142 @@
+{
+  "schema_version": "jailbreak-topology-micro-pilot-v1",
+  "status": "FROZEN_BEFORE_MICRO_PILOT_OUTCOMES",
+  "frozen": true,
+  "paper_validity": false,
+  "evidence_class": "DEVELOPMENT",
+  "parent_scope_contract": "configs/natural_language_localization/paper_scope_decision_v2.json",
+  "purpose": "Decide whether robust nontrivial input-level causal topology exists before expanding the paper.",
+  "families": [
+    {
+      "name": "h4rm3l",
+      "class": "SEMANTIC_COMPOSITIONAL",
+      "minimum_stable_pairs": 2,
+      "coarse_unit_source": "frozen_typed_strategy_node_manifest"
+    },
+    {
+      "name": "GCG",
+      "class": "NONFLUENT_OPTIMIZED",
+      "minimum_stable_pairs": 2,
+      "coarse_unit_source": "frozen_equal_token_blocks_and_recursive_intervals"
+    }
+  ],
+  "target_models": {
+    "development_family_count": 1,
+    "open_weight_required": true,
+    "exact_model_revision_and_tokenizer_must_be_frozen_before_screen": true
+  },
+  "payloads": {
+    "development_payload_count_per_family_target": 4,
+    "raw_payloads_in_safe_artifacts": false,
+    "payload_occurrence_count": 1,
+    "byte_invariance_required": true,
+    "selection_may_not_use_topology_outcomes": true
+  },
+  "generation": {
+    "seed_count": 3,
+    "decoding_must_be_frozen": true,
+    "direct_and_attacked_prompt_share_payload_and_decoding": true,
+    "decision_relevant_truncation_is_excluded": true
+  },
+  "stable_pair_definition": {
+    "direct_request_nonharmful_across_frozen_seeds": true,
+    "attacked_prompt_substantive_harmful_assistance_across_frozen_seeds": true,
+    "payload_preserved": true,
+    "capability_confound_absent": true,
+    "automatic_disagreement_escalates_to_audit": true
+  },
+  "screening": {
+    "wildguard_role": "CONSERVATIVE_REFUSAL_AND_GENERAL_HARMFULNESS_SIGNAL",
+    "harmbench_role": "NONVOTING_DIAGNOSTIC",
+    "rule_based_refusal_signal_allowed": true,
+    "screen_positive_is_not_a_final_label": true,
+    "screen_positive_requires_human_audit_before_topology": true
+  },
+  "human_audit": {
+    "required_for_attacked_baseline": true,
+    "required_for_direct_baseline": true,
+    "required_for_every_reported_minimal_set": true,
+    "required_for_every_strict_subset_needed_for_minimality": true,
+    "required_for_neutralizer_disagreement": true,
+    "independent_annotators": 2,
+    "third_adjudicator_on_disagreement": true,
+    "blinded_to_attack_family_and_intervention_identity": true
+  },
+  "causal_interventions": {
+    "maximum_coarse_units_per_instance": 6,
+    "enumerate_all_subsets": true,
+    "neutralizer_count": 2,
+    "neutralizers": [
+      "LENGTH_AWARE_POSITION_PRESERVING_NEUTRAL_REPLACEMENT",
+      "REGIME_SPECIFIC_NEUTRAL_BLOCK_OR_CLAUSE_REPLACEMENT"
+    ],
+    "deletion_is_primary": false,
+    "strict_subset_verification_required": true,
+    "all_minimal_sets_recorded": true,
+    "no_monotonicity_assumption": true
+  },
+  "primary_outputs": [
+    "MINIMUM_ROBUST_RECOVERY_SET_SIZE",
+    "NUMBER_OF_DISTINCT_MINIMAL_RECOVERY_SETS",
+    "MAXIMUM_CONFIRMED_INTERACTION_ORDER",
+    "NEUTRALIZER_AGREEMENT",
+    "SEED_STABILITY",
+    "CAPABILITY_CONFOUND_RATE",
+    "TOPOLOGY_LABEL"
+  ],
+  "topology_labels": [
+    "LOCALIZED_SINGLE",
+    "LOCALIZED_SMALL_SET",
+    "LOCALIZED_INTERACTIVE",
+    "MULTIPLE_MINIMAL_CUT_SETS",
+    "DISTRIBUTED_WITHIN_BUDGET",
+    "NON_MONOTONE",
+    "CAPABILITY_CONFOUNDED",
+    "UNRESOLVED_ABSTENTION"
+  ],
+  "decision_gate": {
+    "go": {
+      "stable_pairs_total_min": 6,
+      "stable_pairs_per_family_min": 2,
+      "instances_with_robust_minimal_set_min": 3,
+      "instances_with_nonsingleton_or_multiple_minimal_sets_min": 2,
+      "neutralizer_agreement_min": 0.8,
+      "capability_confound_rate_max": 0.25,
+      "next_operation": "FREEZE_FOUR_FAMILY_TWO_MODEL_CONFIRMATORY_PREP"
+    },
+    "narrow": {
+      "condition": "Only one family or structural class yields stable nontrivial topology.",
+      "next_operation": "FREEZE_HONEST_SINGLE_CLASS_PAPER_SCOPE"
+    },
+    "stop": {
+      "stable_pairs_total_below": 4,
+      "all_reportable_topology_is_trivial_singleton_or_whole_suffix": true,
+      "neutralizer_or_seed_instability_dominates": true,
+      "capability_confound_dominates": true,
+      "next_operation": "STOP_MAIN_PAPER_ROUTE_AND_ARCHIVE_DEVELOPMENT_EVIDENCE"
+    }
+  },
+  "baselines_after_exact_topology_only": [
+    "LEAVE_ONE_OUT",
+    "TOKEN_HIGHLIGHTER_STYLE_ATTRIBUTION",
+    "MASK_GCG_STYLE_MASK_SCORE_WHEN_APPLICABLE",
+    "RANDOM_SAME_SIZE_INTERVENTION",
+    "GREEDY_ELIMINATION"
+  ],
+  "excluded_now": [
+    "WAVELET",
+    "KEEP_ONLY_SUFFICIENCY",
+    "HELDOUT_CONFIRMATION",
+    "SECOND_TARGET_MODEL",
+    "DEEPINCEPTION",
+    "AUTODAN",
+    "BROAD_REGIME_GENERALIZATION"
+  ],
+  "sealed_boundaries": {
+    "heldout_opened": false,
+    "paper_valid_confirmation_opened": false,
+    "wavelet_used": false,
+    "keep_only_oracle_opened": false
+  },
+  "next_authorized_operation": "FREEZE_TARGET_MODEL_PAYLOAD_HASHES_DECODING_AND_AUDIT_PACKET_FORMAT"
+}

@@ -1,0 +1,42 @@
+name: paper-scope-and-micro-pilot-static-validation
+
+"on":
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - docs/PAPER_SCOPE_DECISION_V2.md
+      - docs/TOPOLOGY_MICRO_PILOT_V1.md
+      - configs/natural_language_localization/paper_scope_decision_v2.json
+      - configs/natural_language_localization/topology_micro_pilot_v1.json
+      - scripts/validate_scope_and_micro_pilot.py
+      - tests/test_scope_and_micro_pilot.py
+      - .github/workflows/paper_scope_and_micro_pilot_validation.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate narrowed paper scope and decisive micro-pilot
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'pytest>=8.2' 'ruff>=0.6'
+          ruff check \
+            scripts/validate_scope_and_micro_pilot.py \
+            tests/test_scope_and_micro_pilot.py
+          python -m pytest -q tests/test_scope_and_micro_pilot.py
+          python scripts/validate_scope_and_micro_pilot.py \
+            --scope configs/natural_language_localization/paper_scope_decision_v2.json \
+            --pilot configs/natural_language_localization/topology_micro_pilot_v1.json \
+            --output /tmp/scope_and_micro_pilot_validation.safe.json
+          test "$(python -c 'import json; print(json.load(open("/tmp/scope_and_micro_pilot_validation.safe.json"))["status"])')" = "PASS"
+          git diff --check

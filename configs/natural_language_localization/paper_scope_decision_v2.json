@@ -1,0 +1,98 @@
+{
+  "schema_version": "jailbreak-paper-scope-decision-v2",
+  "status": "FROZEN_BEFORE_NEW_TARGET_MODEL_OUTCOMES",
+  "frozen": true,
+  "paper_validity": false,
+  "date_asia_seoul": "2026-08-27",
+  "target_venue": "ICLR_2027",
+  "parent_branch": "agent/programmatic-agentharm-pivot",
+  "parent_head_at_freeze": "d8db7d50f8580e098a9b8aa83363d1cf043a51e1",
+  "working_title": "Beyond Critical Tokens: Minimal Recovery Topologies of LLM Jailbreaks",
+  "central_question": "For a frozen already-successful jailbreak, what are the smallest attack-added input combinations whose neutralization reliably removes substantive harmful assistance without changing the explicit harmful goal or collapsing general model capability?",
+  "primary_object": "ALL_ROBUST_MINIMAL_RECOVERY_SETS_WITHIN_A_FROZEN_COARSE_INTERVENTION_VOCABULARY",
+  "primary_claims": [
+    "strict_subset_minimality",
+    "higher_order_interaction_when_minimal_set_size_exceeds_one",
+    "multiple_alternative_minimal_recovery_sets",
+    "neutralizer_and_seed_stability",
+    "payload_and_capability_preservation",
+    "comparison_against_singleton_attribution_and_masking_baselines"
+  ],
+  "development_core": {
+    "target_model_family_count": 1,
+    "families": [
+      {
+        "name": "h4rm3l",
+        "structural_class": "SEMANTIC_COMPOSITIONAL",
+        "reason": "typed human-readable attack-added units and completed source/unit audits"
+      },
+      {
+        "name": "GCG",
+        "structural_class": "NONFLUENT_OPTIMIZED",
+        "reason": "optimized suffix extreme and completed static source/block audit"
+      }
+    ],
+    "purpose": "DECISIVE_DEVELOPMENT_GO_NARROW_STOP_MICRO_PILOT"
+  },
+  "confirmatory_extension_after_go": {
+    "target_model_family_count": 2,
+    "additional_families": [
+      {
+        "name": "DeepInception",
+        "structural_class": "SEMANTIC_COMPOSITIONAL_REPLICATION"
+      },
+      {
+        "name": "AutoDAN",
+        "structural_class": "FLUENT_OPTIMIZED_REPLICATION"
+      }
+    ],
+    "fresh_payloads_required": true,
+    "paper_valid_split_required": true
+  },
+  "measurement": {
+    "harmbench_is_production_vote": false,
+    "harmbench_role": "NONVOTING_DIAGNOSTIC_ONLY",
+    "wildguard_is_single_primary_judge": false,
+    "wildguard_role": "CONSERVATIVE_SCREENING_COMPONENT",
+    "automatic_panel_role": "DEVELOPMENT_SCREEN_AND_DISAGREEMENT_ROUTING",
+    "human_audit_required_for_paper_reported_baselines_and_cut_sets": true,
+    "independent_annotators": 2,
+    "third_adjudicator_on_disagreement": true,
+    "same_model_personas_count_as_humans": false,
+    "abstention_may_not_be_overridden_silently": true
+  },
+  "exactness": {
+    "coarse_vocabulary_all_subsets_required_when_unit_count_at_most": 6,
+    "fine_token_power_set_required_for_all_instances": false,
+    "fine_refinement": "PREDECLARED_STRATIFIED_SUBSET_ONLY_AFTER_COARSE_TOPOLOGY",
+    "optimized_suffix_claim": "CONTRACT_EXACT_WITH_RESPECT_TO_FROZEN_BLOCK_OR_INTERVAL_VOCABULARY"
+  },
+  "necessity_and_sufficiency": {
+    "minimal_recovery_sets_are_primary": true,
+    "keep_only_sufficiency_is_mandatory": false,
+    "sufficiency_claim_allowed_only_with_coherent_complement_reconstruction": true
+  },
+  "removed_from_core": [
+    "FULLY_AUTONOMOUS_PRODUCTION_EVALUATOR_PANEL",
+    "TWO_FAMILIES_PER_EACH_OF_THREE_REGIMES_AS_A_MINIMUM",
+    "WAVELET_AS_A_PRIMARY_CONTRIBUTION",
+    "NEW_JAILBREAK_GENERATOR",
+    "UNIVERSAL_ALL_JAILBREAK_CLAIM",
+    "MANDATORY_ALL_TOKEN_EXACTNESS_FOR_LONG_SUFFIXES",
+    "AGENTHARM_AS_MAIN_ROUTE",
+    "EVALUATOR_ENGINEERING_AS_HEADLINE_CONTRIBUTION"
+  ],
+  "wavelet": {
+    "opened": false,
+    "role_if_ever_opened": "APPROXIMATE_SEARCH_BASELINE_AFTER_EXACT_COARSE_TOPOLOGY"
+  },
+  "sealed_boundaries": {
+    "new_cross_family_target_outcomes_opened": false,
+    "heldout_opened": false,
+    "paper_valid_confirmation_opened": false,
+    "causal_oracle_opened": false,
+    "keep_only_oracle_opened": false,
+    "wavelet_used": false
+  },
+  "next_authorized_operation": "FREEZE_AND_VALIDATE_TOPOLOGY_MICRO_PILOT_V1"
+}
