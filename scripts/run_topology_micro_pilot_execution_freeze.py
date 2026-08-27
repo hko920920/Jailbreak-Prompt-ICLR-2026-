@@ -85,11 +85,13 @@ def validate_predecessors(root: Path, contract: JsonObject) -> JsonObject:
             raise ValueError(f"family predecessor mismatch: {raw['family']}")
         if value.get("target_model_called") is not False:
             raise ValueError("pre-outcome family audit unexpectedly called a target")
-        family_checks.append({
-            "family": raw["family"],
-            "status": value["status"],
-            "predecessor_sha256": sha256_file(root / str(raw["predecessor_path"])),
-        })
+        family_checks.append(
+            {
+                "family": raw["family"],
+                "status": value["status"],
+                "predecessor_sha256": sha256_file(root / str(raw["predecessor_path"])),
+            }
+        )
     return {"parent": parent_value["status"], "families": family_checks}
 
 
@@ -103,7 +105,9 @@ def select_payloads(csv_path: Path, contract: JsonObject) -> list[JsonObject]:
     for position, category in enumerate(categories):
         candidates: list[dict[str, str]] = []
         for row in rows:
-            tags = {part.strip().casefold() for part in row.get("Tags", "").split(",") if part.strip()}
+            tags = {
+                part.strip().casefold() for part in row.get("Tags", "").split(",") if part.strip()
+            }
             if row.get("FunctionalCategory") != source["functional_category_required"]:
                 continue
             if row.get("SemanticCategory") != category:
@@ -117,9 +121,7 @@ def select_payloads(csv_path: Path, contract: JsonObject) -> list[JsonObject]:
             candidates.append(row)
         if not candidates:
             raise ValueError(f"no eligible payload for category {category}")
-        candidates.sort(
-            key=lambda row: sha256_bytes(f"{category}:{row['BehaviorID']}".encode("utf-8"))
-        )
+        candidates.sort(key=lambda row: sha256_bytes(f"{category}:{row['BehaviorID']}".encode()))
         row = candidates[0]
         payload = row["Behavior"]
         behavior_id = row["BehaviorID"]
@@ -131,14 +133,16 @@ def select_payloads(csv_path: Path, contract: JsonObject) -> list[JsonObject]:
             "Tags": row.get("Tags", ""),
             "ContextString": row.get("ContextString", ""),
         }
-        selected.append({
-            "position": position,
-            "semantic_category": category,
-            "behavior_id_sha256": sha256_bytes(behavior_id.encode("utf-8")),
-            "payload_sha256": sha256_bytes(payload.encode("utf-8")),
-            "payload_utf8_bytes": len(payload.encode("utf-8")),
-            "source_row_sha256": canonical_sha256(source_identity),
-        })
+        selected.append(
+            {
+                "position": position,
+                "semantic_category": category,
+                "behavior_id_sha256": sha256_bytes(behavior_id.encode("utf-8")),
+                "payload_sha256": sha256_bytes(payload.encode("utf-8")),
+                "payload_utf8_bytes": len(payload.encode("utf-8")),
+                "source_row_sha256": canonical_sha256(source_identity),
+            }
+        )
     return selected
 
 
@@ -158,7 +162,9 @@ def resolve_hf_metadata(contract: JsonObject) -> JsonObject:
     runtime = cast(JsonObject, target["development_runtime"])
     runtime_info = api.model_info(str(runtime["repository"]), files_metadata=True)
     runtime_sha = str(runtime_info.sha)
-    required = [str(value).casefold() for value in cast(list[str], runtime["file_name_casefold_contains"])]
+    required = [
+        str(value).casefold() for value in cast(list[str], runtime["file_name_casefold_contains"])
+    ]
     files: list[JsonObject] = []
     for sibling in runtime_info.siblings or ():
         name = str(sibling.rfilename)
@@ -217,14 +223,21 @@ def run(
     payloads = select_payloads(csv_path, contract)
     if len(payloads) != int(source["selected_payload_count"]):
         raise ValueError("payload count mismatch")
-    metadata = load_object(model_metadata_path) if model_metadata_path else resolve_hf_metadata(contract)
-    if metadata.get("canonical_revision") != cast(JsonObject, contract["target_model"])["canonical_revision"]:
+    metadata = (
+        load_object(model_metadata_path) if model_metadata_path else resolve_hf_metadata(contract)
+    )
+    if (
+        metadata.get("canonical_revision")
+        != cast(JsonObject, contract["target_model"])["canonical_revision"]
+    ):
         raise ValueError("resolved canonical revision mismatch")
     generation = cast(JsonObject, contract["generation"])
     budget = cast(JsonObject, contract["causal_budget"])
     if len(cast(list[int], generation["seeds"])) != int(budget["seed_count"]):
         raise ValueError("seed count mismatch")
-    if (2 ** int(budget["maximum_coarse_units_per_instance"])) != int(budget["maximum_subsets_per_instance"]):
+    if (2 ** int(budget["maximum_coarse_units_per_instance"])) != int(
+        budget["maximum_subsets_per_instance"]
+    ):
         raise ValueError("subset budget mismatch")
     expected = (
         int(budget["maximum_subsets_per_instance"])
@@ -253,41 +266,45 @@ def run(
     }
     passed = all(checks.values())
     result: JsonObject = {
-        "schema_version":"topology-micro-pilot-execution-freeze-result-v1",
-        "status":"TOPOLOGY_MICRO_PILOT_EXECUTION_FREEZE_PASS" if passed else "TOPOLOGY_MICRO_PILOT_EXECUTION_FREEZE_FAIL",
-        "operational_pass":passed,
-        "scientific_pass":False,
-        "paper_validity":False,
-        "evidence_class":"PROTOCOL",
-        "contract_sha256":sha256_file(config_path),
-        "contract_git_blob_sha":git_blob_sha(config_path),
-        "predecessor":predecessor,
-        "payload_source":{
-            "repository":source["repository"],
-            "revision":source["revision"],
-            "path":source["path"],
-            "git_blob_sha":source["git_blob_sha"],
-            "selection_rule":source["selection_rule"],
-            "raw_payload_recorded":False,
+        "schema_version": "topology-micro-pilot-execution-freeze-result-v1",
+        "status": "TOPOLOGY_MICRO_PILOT_EXECUTION_FREEZE_PASS"
+        if passed
+        else "TOPOLOGY_MICRO_PILOT_EXECUTION_FREEZE_FAIL",
+        "operational_pass": passed,
+        "scientific_pass": False,
+        "paper_validity": False,
+        "evidence_class": "PROTOCOL",
+        "contract_sha256": sha256_file(config_path),
+        "contract_git_blob_sha": git_blob_sha(config_path),
+        "predecessor": predecessor,
+        "payload_source": {
+            "repository": source["repository"],
+            "revision": source["revision"],
+            "path": source["path"],
+            "git_blob_sha": source["git_blob_sha"],
+            "selection_rule": source["selection_rule"],
+            "raw_payload_recorded": False,
         },
-        "payload_manifest":payloads,
-        "payload_manifest_sha256":canonical_sha256(payloads),
-        "target_model":metadata,
-        "generation":generation,
-        "causal_budget":budget,
-        "screening_and_audit":contract["screening_and_audit"],
-        "checks":checks,
-        "next_authorized_operation":cast(JsonObject, contract["decision_gate"])["on_freeze_pass"] if passed else cast(JsonObject, contract["decision_gate"])["on_operational_fail"],
-        "model_weight_downloaded":False,
-        "model_inference_performed":False,
-        "attack_success_observed":False,
-        "new_harmful_attack_outputs_generated":False,
-        "stage_a_opened":False,
-        "heldout_opened":False,
-        "causal_oracle_opened":False,
-        "keep_only_oracle_opened":False,
-        "wavelet_used":False,
-        "raw_payload_or_response_recorded":False,
+        "payload_manifest": payloads,
+        "payload_manifest_sha256": canonical_sha256(payloads),
+        "target_model": metadata,
+        "generation": generation,
+        "causal_budget": budget,
+        "screening_and_audit": contract["screening_and_audit"],
+        "checks": checks,
+        "next_authorized_operation": cast(JsonObject, contract["decision_gate"])["on_freeze_pass"]
+        if passed
+        else cast(JsonObject, contract["decision_gate"])["on_operational_fail"],
+        "model_weight_downloaded": False,
+        "model_inference_performed": False,
+        "attack_success_observed": False,
+        "new_harmful_attack_outputs_generated": False,
+        "stage_a_opened": False,
+        "heldout_opened": False,
+        "causal_oracle_opened": False,
+        "keep_only_oracle_opened": False,
+        "wavelet_used": False,
+        "raw_payload_or_response_recorded": False,
     }
     write_json(safe_output, result)
     write_jsonl(payload_manifest_output, payloads)

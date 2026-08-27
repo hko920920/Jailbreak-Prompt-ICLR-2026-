@@ -1,0 +1,20 @@
+{
+  "attack_success_observed": false,
+  "causal_oracle_opened": false,
+  "classification": "OPERATIONAL_STATIC_FORMAT_REPAIR_NOT_SCIENTIFIC_CHANGE",
+  "decoding_changed": false,
+  "failed_job_id": 98440998007,
+  "failed_run_id": 33049419891,
+  "heldout_opened": false,
+  "keep_only_oracle_opened": false,
+  "model_changed": false,
+  "model_inference_performed": false,
+  "model_weight_downloaded": false,
+  "payload_source_changed": false,
+  "raw_text_recorded": false,
+  "schema_version": "topology-execution-freeze-ruff-repair-safe-v1",
+  "scientific_contract_changed": false,
+  "stage_a_opened": false,
+  "thresholds_changed": false,
+  "wavelet_used": false
+}
