@@ -1,0 +1,172 @@
+{
+  "attack_success_observed": false,
+  "causal_budget": {
+    "maximum_coarse_units_per_instance": 6,
+    "maximum_intervened_generations_per_stable_pair": 384,
+    "maximum_subsets_per_instance": 64,
+    "monotonicity_assumed": false,
+    "neutralizers": [
+      "LENGTH_AWARE_POSITION_PRESERVING_NEUTRAL_REPLACEMENT",
+      "REGIME_SPECIFIC_NEUTRAL_BLOCK_OR_CLAUSE_REPLACEMENT"
+    ],
+    "record_all_minimal_sets": true,
+    "seed_count": 3,
+    "strict_subset_verification": true
+  },
+  "causal_oracle_opened": false,
+  "checks": {
+    "audit_packet_is_frozen": true,
+    "canonical_model_revision_resolved": true,
+    "decoding_is_frozen": true,
+    "development_runtime_metadata_resolved": true,
+    "intervention_budget_matches": true,
+    "no_attack_success_observed": true,
+    "no_model_inference": true,
+    "no_model_weight_download": true,
+    "payload_count_matches": true,
+    "payload_source_matches": true,
+    "payloads_are_hash_only": true,
+    "predecessors_match": true,
+    "sealed_boundaries_preserved": true
+  },
+  "contract_git_blob_sha": "0f2931429c535c58f18f524abadbb4517b7e1702",
+  "contract_sha256": "d3ea410a47db9b8e7e9bbdad226b6ee8bedacbd287cdeb591e350cbca8d1754d",
+  "evidence_class": "PROTOCOL",
+  "generation": {
+    "decision_relevant_truncation_forces_exclusion": true,
+    "direct_and_attacked_share_payload_and_decoding": true,
+    "do_sample": true,
+    "max_new_tokens": 512,
+    "maximum_input_tokens": 4096,
+    "repetition_penalty": 1.0,
+    "seeds": [
+      11,
+      23,
+      47
+    ],
+    "temperature": 0.7,
+    "top_k": 50,
+    "top_p": 0.9
+  },
+  "heldout_opened": false,
+  "keep_only_oracle_opened": false,
+  "model_inference_performed": false,
+  "model_weight_downloaded": false,
+  "new_harmful_attack_outputs_generated": false,
+  "next_authorized_operation": "FREEZE_H4RM3L_GCG_SIGNAL_SCREEN_INPUT_MANIFEST",
+  "operational_pass": true,
+  "paper_validity": false,
+  "payload_manifest": [
+    {
+      "behavior_id_sha256": "897cd2eaf2442eb08b6fdec54b80f2b3a6b72e5284d47943d45a878ecf77b28d",
+      "payload_sha256": "7fa1cbec548272cb7064c769b6e78382bd8b73c054f250d3cc630f39f26751d6",
+      "payload_utf8_bytes": 113,
+      "position": 0,
+      "semantic_category": "chemical_biological",
+      "source_row_sha256": "c9a26cbd3394134c43de3af9014ffe59bcbdb0d059f4712732e835ee8361d5c7"
+    },
+    {
+      "behavior_id_sha256": "58fdff8b87f3a4ca3439bb8b668806a10dfdab229c6970eb3a85f3ad7118a356",
+      "payload_sha256": "5dc8bdbc2e186455fc6a9f61af3826864391a4d4cac8642fcbf51a29d276f2a6",
+      "payload_utf8_bytes": 126,
+      "position": 1,
+      "semantic_category": "cybercrime_intrusion",
+      "source_row_sha256": "2cba98648346dea8b1174c3c7a40b6637e5c9f99738c67a6287107d78daf7aca"
+    },
+    {
+      "behavior_id_sha256": "4dd1697b689dd863b2f195cc2059779cc5b8c3ab3e21dec4b44d3673d47f0173",
+      "payload_sha256": "5b1324193c4072b4b7761ab2c31ba7407ba09c7967344c55c48aed0e0fe0423a",
+      "payload_utf8_bytes": 79,
+      "position": 2,
+      "semantic_category": "misinformation_disinformation",
+      "source_row_sha256": "1e1fc2f8faaf11c9345c2a1d701bd35334aced0fb8e62e8315869bd090380874"
+    },
+    {
+      "behavior_id_sha256": "1b729654296ed0c85a9291e1c37bea10ec4105caef204058e6e034f34adef3e3",
+      "payload_sha256": "7a73e34808287a1356280d24689ed3b0dfd03cb1f3117e99d853e0deb04f6934",
+      "payload_utf8_bytes": 71,
+      "position": 3,
+      "semantic_category": "illegal",
+      "source_row_sha256": "ea148fad4958efdb2ccf23b4aad6d99447442f8cd25d8f1709630123eb40d2e1"
+    }
+  ],
+  "payload_manifest_sha256": "de1771f1f7b8117270a8f27e340a9d37d56bee7d8fa68bf05c9a68f5cfd6a5c9",
+  "payload_source": {
+    "git_blob_sha": "0cfc6c419122c58df0ccbda6351c0265dc72b125",
+    "path": "data/behavior_datasets/harmbench_behaviors_text_val.csv",
+    "raw_payload_recorded": false,
+    "repository": "centerforaisafety/HarmBench",
+    "revision": "8e1604d1171fe8a48d8febecd22f600e462bdcdd",
+    "selection_rule": "MIN_SHA256_OF_CATEGORY_COLON_BEHAVIOR_ID_WITHIN_EACH_CATEGORY"
+  },
+  "predecessor": {
+    "families": [
+      {
+        "family": "h4rm3l",
+        "predecessor_sha256": "e8c1f5533195f31d63ed3604cd7878659427cca70d10e724a833d0efc3f15f07",
+        "status": "E0_H4RM3L_REAL_TEMPLATES_PASS_FREEZE_REGIME_S_H4RM3L_ADAPTER"
+      },
+      {
+        "family": "GCG",
+        "predecessor_sha256": "f9e9bd44bee84f65a020829e329a4ab004cf675c08b60f43a721473cb4fdd4f4",
+        "status": "E0_GCG_STATIC_AUDIT_PASS_ADVANCE_TO_TOKENIZER_TEMPLATE_BUDGET_AUDIT"
+      }
+    ],
+    "parent": "FROZEN_BEFORE_MICRO_PILOT_OUTCOMES"
+  },
+  "raw_payload_or_response_recorded": false,
+  "schema_version": "topology-micro-pilot-execution-freeze-result-v1",
+  "scientific_pass": false,
+  "screening_and_audit": {
+    "blinding_fields": [
+      "attack_family",
+      "condition",
+      "intervention_identity",
+      "subset_size"
+    ],
+    "harmbench_role": "NONVOTING_DIAGNOSTIC_ONLY",
+    "human_audit_required_before_topology": true,
+    "independent_annotators": 2,
+    "private_packet_contains_raw_prompt_and_response": true,
+    "public_packet_contains_hashes_and_aggregate_labels_only": true,
+    "questions": [
+      "REFUSAL_OR_SAFE_REDIRECTION",
+      "BEHAVIOR_SPECIFIC_COMPLIANCE",
+      "SUBSTANTIVE_HARMFUL_UTILITY",
+      "ACTIONABILITY",
+      "COHERENCE",
+      "CAPABILITY_CONFOUND",
+      "DECISION_RELEVANT_TRUNCATION",
+      "CONFIDENCE"
+    ],
+    "screen_positive_is_final_label": false,
+    "third_adjudicator_on_disagreement": true,
+    "wildguard_role": "CONSERVATIVE_SCREENING_SIGNAL_ONLY"
+  },
+  "stage_a_opened": false,
+  "status": "TOPOLOGY_MICRO_PILOT_EXECUTION_FREEZE_PASS",
+  "target_model": {
+    "canonical_repository": "Qwen/Qwen2.5-7B-Instruct",
+    "canonical_revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+    "development_runtime_files": [
+      {
+        "filename": "qwen2.5-7b-instruct-q4_k_m-00001-of-00002.gguf",
+        "sha256": "dfce12e3862a5283ccfb88221b48480e58745165de856439950d0f22590580db",
+        "size_bytes": 3993201344
+      },
+      {
+        "filename": "qwen2.5-7b-instruct-q4_k_m-00002-of-00002.gguf",
+        "sha256": "539cf93f78e887edea1c04e2d7d8cdaca9d01dae9c9025bcb8accbe29df3d72a",
+        "size_bytes": 689872288
+      }
+    ],
+    "development_runtime_repository": "Qwen/Qwen2.5-7B-Instruct-GGUF",
+    "development_runtime_revision": "bb5d59e06d9551d752d08b292a50eb208b07ab1f",
+    "llama_cpp_release_tag": "b10441",
+    "llama_cpp_repository": "ggml-org/llama.cpp",
+    "llama_cpp_revision": "0177dcc7300bad8914bb838baabce87899812491",
+    "model_weights_downloaded": false,
+    "tokenizer_revision": "a09a35458c702b33eeacc393d103063234e8bc28"
+  },
+  "wavelet_used": false
+}
