@@ -15,12 +15,22 @@ SPEC.loader.exec_module(MODULE)
 
 def test_parse_nvidia_smi_rows() -> None:
     rows = MODULE._parse_nvidia_smi(
-        "NVIDIA A100 80GB PCIe, 81920, 77000, 535.216.03, GPU-abc\n"
-        "NVIDIA A100 80GB PCIe, 81920, 76000, 535.216.03, GPU-def\n"
+        "NVIDIA A100 80GB PCIe, 81920, 77000, 535.216.03, GPU-abc, Disabled\n"
+        "NVIDIA A100 80GB PCIe, 81920, 76000, 535.216.03, GPU-def, Disabled\n"
     )
     assert len(rows) == 2
     assert rows[0]["memory_total_mib"] == 81920
     assert rows[0]["uuid_sha256"] != "GPU-abc"
+    assert rows[0]["mig_mode"] == "disabled"
+    assert rows[0]["mig_mode_disabled"] is True
+
+
+def test_enabled_mig_mode_rejected() -> None:
+    rows = MODULE._parse_nvidia_smi(
+        "NVIDIA A100 80GB PCIe, 81920, 77000, 535.216.03, GPU-abc, Enabled\n"
+    )
+    with pytest.raises(MODULE.ContractError, match="MIG_MODE_NOT_DISABLED"):
+        MODULE._require_mig_disabled(rows)
 
 
 def test_invalid_driver_version_rejected() -> None:
