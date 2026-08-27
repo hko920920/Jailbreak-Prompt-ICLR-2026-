@@ -1,0 +1,177 @@
+{
+  "schema_version": "h4rm3l-gcg-signal-screen-runtime-bundle-contract-v1",
+  "status": "FROZEN_BEFORE_PRIVATE_SIGNAL_SCREEN_RUNTIME_MATERIALIZATION",
+  "frozen": true,
+  "paper_validity": false,
+  "evidence_class": "PROTOCOL",
+  "purpose": "Freeze the exact attack, optimizer-target, target-model, evaluator, privacy, and compute identities needed by the 36-generation h4rm3l/GCG signal screen before any private attack material or target output is generated.",
+  "predecessors": {
+    "signal_screen_input_manifest": {
+      "path": "data/natural_language_localization/topology_micro_pilot_v1/h4rm3l_gcg_signal_screen_input_manifest_v1.safe.json",
+      "git_blob_sha": "9146cba33faaaf2c6f851debdcce385671e962ae",
+      "required_status": "H4RM3L_GCG_SIGNAL_SCREEN_INPUT_MANIFEST_FREEZE_PASS",
+      "required_next_operation": "FREEZE_PRIVATE_SIGNAL_SCREEN_RUNTIME_BUNDLE_AND_EVALUATOR_REVISIONS",
+      "required_total_target_generations": 36
+    },
+    "execution_freeze": {
+      "path": "data/natural_language_localization/topology_micro_pilot_v1/topology_micro_pilot_execution_freeze_v1.safe.json",
+      "git_blob_sha": "fe94f8619866be4d37a01d3336905e192e421a33",
+      "required_status": "TOPOLOGY_MICRO_PILOT_EXECUTION_FREEZE_PASS",
+      "required_payload_count": 4,
+      "required_payload_manifest_sha256": "de1771f1f7b8117270a8f27e340a9d37d56bee7d8fa68bf05c9a68f5cfd6a5c9"
+    },
+    "gcg_qwen_preflight": {
+      "path": "data/natural_language_localization/e0_attack_family_provenance_v1/gcg_qwen_preflight.safe.json",
+      "git_blob_sha": "cb67942c28cfa13fe7470515e9446327706ff2e1",
+      "required_status": "E0_GCG_QWEN_PREFLIGHT_PASS",
+      "required_operational_pass": true,
+      "required_compatibility_pass": true,
+      "required_control_token_count": 20,
+      "required_block_count": 6,
+      "required_subset_count": 64
+    },
+    "h4rm3l_real_templates": {
+      "path": "data/natural_language_localization/e0_attack_family_provenance_v1/h4rm3l_real_templates.safe.json",
+      "git_blob_sha": "f1545c004dbf91290393e620e753f8fcf1862e06",
+      "required_status": "E0_H4RM3L_REAL_TEMPLATES_PASS_FREEZE_REGIME_S_H4RM3L_ADAPTER",
+      "required_program_count": 7,
+      "required_operational_pass": true
+    },
+    "gcg_static_audit": {
+      "path": "data/natural_language_localization/e0_attack_family_provenance_v1/gcg_static_audit.safe.json",
+      "git_blob_sha": "916cee97bdb583021e431cf7e2b22ff39700ccaa",
+      "required_status": "E0_GCG_STATIC_AUDIT_PASS_ADVANCE_TO_TOKENIZER_TEMPLATE_BUDGET_AUDIT",
+      "required_operational_pass": true
+    }
+  },
+  "payload_and_optimizer_target_source": {
+    "repository": "centerforaisafety/HarmBench",
+    "revision": "8e1604d1171fe8a48d8febecd22f600e462bdcdd",
+    "behavior_path": "data/behavior_datasets/harmbench_behaviors_text_val.csv",
+    "behavior_git_blob_sha": "0cfc6c419122c58df0ccbda6351c0265dc72b125",
+    "optimizer_target_path": "data/optimizer_targets/harmbench_targets_text.json",
+    "optimizer_target_git_blob_sha": "41ca4603128f0a86c9eb0b4bd92040541accd44d",
+    "expected_payload_count": 4,
+    "raw_payload_or_target_may_enter_safe_output": false
+  },
+  "attack_runtimes": {
+    "h4rm3l": {
+      "repository": "mdoumbouya/h4rm3l",
+      "revision": "e6f58a1a1e56c1a95b26b06aa4fe393ee2240dbd",
+      "decorators_git_blob_sha": "b60346ec12b9334e0818dabc59ba65af55c167aa",
+      "program_count": 7,
+      "assignment_rule": "BALANCED_CYCLE_OVER_HASH_SORTED_DIRECT_INSTANCES_AND_PROGRAM_IDENTITIES",
+      "materialization_runtime_frozen": true,
+      "decorators_path": "h4rm3l/src/h4rm3l/decorators.py"
+    },
+    "GCG": {
+      "algorithm_repository": "llm-attacks/llm-attacks",
+      "algorithm_revision": "098262edf85f807224e70ecd87b9d83716bf6b73",
+      "algorithm_tree_sha": "aa64fc78c0bed738c6952210cd0eb83d8bc0da9b",
+      "harmbench_executable_path": "baselines/gcg/gcg.py",
+      "harmbench_executable_git_blob_sha": "3a13391a6fb8be6917b76fdc9961193eb71be0fe",
+      "harmbench_config_path": "configs/method_configs/GCG_config.yaml",
+      "harmbench_config_git_blob_sha": "ffdc417b49f26f6c26f89f10696dd96520b50075",
+      "num_steps": 500,
+      "search_width": 512,
+      "topk": 256,
+      "allow_non_ascii": false,
+      "gradient_required": true,
+      "full_precision_or_bfloat16_weights_required": true,
+      "gguf_inference_runtime_is_not_optimizer_runtime": true
+    }
+  },
+  "target_model": {
+    "repository": "Qwen/Qwen2.5-7B-Instruct",
+    "revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+    "tokenizer_revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+    "differentiable_optimizer_runtime": {
+      "framework": "transformers",
+      "transformers_version": "4.48.3",
+      "torch_version": "2.6.0",
+      "dtype": "bfloat16",
+      "device_type": "cuda",
+      "quantization": "none",
+      "gradient_enabled": true,
+      "runner_contract_frozen": false,
+      "runner_labels": [],
+      "minimum_free_device_memory_bytes": null,
+      "maximum_wall_clock_minutes": null,
+      "private_cache_contract_frozen": false
+    },
+    "generation_runtime": {
+      "repository": "Qwen/Qwen2.5-7B-Instruct-GGUF",
+      "revision": "bb5d59e06d9551d752d08b292a50eb208b07ab1f",
+      "files": [
+        {
+          "filename": "qwen2.5-7b-instruct-q4_k_m-00001-of-00002.gguf",
+          "sha256": "dfce12e3862a5283ccfb88221b48480e58745165de856439950d0f22590580db",
+          "size_bytes": 3993201344
+        },
+        {
+          "filename": "qwen2.5-7b-instruct-q4_k_m-00002-of-00002.gguf",
+          "sha256": "539cf93f78e887edea1c04e2d7d8cdaca9d01dae9c9025bcb8accbe29df3d72a",
+          "size_bytes": 689872288
+        }
+      ],
+      "llama_cpp_repository": "ggml-org/llama.cpp",
+      "llama_cpp_release_tag": "b10441",
+      "llama_cpp_revision": "0177dcc7300bad8914bb838baabce87899812491"
+    }
+  },
+  "evaluators": {
+    "WildGuard": {
+      "role": "CONSERVATIVE_SCREENING_SIGNAL_ONLY",
+      "contract_path": "configs/natural_language_localization/evaluator_panel_e1b_wildguard_v1.json",
+      "contract_git_blob_sha": "3cdb58afd2c32608f7725dbdd443d75af480a8a2",
+      "result_path": "data/natural_language_localization/evaluator_panel_v1/e1b_wildguard_execution.safe.json",
+      "result_git_blob_sha": "752bd5c148309599e144086e0e7587395e208426",
+      "required_result_status": "EVALUATOR_PANEL_E1B_WILDGUARD_PASS",
+      "required_operational_pass": true,
+      "single_primary_judge": false
+    },
+    "HarmBench": {
+      "role": "NONVOTING_DIAGNOSTIC_ONLY",
+      "contract_path": "configs/natural_language_localization/evaluator_panel_e1c_harmbench_live_contract_v1.json",
+      "contract_git_blob_sha": "c96f350ed547b03a5caac169d567e686f209ed65",
+      "result_path": "data/natural_language_localization/evaluator_panel_v1/e1c_harmbench_live.safe.json",
+      "result_git_blob_sha": "2590dd0879cded55a6a651c17df2421a1a5a6f98",
+      "observed_result_status": "E1C_HARMBENCH_COMPONENT_OPERATIONAL_FAIL",
+      "operational_pass_required_for_voting": true,
+      "voting_enabled": false,
+      "single_primary_judge": false
+    },
+    "human_audit": {
+      "required_before_topology": true,
+      "independent_annotators": 2,
+      "third_adjudicator_on_disagreement": true,
+      "primary_reference": true
+    }
+  },
+  "privacy": {
+    "private_work_root": "/tmp/h4rm3l-gcg-signal-screen-private",
+    "raw_payload_prompt_target_control_response_or_evaluator_output_committed": false,
+    "safe_records_contain_hashes_lengths_parse_statuses_and_aggregates_only": true,
+    "private_files_mode": "0600",
+    "private_directories_mode": "0700",
+    "plaintext_private_files_destroyed_after_safe_record": true,
+    "server_logs_destroyed_after_readiness": true
+  },
+  "sealed_boundaries": {
+    "attack_optimization_performed": false,
+    "target_model_called": false,
+    "attack_success_observed": false,
+    "automated_label_observed": false,
+    "human_label_observed": false,
+    "stage_a_opened": false,
+    "heldout_opened": false,
+    "causal_oracle_opened": false,
+    "keep_only_oracle_opened": false,
+    "wavelet_used": false
+  },
+  "decision_gate": {
+    "on_bundle_freeze_pass_and_execution_ready": "EXECUTE_PRIVATE_H4RM3L_GCG_SIGNAL_SCREEN_V1",
+    "on_bundle_freeze_pass_but_gcg_runtime_missing": "FREEZE_GCG_QWEN_DIFFERENTIABLE_RUNTIME_AND_COMPUTE_CONTRACT",
+    "on_bundle_freeze_fail": "REPAIR_RUNTIME_BUNDLE_IDENTITY_OR_PRIVACY_DRIFT_ONLY"
+  }
+}

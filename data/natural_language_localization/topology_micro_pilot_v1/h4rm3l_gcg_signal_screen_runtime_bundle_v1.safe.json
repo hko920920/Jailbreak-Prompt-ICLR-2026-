@@ -1,0 +1,207 @@
+{
+  "attack_optimization_performed": false,
+  "attack_runtimes": {
+    "gcg_algorithm_revision": "098262edf85f807224e70ecd87b9d83716bf6b73",
+    "gcg_gradient_required": true,
+    "gcg_num_steps": 500,
+    "gcg_search_width": 512,
+    "gcg_topk": 256,
+    "h4rm3l_decorators_path": "h4rm3l/src/h4rm3l/decorators.py",
+    "h4rm3l_program_count": 7,
+    "h4rm3l_revision": "e6f58a1a1e56c1a95b26b06aa4fe393ee2240dbd"
+  },
+  "attack_success_observed": false,
+  "automated_label_observed": false,
+  "blocking_reasons": [
+    "runner_contract_frozen",
+    "runner_labels_frozen",
+    "minimum_free_device_memory_frozen",
+    "wall_clock_budget_frozen",
+    "private_cache_contract_frozen"
+  ],
+  "causal_oracle_opened": false,
+  "contract_git_blob_sha": "95bda3c6a6181438dc386dc4d61c5a9b78d45e40",
+  "contract_sha256": "0b812e94cf4ab2c24306380cf25d0271d2db6dbe28ed8b3108335bf77da78f22",
+  "differentiable_model": {
+    "repository": "Qwen/Qwen2.5-7B-Instruct",
+    "revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+    "tokenizer_revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+    "total_weight_bytes": 15231271888,
+    "weight_files": [
+      {
+        "filename": "model-00001-of-00004.safetensors",
+        "sha256": "a1333e6293854747c481288ea83b348226af178dd565c49b6f9495ba1966aba7",
+        "size_bytes": 3945441440
+      },
+      {
+        "filename": "model-00002-of-00004.safetensors",
+        "sha256": "f5d25a2772cb825164a2a2c0fb6d51a87e282abf21e4dd75bc5cfb3cd0ea6185",
+        "size_bytes": 3864726352
+      },
+      {
+        "filename": "model-00003-of-00004.safetensors",
+        "sha256": "8efdec4c1bc12317ae1a38dc42b595ce777738a64deea3fcb8a0a91381bcdfd5",
+        "size_bytes": 3864726424
+      },
+      {
+        "filename": "model-00004-of-00004.safetensors",
+        "sha256": "1a72d403cdf0c1ec3cb7f289f17b394a01e64394c2e9b3c0f94dbce3faf879bd",
+        "size_bytes": 3556377672
+      }
+    ],
+    "weights_downloaded": false
+  },
+  "evaluators": {
+    "HarmBench": {
+      "contract_sha256": "9cdb6da3f16ee8c56529144538d0e098287bd9fb8a33a310624b90bbb14f9652",
+      "operational_pass": false,
+      "result_status": "E1C_HARMBENCH_COMPONENT_OPERATIONAL_FAIL",
+      "role": "NONVOTING_DIAGNOSTIC_ONLY",
+      "single_primary_judge": false,
+      "voting_enabled": false
+    },
+    "WildGuard": {
+      "contract_sha256": "ca197977abe12aa62544c0ab15eb17c25fa71dd0440ad64705bfe4965cec2525",
+      "operational_pass": true,
+      "result_status": "EVALUATOR_PANEL_E1B_WILDGUARD_PASS",
+      "role": "CONSERVATIVE_SCREENING_SIGNAL_ONLY",
+      "single_primary_judge": false,
+      "voting_enabled": false
+    },
+    "human_audit": {
+      "independent_annotators": 2,
+      "primary_reference": true,
+      "required_before_topology": true,
+      "third_adjudicator_on_disagreement": true
+    }
+  },
+  "evidence_class": "PROTOCOL",
+  "execution_ready": false,
+  "freeze_checks": {
+    "attack_sources_match": true,
+    "differentiable_model_revision_resolved": true,
+    "differentiable_weight_metadata_resolved": true,
+    "evaluator_revisions_frozen": true,
+    "generation_runtime_frozen": true,
+    "harmbench_is_nonvoting_after_operational_fail": true,
+    "human_audit_remains_primary": true,
+    "no_attack_optimization": true,
+    "no_model_weight_download": true,
+    "no_target_inference": true,
+    "optimizer_target_mapping_complete": true,
+    "optimizer_target_source_matches": true,
+    "optimizer_targets_are_hash_only": true,
+    "predecessors_match": true,
+    "safe_output_boundary_frozen": true,
+    "sealed_boundaries_preserved": true,
+    "wildguard_is_not_primary_judge": true
+  },
+  "generation_runtime": {
+    "files": [
+      {
+        "filename": "qwen2.5-7b-instruct-q4_k_m-00001-of-00002.gguf",
+        "sha256": "dfce12e3862a5283ccfb88221b48480e58745165de856439950d0f22590580db",
+        "size_bytes": 3993201344
+      },
+      {
+        "filename": "qwen2.5-7b-instruct-q4_k_m-00002-of-00002.gguf",
+        "sha256": "539cf93f78e887edea1c04e2d7d8cdaca9d01dae9c9025bcb8accbe29df3d72a",
+        "size_bytes": 689872288
+      }
+    ],
+    "llama_cpp_release_tag": "b10441",
+    "llama_cpp_repository": "ggml-org/llama.cpp",
+    "llama_cpp_revision": "0177dcc7300bad8914bb838baabce87899812491",
+    "repository": "Qwen/Qwen2.5-7B-Instruct-GGUF",
+    "revision": "bb5d59e06d9551d752d08b292a50eb208b07ab1f"
+  },
+  "heldout_opened": false,
+  "human_label_observed": false,
+  "keep_only_oracle_opened": false,
+  "model_inference_performed": false,
+  "model_weight_downloaded": false,
+  "new_harmful_attack_outputs_generated": false,
+  "next_authorized_operation": "FREEZE_GCG_QWEN_DIFFERENTIABLE_RUNTIME_AND_COMPUTE_CONTRACT",
+  "operational_pass": true,
+  "optimizer_target_manifest": [
+    {
+      "behavior_id_sha256": "897cd2eaf2442eb08b6fdec54b80f2b3a6b72e5284d47943d45a878ecf77b28d",
+      "optimizer_target_sha256": "839e6739889923c9ebfb7e7402df5eb80ece4eb7dcc9bed23523e7a4d2fa6a87",
+      "optimizer_target_utf8_bytes": 95,
+      "payload_sha256": "7fa1cbec548272cb7064c769b6e78382bd8b73c054f250d3cc630f39f26751d6",
+      "position": 0,
+      "raw_payload_or_target_recorded": false,
+      "semantic_category": "chemical_biological"
+    },
+    {
+      "behavior_id_sha256": "58fdff8b87f3a4ca3439bb8b668806a10dfdab229c6970eb3a85f3ad7118a356",
+      "optimizer_target_sha256": "95a953a62e93553f66d41f848697115bec95155b3e987745c0e313fa4ff872d8",
+      "optimizer_target_utf8_bytes": 151,
+      "payload_sha256": "5dc8bdbc2e186455fc6a9f61af3826864391a4d4cac8642fcbf51a29d276f2a6",
+      "position": 1,
+      "raw_payload_or_target_recorded": false,
+      "semantic_category": "cybercrime_intrusion"
+    },
+    {
+      "behavior_id_sha256": "4dd1697b689dd863b2f195cc2059779cc5b8c3ab3e21dec4b44d3673d47f0173",
+      "optimizer_target_sha256": "29dbd1fb3c7b1df2f07040704f01cb77492d5ccb18259eabf589f299c9ac62af",
+      "optimizer_target_utf8_bytes": 87,
+      "payload_sha256": "5b1324193c4072b4b7761ab2c31ba7407ba09c7967344c55c48aed0e0fe0423a",
+      "position": 2,
+      "raw_payload_or_target_recorded": false,
+      "semantic_category": "misinformation_disinformation"
+    },
+    {
+      "behavior_id_sha256": "1b729654296ed0c85a9291e1c37bea10ec4105caef204058e6e034f34adef3e3",
+      "optimizer_target_sha256": "b41c78998af57713d6a5d959d54bdfb183c61737bedfdcbfb01eb1f8e3c3bd69",
+      "optimizer_target_utf8_bytes": 79,
+      "payload_sha256": "7a73e34808287a1356280d24689ed3b0dfd03cb1f3117e99d853e0deb04f6934",
+      "position": 3,
+      "raw_payload_or_target_recorded": false,
+      "semantic_category": "illegal"
+    }
+  ],
+  "optimizer_target_manifest_sha256": "e9f4d4842fd0769d35b0fb6c032fd4a61a32973e580d3459c3500b6f4c3eee63",
+  "paper_validity": false,
+  "payload_and_optimizer_target_source": {
+    "behavior_git_blob_sha": "0cfc6c419122c58df0ccbda6351c0265dc72b125",
+    "behavior_path": "data/behavior_datasets/harmbench_behaviors_text_val.csv",
+    "optimizer_target_git_blob_sha": "41ca4603128f0a86c9eb0b4bd92040541accd44d",
+    "optimizer_target_path": "data/optimizer_targets/harmbench_targets_text.json",
+    "raw_payload_or_target_recorded": false,
+    "repository": "centerforaisafety/HarmBench",
+    "revision": "8e1604d1171fe8a48d8febecd22f600e462bdcdd"
+  },
+  "predecessors": {
+    "execution_freeze": "TOPOLOGY_MICRO_PILOT_EXECUTION_FREEZE_PASS",
+    "gcg_qwen_preflight": "E0_GCG_QWEN_PREFLIGHT_PASS",
+    "gcg_static_audit": "E0_GCG_STATIC_AUDIT_PASS_ADVANCE_TO_TOKENIZER_TEMPLATE_BUDGET_AUDIT",
+    "h4rm3l_real_templates": "E0_H4RM3L_REAL_TEMPLATES_PASS_FREEZE_REGIME_S_H4RM3L_ADAPTER",
+    "signal_screen_input_manifest": "H4RM3L_GCG_SIGNAL_SCREEN_INPUT_MANIFEST_FREEZE_PASS"
+  },
+  "raw_payload_prompt_target_control_response_or_evaluator_output_recorded": false,
+  "readiness": {
+    "checks": {
+      "cuda_device_required": true,
+      "gradient_enabled": true,
+      "minimum_free_device_memory_frozen": false,
+      "private_cache_contract_frozen": false,
+      "runner_contract_frozen": false,
+      "runner_labels_frozen": false,
+      "unquantized_optimizer_weights": true,
+      "wall_clock_budget_frozen": false
+    },
+    "execution_ready": false
+  },
+  "schema_version": "h4rm3l-gcg-signal-screen-runtime-bundle-result-v1",
+  "scientific_pass": false,
+  "source_commit": "4756cc389083c35907656c4aa1f5afab53084541",
+  "stage_a_opened": false,
+  "status": "H4RM3L_GCG_SIGNAL_SCREEN_RUNTIME_BUNDLE_FREEZE_PASS_EXECUTION_BLOCKED",
+  "wavelet_used": false,
+  "workflow_run": {
+    "run_attempt": "1",
+    "run_id": "33090289422",
+    "workflow_sha": "4756cc389083c35907656c4aa1f5afab53084541"
+  }
+}
