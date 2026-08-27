@@ -38,7 +38,7 @@ jobs:
             scripts/run_topology_micro_pilot_execution_freeze.py
             tests/test_topology_micro_pilot_execution_freeze.py
           )
-          ruff check --fix --unsafe-fixes "${targets[@]}"
+          ruff check --fix --unsafe-fixes "${targets[@]}" || true
           ruff format "${targets[@]}"
           ruff check "${targets[@]}"
           python -m pytest -q tests/test_topology_micro_pilot_execution_freeze.py
