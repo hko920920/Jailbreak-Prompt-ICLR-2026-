@@ -1,0 +1,57 @@
+name: gcg-qwen-ephemeral-runner-bootstrap-validation
+
+"on":
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/gcg_qwen_ephemeral_runner_bootstrap_validation.yml
+      - scripts/bootstrap_gcg_qwen_ephemeral_runner.sh
+      - tests/test_gcg_qwen_ephemeral_runner_bootstrap.py
+      - docs/GCG_QWEN_EPHEMERAL_RUNNER_BOOTSTRAP_V1.md
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gcg-qwen-ephemeral-runner-bootstrap-validation
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/programmatic-agentharm-pivot
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate shell and contract tests
+        run: |
+          python -m pip install \
+            'pytest==8.3.5' \
+            'ruff==0.16.4'
+          bash -n scripts/bootstrap_gcg_qwen_ephemeral_runner.sh
+          ruff check tests/test_gcg_qwen_ephemeral_runner_bootstrap.py
+          ruff format --check tests/test_gcg_qwen_ephemeral_runner_bootstrap.py
+          python -m pytest -q \
+            tests/test_gcg_qwen_ephemeral_runner_bootstrap.py
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("scripts/bootstrap_gcg_qwen_ephemeral_runner.sh")
+          mode = path.stat().st_mode & 0o777
+          assert mode in {0o644, 0o755}, oct(mode)
+          text = path.read_text(encoding="utf-8")
+          assert "set -Eeuo pipefail" in text
+          assert "set -x" not in text
+          assert "--ephemeral" in text
+          assert "MIG" not in text or "ATTEST_SCRIPT" in text
+          PY
+          git diff --check
