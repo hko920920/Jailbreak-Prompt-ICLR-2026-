@@ -1,18 +1,132 @@
 {
   "attack_optimization_performed": false,
   "attack_success_observed": false,
+  "audit": {
+    "block_ranges": [
+      [
+        0,
+        4
+      ],
+      [
+        4,
+        8
+      ],
+      [
+        8,
+        11
+      ],
+      [
+        11,
+        14
+      ],
+      [
+        14,
+        17
+      ],
+      [
+        17,
+        20
+      ]
+    ],
+    "candidate_results": [
+      {
+        "candidate_id": "DOT",
+        "failure_codes": [],
+        "mapping_sha256": "27336936b5722787f0d102d0cac0b362c4b5f224885028644f898f06c87b708d",
+        "passed": true,
+        "roundtrip_pass_count": 64,
+        "single_token_positions": 20,
+        "subset_count": 64
+      },
+      {
+        "candidate_id": "COMMA",
+        "failure_codes": [],
+        "mapping_sha256": "dc65629f4ec88d165069e1d41e73a786ee738328f47141eef3bb9fb61ebf231f",
+        "passed": true,
+        "roundtrip_pass_count": 64,
+        "single_token_positions": 20,
+        "subset_count": 64
+      },
+      {
+        "candidate_id": "COLON",
+        "failure_codes": [],
+        "mapping_sha256": "67a5a840b3d8973cd33873fd77c2bfff4a97e670f63e31a39a037b8592a594e6",
+        "passed": true,
+        "roundtrip_pass_count": 64,
+        "single_token_positions": 20,
+        "subset_count": 64
+      },
+      {
+        "candidate_id": "SEMICOLON",
+        "failure_codes": [],
+        "mapping_sha256": "b6d8fcced92d305c3e4288acb93096ceb2165e6df5dceb0784237996e7df81e1",
+        "passed": true,
+        "roundtrip_pass_count": 64,
+        "single_token_positions": 20,
+        "subset_count": 64
+      },
+      {
+        "candidate_id": "QUESTION",
+        "failure_codes": [],
+        "mapping_sha256": "d1075359af6f1a52df3190862385f85a2a8e5fdb8b919916d51718469f98b3a9",
+        "passed": true,
+        "roundtrip_pass_count": 64,
+        "single_token_positions": 20,
+        "subset_count": 64
+      }
+    ],
+    "chat_template_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+    "compatibility_pass": true,
+    "control_slice": {
+      "start": 33,
+      "stop": 53
+    },
+    "control_token_count": 20,
+    "control_token_ids_sha256": "8306e3a78f2288deb1286e94ede9826363bf77bd170ef374b93bfa0c8d6c64e5",
+    "is_fast": true,
+    "passing_candidate_count": 5,
+    "passing_candidate_ids": [
+      "DOT",
+      "COMMA",
+      "COLON",
+      "SEMICOLON",
+      "QUESTION"
+    ],
+    "raw_fixture_recorded": false,
+    "raw_rendered_prompt_recorded": false,
+    "raw_token_ids_recorded": false,
+    "rendered_token_count": 68,
+    "rendered_token_ids_sha256": "f06ae08b85bbe42f017f36700ee3745bbe42071338ac67928440476ec53c7de2",
+    "subset_count": 64,
+    "target_slice": {
+      "start": 58,
+      "stop": 66
+    },
+    "target_token_count": 8,
+    "target_token_ids_sha256": "f1c6f07e7865f8ea35be522e37b2c81babcd06504c9918a717cacb73e36eadd0",
+    "tokenizer_class": "Qwen2TokenizerFast",
+    "vocab_size": 151643
+  },
   "causal_oracle_opened": false,
-  "compatibility_pass": false,
-  "error_message_sha256": "69a55bcbd38e55f320c97e18ed1ec5fa8d1e364e873306be9274dcb0d1ea00ea",
-  "error_type": "NameError",
+  "compatibility_pass": true,
+  "contract_git_blob_sha": "768262bf08ccf9bfbb2463441f45e0f147753f4e",
+  "contract_sha256": "cf7b2cc1e30994d936b37b0a3e455a81034940041d3b2cd42af271c36887b1c9",
+  "evidence_class": "PROTOCOL_COMPATIBILITY",
   "heldout_opened": false,
   "keep_only_oracle_opened": false,
   "model_forward_pass": false,
   "model_generation": false,
   "model_weights_downloaded": false,
-  "next_authorized_operation": "REPAIR_PREFLIGHT_RUNTIME_WITHOUT_CHANGING_SCIENTIFIC_CONTRACT",
-  "operational_pass": false,
+  "next_authorized_operation": "INSTALL_GCG_QWEN_PREFLIGHT_SAFE_RESULT_AND_AUTHORIZE_RUNTIME_BUNDLE",
+  "operational_pass": true,
   "paper_validity": false,
+  "predecessors": {
+    "all_predecessors_match": true,
+    "execution_freeze_git_blob_sha": "fe94f8619866be4d37a01d3336905e192e421a33",
+    "gcg_contract_git_blob_sha": "7a567201ea507d92b65531e0f825cfbb78110806",
+    "gcg_result_git_blob_sha": "916cee97bdb583021e431cf7e2b22ff39700ccaa",
+    "signal_screen_manifest_git_blob_sha": "9146cba33faaaf2c6f851debdcce385671e962ae"
+  },
   "raw_fixture_recorded": false,
   "raw_rendered_prompt_recorded": false,
   "raw_token_ids_recorded": false,
@@ -20,6 +134,15 @@
   "schema_version": "e0-gcg-qwen-preflight-result-v1",
   "scientific_pass": false,
   "stage_a_opened": false,
-  "status": "E0_GCG_QWEN_PREFLIGHT_OPERATIONAL_FAIL",
+  "status": "E0_GCG_QWEN_PREFLIGHT_PASS",
+  "tokenizer": {
+    "expected_revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+    "model_forward_pass": false,
+    "model_generation": false,
+    "model_weights_downloaded": false,
+    "observed_revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+    "repository": "Qwen/Qwen2.5-7B-Instruct",
+    "revision_match": true
+  },
   "wavelet_used": false
 }
