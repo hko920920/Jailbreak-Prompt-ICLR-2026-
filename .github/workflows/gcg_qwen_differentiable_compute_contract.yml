@@ -99,6 +99,8 @@ jobs:
             tests/test_gcg_qwen_differentiable_compute_contract.py
             tests/test_gcg_qwen_self_hosted_attestation.py
           )
+          ruff check --fix "${targets[@]}"
+          ruff format "${targets[@]}"
           ruff check "${targets[@]}"
           ruff format --check "${targets[@]}"
           python -m py_compile \
