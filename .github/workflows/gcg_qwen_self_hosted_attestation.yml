@@ -1,0 +1,106 @@
+name: gcg-qwen-self-hosted-runner-attestation
+
+"on":
+  workflow_dispatch:
+    inputs:
+      attestation_only:
+        description: Confirm that this run must not download model weights or execute GCG
+        required: true
+        default: "true"
+        type: choice
+        options:
+          - "true"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gcg-qwen-self-hosted-runner-attestation
+  cancel-in-progress: false
+
+env:
+  TARGET_BRANCH: agent/programmatic-agentharm-pivot
+  CONFIG: configs/natural_language_localization/gcg_qwen_differentiable_compute_contract_v1.json
+  SAFE_DIR: artifacts/gcg-qwen-self-hosted-runner-attestation-v1
+  SAFE_RESULT: artifacts/gcg-qwen-self-hosted-runner-attestation-v1/gcg_qwen_self_hosted_runner_attestation_v1.safe.json
+  RECORD: data/natural_language_localization/topology_micro_pilot_v1/gcg_qwen_self_hosted_runner_attestation_v1.safe.json
+  GCG_PRIVATE_CACHE_ROOT: ${{ secrets.GCG_PRIVATE_CACHE_ROOT }}
+  GCG_PRIVATE_VENV_ROOT: ${{ secrets.GCG_PRIVATE_VENV_ROOT }}
+  GCG_PRIVATE_WORK_ROOT: ${{ secrets.GCG_PRIVATE_WORK_ROOT }}
+
+jobs:
+  attest:
+    runs-on: [self-hosted, Linux, X64, gpu, a100-80gb, private-research]
+    timeout-minutes: 20
+    steps:
+      - name: Enforce attestation-only mode
+        run: |
+          test "${{ inputs.attestation_only }}" = "true"
+
+      - name: Check out frozen research branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TARGET_BRANCH }}
+          fetch-depth: 0
+
+      - name: Attest runner without model download
+        run: |
+          umask 077
+          mkdir -p "$SAFE_DIR"
+          python3 scripts/attest_gcg_qwen_self_hosted_runner.py \
+            --config "$CONFIG" \
+            --workspace "$GITHUB_WORKSPACE" \
+            --output "$SAFE_RESULT"
+          test "$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["status"])' "$SAFE_RESULT")" = \
+            "GCG_QWEN_SELF_HOSTED_RUNNER_ATTESTATION_PASS"
+          test "$(python3 -c 'import json,sys; print(str(json.load(open(sys.argv[1]))["model_weight_downloaded"]).lower())' "$SAFE_RESULT")" = "false"
+          test "$(python3 -c 'import json,sys; print(str(json.load(open(sys.argv[1]))["attack_optimization_performed"]).lower())' "$SAFE_RESULT")" = "false"
+
+      - name: Audit safe-output boundary
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          forbidden = (
+              '"Behavior"',
+              '"BehaviorID"',
+              '"payload_text"',
+              '"raw_payload"',
+              '"optimizer_target_text"',
+              '"raw_prompt"',
+              '"raw_response"',
+              '"optimized_control"',
+              '"evaluator_output"',
+              '"hostname"',
+              '"cache_root"',
+              '"venv_root"',
+              '"work_root"',
+          )
+          for path in Path("artifacts/gcg-qwen-self-hosted-runner-attestation-v1").rglob("*"):
+              if not path.is_file():
+                  continue
+              text = path.read_text(encoding="utf-8")
+              for token in forbidden:
+                  assert token not in text, (path, token)
+          PY
+
+      - name: Upload safe attestation artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gcg-qwen-self-hosted-runner-attestation-v1-safe
+          path: ${{ env.SAFE_DIR }}
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Commit hash-only attestation record
+        run: |
+          mkdir -p "$(dirname "$RECORD")"
+          cp "$SAFE_RESULT" "$RECORD"
+          git config user.name "github-actions[bot]"
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$RECORD"
+          git commit -m "Record GCG-Qwen self-hosted runner attestation"
+          git fetch origin "$TARGET_BRANCH"
+          git rebase "origin/$TARGET_BRANCH"
+          git push origin "HEAD:$TARGET_BRANCH"
