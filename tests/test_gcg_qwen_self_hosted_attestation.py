@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+# Contract invariant: an A100 runner is eligible only when MIG is explicitly disabled.
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts/attest_gcg_qwen_self_hosted_runner.py"
 SPEC = importlib.util.spec_from_file_location("attest_runner", SCRIPT)
