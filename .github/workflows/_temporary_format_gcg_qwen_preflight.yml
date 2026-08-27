@@ -1,0 +1,77 @@
+name: temporary-format-gcg-qwen-preflight
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/_temporary_format_gcg_qwen_preflight.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: temporary-format-gcg-qwen-preflight-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  format:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/programmatic-agentharm-pivot
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Apply formatting-only repair and verify
+        run: |
+          python -m pip install 'pytest==8.3.5' 'ruff==0.16.4'
+          targets=(
+            scripts/gcg_qwen_adapter.py
+            scripts/run_e0_gcg_qwen_preflight.py
+            tests/test_e0_gcg_qwen_preflight.py
+          )
+          before_contract=$(git hash-object \
+            configs/natural_language_localization/e0_gcg_qwen_preflight_v1.json)
+          before_workflow=$(git hash-object \
+            .github/workflows/e0_gcg_qwen_preflight.yml)
+          ruff format "${targets[@]}"
+          ruff check "${targets[@]}" \
+            scripts/install_gcg_qwen_preflight_result.py
+          ruff format --check "${targets[@]}" \
+            scripts/install_gcg_qwen_preflight_result.py
+          python -m py_compile \
+            scripts/gcg_qwen_adapter.py \
+            scripts/run_e0_gcg_qwen_preflight.py \
+            scripts/install_gcg_qwen_preflight_result.py
+          python -m pytest -q tests/test_e0_gcg_qwen_preflight.py
+          test "$before_contract" = "$(git hash-object \
+            configs/natural_language_localization/e0_gcg_qwen_preflight_v1.json)"
+          test "$before_workflow" = "$(git hash-object \
+            .github/workflows/e0_gcg_qwen_preflight.yml)"
+          git diff --check
+          changed=$(git diff --name-only | sort)
+          expected=$(printf '%s\n' \
+            scripts/gcg_qwen_adapter.py \
+            scripts/run_e0_gcg_qwen_preflight.py \
+            tests/test_e0_gcg_qwen_preflight.py | sort)
+          test "$changed" = "$expected"
+
+      - name: Commit formatting-only repair
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email \
+            '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            scripts/gcg_qwen_adapter.py \
+            scripts/run_e0_gcg_qwen_preflight.py \
+            tests/test_e0_gcg_qwen_preflight.py
+          git commit -m 'Format GCG-Qwen preflight implementation'
+          git pull --rebase origin agent/programmatic-agentharm-pivot
+          git push origin HEAD:agent/programmatic-agentharm-pivot
