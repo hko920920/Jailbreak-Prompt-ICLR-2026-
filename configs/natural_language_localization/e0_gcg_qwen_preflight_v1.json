@@ -1,0 +1,96 @@
+{
+  "schema_version": "e0-gcg-qwen-preflight-v1",
+  "status": "FROZEN_BEFORE_GCG_QWEN_TOKENIZER_PREFLIGHT",
+  "frozen": true,
+  "paper_validity": false,
+  "family": "GCG",
+  "regime": "U_nonfluent_optimized",
+  "purpose": "Verify the pinned Qwen2.5 tokenizer, chat template, GCG control slice, six-block partition, all 64 subset masks, and two position-preserving neutralizers without loading model weights or generating text.",
+  "predecessors": {
+    "gcg_contract": {
+      "path": "configs/natural_language_localization/e0_gcg_static_audit_v1.json",
+      "git_blob_sha": "7a567201ea507d92b65531e0f825cfbb78110806",
+      "required_status": "FROZEN_BEFORE_GCG_HARMLESS_STATIC_AUDIT"
+    },
+    "gcg_static_result": {
+      "path": "data/natural_language_localization/e0_attack_family_provenance_v1/gcg_static_audit.safe.json",
+      "git_blob_sha": "916cee97bdb583021e431cf7e2b22ff39700ccaa",
+      "required_status": "E0_GCG_STATIC_AUDIT_PASS_ADVANCE_TO_TOKENIZER_TEMPLATE_BUDGET_AUDIT",
+      "required_next_operation": "FREEZE_GCG_TOKENIZER_TEMPLATE_BUDGET_AND_POSITION_PRESERVING_NEUTRALIZER_AUDIT"
+    },
+    "execution_freeze": {
+      "path": "data/natural_language_localization/topology_micro_pilot_v1/topology_micro_pilot_execution_freeze_v1.safe.json",
+      "git_blob_sha": "fe94f8619866be4d37a01d3336905e192e421a33",
+      "required_status": "TOPOLOGY_MICRO_PILOT_EXECUTION_FREEZE_PASS"
+    },
+    "signal_screen_manifest": {
+      "path": "data/natural_language_localization/topology_micro_pilot_v1/h4rm3l_gcg_signal_screen_input_manifest_v1.safe.json",
+      "git_blob_sha": "9146cba33faaaf2c6f851debdcce385671e962ae",
+      "required_status": "H4RM3L_GCG_SIGNAL_SCREEN_INPUT_MANIFEST_FREEZE_PASS"
+    }
+  },
+  "target_tokenizer": {
+    "repository": "Qwen/Qwen2.5-7B-Instruct",
+    "revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+    "trust_remote_code": false,
+    "use_fast": true,
+    "chat_template_required": true
+  },
+  "harmless_fixture": {
+    "synthetic_goal": "Summarize a neutral library catalog entry.",
+    "synthetic_target": "The catalog entry describes a fictional book.",
+    "control_lexical_unit": "!",
+    "control_lexical_unit_count": 20,
+    "control_separator": " ",
+    "raw_fixture_may_enter_safe_result": false
+  },
+  "coarse_partition": {
+    "control_token_count_required": 20,
+    "block_count": 6,
+    "subset_count": 64,
+    "include_empty_subset": true,
+    "require_contiguous_nonoverlapping_full_cover": true
+  },
+  "neutralizer_candidates": [
+    {"id": "DOT", "text": "."},
+    {"id": "COMMA", "text": ","},
+    {"id": "COLON", "text": ":"},
+    {"id": "SEMICOLON", "text": ";"},
+    {"id": "QUESTION", "text": "?"}
+  ],
+  "compatibility_gate": {
+    "required_position_preserving_neutralizer_count": 2,
+    "require_exact_token_count": true,
+    "require_control_target_disjointness": true,
+    "require_all_64_masks": true,
+    "require_roundtrip_identity_for_every_mask": true,
+    "require_target_boundary_unchanged": true,
+    "require_control_boundary_unchanged": true
+  },
+  "safe_output_policy": {
+    "raw_fixture_recorded": false,
+    "raw_rendered_prompt_recorded": false,
+    "raw_token_ids_recorded": false,
+    "raw_control_recorded": false,
+    "raw_target_recorded": false,
+    "hashes_counts_and_slices_only": true
+  },
+  "sealed_boundaries": {
+    "model_weights_downloaded": false,
+    "model_forward_pass": false,
+    "model_generation": false,
+    "real_harmful_payload_used": false,
+    "attack_optimization_performed": false,
+    "attack_success_observed": false,
+    "stage_a_opened": false,
+    "heldout_opened": false,
+    "causal_oracle_opened": false,
+    "keep_only_oracle_opened": false,
+    "wavelet_used": false
+  },
+  "decision_gate": {
+    "on_pass": "INSTALL_GCG_QWEN_PREFLIGHT_SAFE_RESULT_AND_AUTHORIZE_RUNTIME_BUNDLE",
+    "on_compatibility_fail": "BLOCK_SIGNAL_SCREEN_RUNTIME_MATERIALIZATION",
+    "on_operational_fail": "REPAIR_PREFLIGHT_RUNTIME_WITHOUT_CHANGING_SCIENTIFIC_CONTRACT"
+  }
+}
