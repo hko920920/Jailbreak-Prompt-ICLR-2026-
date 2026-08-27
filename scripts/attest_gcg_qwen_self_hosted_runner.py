@@ -37,14 +37,15 @@ def _parse_nvidia_smi(text: str) -> list[dict[str, Any]]:
         if not line:
             continue
         pieces = [piece.strip() for piece in line.split(",")]
-        if len(pieces) != 5:
+        if len(pieces) != 6:
             raise ContractError("INVALID_NVIDIA_SMI_ROW")
-        name, total_mib, free_mib, driver, uuid = pieces
+        name, total_mib, free_mib, driver, uuid, mig_mode = pieces
         try:
             total = int(total_mib)
             free = int(free_mib)
         except ValueError as exc:
             raise ContractError("INVALID_NVIDIA_SMI_MEMORY") from exc
+        normalized_mig_mode = mig_mode.strip().lower()
         rows.append(
             {
                 "name": name,
@@ -52,11 +53,18 @@ def _parse_nvidia_smi(text: str) -> list[dict[str, Any]]:
                 "memory_free_mib": free,
                 "driver_version": driver,
                 "uuid_sha256": _sha256_text(uuid),
+                "mig_mode": normalized_mig_mode,
+                "mig_mode_disabled": normalized_mig_mode == "disabled",
             }
         )
     if not rows:
         raise ContractError("NO_GPU_ROWS")
     return rows
+
+
+def _require_mig_disabled(rows: list[dict[str, Any]]) -> None:
+    if any(not row.get("mig_mode_disabled", False) for row in rows):
+        raise ContractError("MIG_MODE_NOT_DISABLED")
 
 
 def _resolve_private_root(
@@ -111,12 +119,14 @@ def attest(config: dict[str, Any], workspace: Path) -> dict[str, Any]:
 
     if platform.system() != runner["required_os"]:
         raise ContractError("RUNNER_OS_MISMATCH")
-    if platform.machine().lower() not in {item.lower() for item in runner["allowed_architectures"]}:
+    if platform.machine().lower() not in {
+        item.lower() for item in runner["allowed_architectures"]
+    }:
         raise ContractError("RUNNER_ARCH_MISMATCH")
 
     command = [
         "nvidia-smi",
-        "--query-gpu=name,memory.total,memory.free,driver_version,uuid",
+        "--query-gpu=name,memory.total,memory.free,driver_version,uuid,mig.mode.current",
         "--format=csv,noheader,nounits",
     ]
     try:
@@ -142,6 +152,8 @@ def attest(config: dict[str, Any], workspace: Path) -> dict[str, Any]:
         raise ContractError("INSUFFICIENT_TOTAL_GPU_MEMORY")
     if any(row["memory_free_mib"] < minimum_free for row in matching):
         raise ContractError("INSUFFICIENT_FREE_GPU_MEMORY")
+    if hardware.get("mig_must_be_disabled", False):
+        _require_mig_disabled(matching)
 
     minimum_driver = _version_tuple(hardware["minimum_driver_version"])
     maximum_driver = _version_tuple(hardware["maximum_driver_version_exclusive"])
@@ -188,7 +200,10 @@ def attest(config: dict[str, Any], workspace: Path) -> dict[str, Any]:
                 "minimum_total_memory_mib_per_gpu": minimum_total,
                 "minimum_free_memory_mib_per_gpu": minimum_free,
                 "minimum_driver_version": hardware["minimum_driver_version"],
-                "maximum_driver_version_exclusive": hardware["maximum_driver_version_exclusive"],
+                "maximum_driver_version_exclusive": hardware[
+                    "maximum_driver_version_exclusive"
+                ],
+                "mig_must_be_disabled": hardware.get("mig_must_be_disabled", False),
             },
             "private_storage_attestation": {
                 "cache_root_sha256": _sha256_text(str(cache_root)),
@@ -204,6 +219,7 @@ def attest(config: dict[str, Any], workspace: Path) -> dict[str, Any]:
                 "gpu_count_pass": True,
                 "total_gpu_memory_pass": True,
                 "free_gpu_memory_pass": True,
+                "mig_disabled_pass": True,
                 "driver_range_pass": True,
                 "private_roots_outside_workspace": True,
                 "private_directory_modes_pass": True,
@@ -237,7 +253,9 @@ def main() -> int:
                 "runner_attestation_observed": True,
                 "execution_ready": False,
                 "failure_code": str(exc),
-                "next_authorized_operation": ("REPAIR_SELF_HOSTED_RUNNER_OR_PRIVATE_STORAGE_ONLY"),
+                "next_authorized_operation": (
+                    "REPAIR_SELF_HOSTED_RUNNER_OR_PRIVATE_STORAGE_ONLY"
+                ),
             }
         )
         args.output.write_text(
@@ -245,7 +263,9 @@ def main() -> int:
         )
         return 1
 
-    args.output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    args.output.write_text(
+        json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
     return 0
 
 
