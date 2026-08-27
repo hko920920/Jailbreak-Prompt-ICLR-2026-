@@ -1,0 +1,43 @@
+name: topology-micro-pilot-execution-freeze
+
+"on":
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/topology_micro_pilot_execution_freeze.yml
+      - tools/bootstrap/topology_execution_freeze_v1.zip
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: topology-micro-pilot-execution-freeze
+  cancel-in-progress: false
+
+jobs:
+  freeze:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Check out exact pre-outcome bootstrap commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Materialize frozen execution-freeze implementation
+        run: |
+          test -f tools/bootstrap/topology_execution_freeze_v1.zip
+          unzip -o tools/bootstrap/topology_execution_freeze_v1.zip -d .
+          test -x tools/run_topology_micro_pilot_execution_freeze_ci.sh
+
+      - name: Resolve and record immutable execution identities
+        run: |
+          bash tools/run_topology_micro_pilot_execution_freeze_ci.sh
