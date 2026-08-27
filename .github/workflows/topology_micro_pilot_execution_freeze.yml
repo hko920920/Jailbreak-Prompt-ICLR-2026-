@@ -1,3 +1,4 @@
+# Retry marker after formatting-only repair; scientific contract unchanged.
 name: topology-micro-pilot-execution-freeze
 
 "on":
