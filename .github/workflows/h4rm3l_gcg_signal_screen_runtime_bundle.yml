@@ -1,0 +1,227 @@
+name: h4rm3l-gcg-signal-screen-runtime-bundle
+
+"on":
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/h4rm3l_gcg_signal_screen_runtime_bundle.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: h4rm3l-gcg-signal-screen-runtime-bundle
+  cancel-in-progress: false
+
+env:
+  TARGET_BRANCH: agent/programmatic-agentharm-pivot
+  INSTALLER: .github/workflows/_temporary_install_h4rm3l_gcg_runtime_bundle.yml
+  BUNDLE_SHA256: 8b61a85aebd186ea53d261e3d90b90e1dbfafd55d726b5bff589ffbac52de60a
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  HARM_BENCH_ROOT: upstream/HarmBench
+  HARM_BENCH_REVISION: 8e1604d1171fe8a48d8febecd22f600e462bdcdd
+  H4RM3L_ROOT: upstream/h4rm3l
+  H4RM3L_REVISION: e6f58a1a1e56c1a95b26b06aa4fe393ee2240dbd
+  LLM_ATTACKS_ROOT: upstream/llm-attacks
+  LLM_ATTACKS_REVISION: 098262edf85f807224e70ecd87b9d83716bf6b73
+  CONFIG: configs/natural_language_localization/h4rm3l_gcg_signal_screen_runtime_bundle_v1.json
+  SAFE_DIR: artifacts/h4rm3l-gcg-signal-screen-runtime-bundle-v1
+  SAFE_RESULT: artifacts/h4rm3l-gcg-signal-screen-runtime-bundle-v1/h4rm3l_gcg_signal_screen_runtime_bundle_v1.safe.json
+  SAFE_TARGETS: artifacts/h4rm3l-gcg-signal-screen-runtime-bundle-v1/h4rm3l_gcg_optimizer_targets_v1.safe.jsonl
+  RECORD_DIR: data/natural_language_localization/topology_micro_pilot_v1
+
+jobs:
+  freeze:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Check out exact pre-outcome contract commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Restore validated non-workflow runtime-bundle source
+        run: |
+          python - <<'PY'
+          import base64
+          import hashlib
+          import json
+          import os
+          import re
+          import zlib
+          from pathlib import Path
+
+          installer = Path(os.environ["INSTALLER"])
+          text = installer.read_text(encoding="utf-8")
+          match = re.search(r'encoded = "([A-Za-z0-9+/=]+)"', text)
+          if match is None:
+              raise RuntimeError("embedded runtime bundle not found")
+          raw = zlib.decompress(base64.b64decode(match.group(1), validate=True))
+          observed = hashlib.sha256(raw).hexdigest()
+          if observed != os.environ["BUNDLE_SHA256"]:
+              raise RuntimeError(f"bundle SHA mismatch: {observed}")
+          files = json.loads(raw)
+          workflow = (
+              ".github/workflows/"
+              "h4rm3l_gcg_signal_screen_runtime_bundle.yml"
+          )
+          expected = {
+              workflow,
+              "configs/natural_language_localization/"
+              "h4rm3l_gcg_signal_screen_runtime_bundle_v1.json",
+              "scripts/freeze_h4rm3l_gcg_signal_screen_runtime_bundle.py",
+              "tests/test_h4rm3l_gcg_signal_screen_runtime_bundle.py",
+              "docs/H4RM3L_GCG_SIGNAL_SCREEN_RUNTIME_BUNDLE_V1.md",
+          }
+          if set(files) != expected:
+              raise RuntimeError("unexpected runtime-bundle membership")
+          for relative in sorted(expected - {workflow}):
+              path = Path(relative)
+              path.parent.mkdir(parents=True, exist_ok=True)
+              path.write_text(files[relative], encoding="utf-8")
+          PY
+
+      - name: Check out immutable HarmBench source
+        uses: actions/checkout@v4
+        with:
+          repository: centerforaisafety/HarmBench
+          ref: ${{ env.HARM_BENCH_REVISION }}
+          path: ${{ env.HARM_BENCH_ROOT }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Check out immutable h4rm3l source
+        uses: actions/checkout@v4
+        with:
+          repository: mdoumbouya/h4rm3l
+          ref: ${{ env.H4RM3L_REVISION }}
+          path: ${{ env.H4RM3L_ROOT }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Check out immutable llm-attacks source
+        uses: actions/checkout@v4
+        with:
+          repository: llm-attacks/llm-attacks
+          ref: ${{ env.LLM_ATTACKS_REVISION }}
+          path: ${{ env.LLM_ATTACKS_ROOT }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate and freeze runtime bundle
+        run: |
+          umask 077
+          chmod -R go-rwx upstream
+          python -m pip install --upgrade pip
+          python -m pip install \
+            'pytest>=8.2' \
+            'ruff==0.16.4' \
+            'huggingface_hub==0.36.2'
+          ruff check \
+            scripts/freeze_h4rm3l_gcg_signal_screen_runtime_bundle.py \
+            tests/test_h4rm3l_gcg_signal_screen_runtime_bundle.py
+          python -m pytest -q \
+            tests/test_h4rm3l_gcg_signal_screen_runtime_bundle.py
+          python -m py_compile \
+            scripts/freeze_h4rm3l_gcg_signal_screen_runtime_bundle.py
+          python -m json.tool "$CONFIG" >/dev/null
+          mkdir -p "$SAFE_DIR"
+          python scripts/freeze_h4rm3l_gcg_signal_screen_runtime_bundle.py \
+            --root . \
+            --harmbench-root "$HARM_BENCH_ROOT" \
+            --h4rm3l-root "$H4RM3L_ROOT" \
+            --llm-attacks-root "$LLM_ATTACKS_ROOT" \
+            --config "$CONFIG" \
+            --safe-output "$SAFE_RESULT" \
+            --target-manifest-output "$SAFE_TARGETS"
+          test "$(jq -r '.status' "$SAFE_RESULT")" = \
+            "H4RM3L_GCG_SIGNAL_SCREEN_RUNTIME_BUNDLE_FREEZE_PASS_EXECUTION_BLOCKED"
+          test "$(jq -r '.operational_pass' "$SAFE_RESULT")" = "true"
+          test "$(jq -r '.execution_ready' "$SAFE_RESULT")" = "false"
+          test "$(jq -r '.next_authorized_operation' "$SAFE_RESULT")" = \
+            "FREEZE_GCG_QWEN_DIFFERENTIABLE_RUNTIME_AND_COMPUTE_CONTRACT"
+          test "$(jq -r '.model_inference_performed' "$SAFE_RESULT")" = "false"
+          test "$(jq -r '.attack_optimization_performed' "$SAFE_RESULT")" = "false"
+          test "$(wc -l < "$SAFE_TARGETS")" = "4"
+          git diff --check
+
+      - name: Audit safe-output privacy boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          forbidden = (
+              '"Behavior"',
+              '"BehaviorID"',
+              '"payload_text"',
+              '"raw_payload"',
+              '"optimizer_target_text"',
+              '"raw_prompt"',
+              '"raw_response"',
+              '"optimized_control"',
+              '"evaluator_output"',
+          )
+          safe_dir = Path("artifacts/h4rm3l-gcg-signal-screen-runtime-bundle-v1")
+          for path in safe_dir.rglob("*"):
+              if not path.is_file():
+                  continue
+              text = path.read_text(encoding="utf-8")
+              for token in forbidden:
+                  assert token not in text, (path, token)
+          PY
+
+      - name: Destroy checked-out raw source material
+        if: always()
+        run: |
+          rm -rf upstream
+
+      - name: Upload safe runtime-bundle artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: h4rm3l-gcg-signal-screen-runtime-bundle-v1-safe
+          path: ${{ env.SAFE_DIR }}
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Commit safe runtime-bundle records
+        run: |
+          mkdir -p "$RECORD_DIR"
+          cp "$SAFE_RESULT" \
+            "$RECORD_DIR/h4rm3l_gcg_signal_screen_runtime_bundle_v1.safe.json"
+          cp "$SAFE_TARGETS" \
+            "$RECORD_DIR/h4rm3l_gcg_optimizer_targets_v1.safe.jsonl"
+          git config user.name "github-actions[bot]"
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            configs/natural_language_localization/h4rm3l_gcg_signal_screen_runtime_bundle_v1.json \
+            scripts/freeze_h4rm3l_gcg_signal_screen_runtime_bundle.py \
+            tests/test_h4rm3l_gcg_signal_screen_runtime_bundle.py \
+            docs/H4RM3L_GCG_SIGNAL_SCREEN_RUNTIME_BUNDLE_V1.md \
+            "$RECORD_DIR/h4rm3l_gcg_signal_screen_runtime_bundle_v1.safe.json" \
+            "$RECORD_DIR/h4rm3l_gcg_optimizer_targets_v1.safe.jsonl"
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "Record h4rm3l-GCG runtime bundle freeze"
+          git fetch origin "$TARGET_BRANCH"
+          frozen_inputs=(
+            configs/natural_language_localization/h4rm3l_gcg_signal_screen_runtime_bundle_v1.json
+            scripts/freeze_h4rm3l_gcg_signal_screen_runtime_bundle.py
+            tests/test_h4rm3l_gcg_signal_screen_runtime_bundle.py
+            data/natural_language_localization/topology_micro_pilot_v1/h4rm3l_gcg_signal_screen_input_manifest_v1.safe.json
+            data/natural_language_localization/e0_attack_family_provenance_v1/gcg_qwen_preflight.safe.json
+          )
+          if ! git diff --quiet \
+            "$GITHUB_SHA" "origin/$TARGET_BRANCH" -- "${frozen_inputs[@]}"; then
+            echo "Frozen runtime-bundle inputs changed during the run." >&2
+            exit 1
+          fi
+          git rebase "origin/$TARGET_BRANCH"
+          git push origin "HEAD:$TARGET_BRANCH"
