@@ -1,0 +1,151 @@
+name: h4rm3l-gcg-signal-screen-input-manifest
+
+"on":
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/h4rm3l_gcg_signal_screen_input_manifest.yml
+      - configs/natural_language_localization/h4rm3l_gcg_signal_screen_input_manifest_v1.json
+      - scripts/freeze_h4rm3l_gcg_signal_screen_input_manifest.py
+      - tests/test_h4rm3l_gcg_signal_screen_input_manifest.py
+      - docs/H4RM3L_GCG_SIGNAL_SCREEN_INPUT_MANIFEST_V1.md
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: h4rm3l-gcg-signal-screen-input-manifest
+  cancel-in-progress: false
+
+env:
+  TARGET_BRANCH: agent/programmatic-agentharm-pivot
+  CONFIG: configs/natural_language_localization/h4rm3l_gcg_signal_screen_input_manifest_v1.json
+  SAFE_DIR: artifacts/h4rm3l-gcg-signal-screen-input-manifest-v1
+  SAFE_RESULT: artifacts/h4rm3l-gcg-signal-screen-input-manifest-v1/h4rm3l_gcg_signal_screen_input_manifest_v1.safe.json
+  SAFE_DIRECT: artifacts/h4rm3l-gcg-signal-screen-input-manifest-v1/h4rm3l_gcg_signal_screen_direct_instances_v1.safe.jsonl
+  SAFE_PAIRS: artifacts/h4rm3l-gcg-signal-screen-input-manifest-v1/h4rm3l_gcg_signal_screen_pair_plans_v1.safe.jsonl
+  RECORD_DIR: data/natural_language_localization/topology_micro_pilot_v1
+
+jobs:
+  freeze:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate and freeze hash-only signal-screen identities
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'pytest>=8.2' 'ruff==0.16.4'
+          targets=(
+            scripts/freeze_h4rm3l_gcg_signal_screen_input_manifest.py
+            tests/test_h4rm3l_gcg_signal_screen_input_manifest.py
+          )
+          ruff check "${targets[@]}"
+          python -m pytest -q \
+            tests/test_h4rm3l_gcg_signal_screen_input_manifest.py
+          python -m py_compile \
+            scripts/freeze_h4rm3l_gcg_signal_screen_input_manifest.py
+          python -m json.tool "$CONFIG" >/dev/null
+          mkdir -p "$SAFE_DIR"
+          python \
+            scripts/freeze_h4rm3l_gcg_signal_screen_input_manifest.py \
+            --root . \
+            --config "$CONFIG" \
+            --safe-output "$SAFE_RESULT" \
+            --direct-output "$SAFE_DIRECT" \
+            --pair-output "$SAFE_PAIRS"
+          test "$(jq -r '.status' "$SAFE_RESULT")" = \
+            "H4RM3L_GCG_SIGNAL_SCREEN_INPUT_MANIFEST_FREEZE_PASS"
+          test "$(jq -r '.next_authorized_operation' "$SAFE_RESULT")" = \
+            "FREEZE_PRIVATE_SIGNAL_SCREEN_RUNTIME_BUNDLE_AND_EVALUATOR_REVISIONS"
+          test "$(jq -r '.model_inference_performed' "$SAFE_RESULT")" = \
+            "false"
+          test "$(jq -r '.attack_optimization_performed' "$SAFE_RESULT")" = \
+            "false"
+          test "$(wc -l < "$SAFE_DIRECT")" = "12"
+          test "$(wc -l < "$SAFE_PAIRS")" = "24"
+          git diff --check
+
+      - name: Audit safe-output privacy boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          forbidden = (
+              '"payload_text":',
+              '"raw_payload":',
+              '"raw_prompt":',
+              '"raw_response":',
+              '"rendered_prompt":',
+              '"control_init":',
+              '"optimized_control":',
+              '"program_id":',
+              '"evaluator_raw_output":',
+          )
+          safe_dir = Path(
+              "artifacts/h4rm3l-gcg-signal-screen-input-manifest-v1"
+          )
+          for path in safe_dir.rglob("*"):
+              if not path.is_file():
+                  continue
+              text = path.read_text(encoding="utf-8")
+              for token in forbidden:
+                  assert token not in text, (path, token)
+          PY
+
+      - name: Upload safe manifest artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: h4rm3l-gcg-signal-screen-input-manifest-v1-safe
+          path: ${{ env.SAFE_DIR }}
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Commit safe manifest records
+        run: |
+          mkdir -p "$RECORD_DIR"
+          cp "$SAFE_RESULT" \
+            "$RECORD_DIR/h4rm3l_gcg_signal_screen_input_manifest_v1.safe.json"
+          cp "$SAFE_DIRECT" \
+            "$RECORD_DIR/h4rm3l_gcg_signal_screen_direct_instances_v1.safe.jsonl"
+          cp "$SAFE_PAIRS" \
+            "$RECORD_DIR/h4rm3l_gcg_signal_screen_pair_plans_v1.safe.jsonl"
+          git config user.name "github-actions[bot]"
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            "$RECORD_DIR/h4rm3l_gcg_signal_screen_input_manifest_v1.safe.json" \
+            "$RECORD_DIR/h4rm3l_gcg_signal_screen_direct_instances_v1.safe.jsonl" \
+            "$RECORD_DIR/h4rm3l_gcg_signal_screen_pair_plans_v1.safe.jsonl"
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m \
+            "Record h4rm3l-GCG signal-screen input manifest freeze"
+          git fetch origin "$TARGET_BRANCH"
+          frozen_inputs=(
+            configs/natural_language_localization/h4rm3l_gcg_signal_screen_input_manifest_v1.json
+            scripts/freeze_h4rm3l_gcg_signal_screen_input_manifest.py
+            tests/test_h4rm3l_gcg_signal_screen_input_manifest.py
+            data/natural_language_localization/topology_micro_pilot_v1/topology_micro_pilot_execution_freeze_v1.safe.json
+            data/natural_language_localization/topology_micro_pilot_v1/topology_micro_pilot_payload_manifest_v1.safe.jsonl
+            data/natural_language_localization/e0_attack_family_provenance_v1/h4rm3l_real_templates.safe.json
+            data/natural_language_localization/e0_attack_family_provenance_v1/gcg_static_audit.safe.json
+          )
+          if ! git diff --quiet \
+            "$GITHUB_SHA" "origin/$TARGET_BRANCH" -- \
+            "${frozen_inputs[@]}"; then
+            echo "Frozen manifest inputs changed during the run." >&2
+            exit 1
+          fi
+          git rebase "origin/$TARGET_BRANCH"
+          git push origin "HEAD:$TARGET_BRANCH"
