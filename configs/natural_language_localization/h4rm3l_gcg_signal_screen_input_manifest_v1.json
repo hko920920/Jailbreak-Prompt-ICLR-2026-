@@ -1,0 +1,93 @@
+{
+  "attack_families": [
+    {
+      "class": "SEMANTIC_COMPOSITIONAL",
+      "family": "h4rm3l",
+      "maximum_coarse_units": 6,
+      "predecessor_git_blob_sha": "f1545c004dbf91290393e620e753f8fcf1862e06",
+      "predecessor_path": "data/natural_language_localization/e0_attack_family_provenance_v1/h4rm3l_real_templates.safe.json",
+      "program_assignment_rule": "BALANCED_CYCLE_OVER_HASH_SORTED_DIRECT_INSTANCES_AND_PROGRAM_IDENTITIES",
+      "raw_template_or_rendered_text_in_safe_outputs": false,
+      "required_program_count": 7,
+      "required_status": "E0_H4RM3L_REAL_TEMPLATES_PASS_FREEZE_REGIME_S_H4RM3L_ADAPTER"
+    },
+    {
+      "class": "NONFLUENT_OPTIMIZED",
+      "control_identity_fields": [
+        "control_init_sha256",
+        "control_init_lexical_units"
+      ],
+      "family": "GCG",
+      "maximum_coarse_units": 6,
+      "predecessor_git_blob_sha": "916cee97bdb583021e431cf7e2b22ff39700ccaa",
+      "predecessor_path": "data/natural_language_localization/e0_attack_family_provenance_v1/gcg_static_audit.safe.json",
+      "raw_control_text_in_safe_outputs": false,
+      "required_status": "E0_GCG_STATIC_AUDIT_PASS_ADVANCE_TO_TOKENIZER_TEMPLATE_BUDGET_AUDIT"
+    }
+  ],
+  "condition_contract": {
+    "attacked_condition": "ATTACKED",
+    "attacked_material_status_before_next_stage": "PLANNED_PRIVATE_NOT_GENERATED",
+    "direct_and_attacked_share_payload_model_and_decoding": true,
+    "direct_condition": "DIRECT",
+    "direct_output_is_shared_across_families_for_same_payload_and_seed": true
+  },
+  "decision_gate": {
+    "on_manifest_freeze_pass": "FREEZE_PRIVATE_SIGNAL_SCREEN_RUNTIME_BUNDLE_AND_EVALUATOR_REVISIONS",
+    "on_operational_fail": "REPAIR_SIGNAL_SCREEN_INPUT_MANIFEST_IMPLEMENTATION_ONLY",
+    "scientific_threshold_changes_allowed": false
+  },
+  "evaluator_runtime_gate": {
+    "automated_screen_positive_is_not_a_final_label": true,
+    "exact_evaluator_runtime_revisions_required_before_first_automated_label": true,
+    "harmbench_classifier_runtime_revision_frozen": false,
+    "human_final_label_protocol_is_unchanged": true,
+    "logical_screening_and_audit_contract_is_inherited": true,
+    "wildguard_runtime_revision_frozen": false
+  },
+  "evidence_class": "PROTOCOL",
+  "execution_freeze_predecessor": {
+    "payload_manifest_git_blob_sha": "00b5afbc59863e49c1bbd5fa7cf8ba0f2f2771cf",
+    "payload_manifest_path": "data/natural_language_localization/topology_micro_pilot_v1/topology_micro_pilot_payload_manifest_v1.safe.jsonl",
+    "required_next_authorized_operation": "FREEZE_H4RM3L_GCG_SIGNAL_SCREEN_INPUT_MANIFEST",
+    "required_payload_count": 4,
+    "required_payload_manifest_sha256": "de1771f1f7b8117270a8f27e340a9d37d56bee7d8fa68bf05c9a68f5cfd6a5c9",
+    "required_status": "TOPOLOGY_MICRO_PILOT_EXECUTION_FREEZE_PASS",
+    "result_git_blob_sha": "fe94f8619866be4d37a01d3336905e192e421a33",
+    "result_path": "data/natural_language_localization/topology_micro_pilot_v1/topology_micro_pilot_execution_freeze_v1.safe.json"
+  },
+  "frozen": true,
+  "manifest_cardinality": {
+    "attacked_pair_plan_count": 24,
+    "family_count": 2,
+    "payload_count": 4,
+    "planned_baseline_generation_count": 36,
+    "seed_count": 3,
+    "shared_direct_instance_count": 12
+  },
+  "paper_validity": false,
+  "safe_output_policy": {
+    "payload_identity_mode": "HASH_ONLY",
+    "private_runner_may_materialize_raw_inputs_only_after_runtime_bundle_freeze": true,
+    "raw_attack_template_recording_allowed": false,
+    "raw_evaluator_output_recording_allowed": false,
+    "raw_optimized_control_recording_allowed": false,
+    "raw_payload_recording_allowed": false,
+    "raw_prompt_recording_allowed": false,
+    "raw_response_recording_allowed": false
+  },
+  "schema_version": "h4rm3l-gcg-signal-screen-input-manifest-contract-v1",
+  "sealed_boundaries": {
+    "attack_optimization_performed": false,
+    "attack_success_observed": false,
+    "automated_label_observed": false,
+    "causal_oracle_opened": false,
+    "heldout_opened": false,
+    "human_label_observed": false,
+    "keep_only_oracle_opened": false,
+    "stage_a_opened": false,
+    "target_model_called": false,
+    "wavelet_used": false
+  },
+  "status": "FROZEN_BEFORE_SIGNAL_SCREEN_ATTACK_MATERIALIZATION_OR_TARGET_OUTCOMES"
+}
