@@ -40,50 +40,6 @@ jobs:
           ref: ${{ env.TARGET_BRANCH }}
           fetch-depth: 0
 
-      - name: Restore validated compute-contract source bundle
-        env:
-          SOURCE_BUNDLE_SHA256: 507639a2032ce5aff9755eb1680a79c443b2a370f5b8d639db88b7f58fefdcd2
-        run: |
-          python - <<'PY'
-          import base64
-          import hashlib
-          import json
-          import os
-          import zlib
-          from pathlib import Path
-
-          bundle_dir = Path(".bootstrap/gcg_qwen_compute_contract")
-          parts = sorted(bundle_dir.glob("bundle.part.*"))
-          if [path.name for path in parts] != [
-              "bundle.part.00",
-              "bundle.part.01",
-              "bundle.part.02",
-              "bundle.part.03",
-          ]:
-              raise RuntimeError("compute-contract bundle parts are incomplete")
-          encoded = "".join(path.read_text(encoding="utf-8") for path in parts)
-          raw = zlib.decompress(base64.b64decode(encoded, validate=True))
-          observed = hashlib.sha256(raw).hexdigest()
-          if observed != os.environ["SOURCE_BUNDLE_SHA256"]:
-              raise RuntimeError(f"source bundle SHA mismatch: {observed}")
-          files = json.loads(raw)
-          expected = {
-              "configs/natural_language_localization/"
-              "gcg_qwen_differentiable_compute_contract_v1.json",
-              "scripts/freeze_gcg_qwen_differentiable_compute_contract.py",
-              "scripts/attest_gcg_qwen_self_hosted_runner.py",
-              "tests/test_gcg_qwen_differentiable_compute_contract.py",
-              "tests/test_gcg_qwen_self_hosted_attestation.py",
-              "docs/GCG_QWEN_DIFFERENTIABLE_COMPUTE_CONTRACT_V1.md",
-          }
-          if set(files) != expected:
-              raise RuntimeError("unexpected compute-contract bundle membership")
-          for relative in sorted(expected):
-              path = Path(relative)
-              path.parent.mkdir(parents=True, exist_ok=True)
-              path.write_text(files[relative], encoding="utf-8")
-          PY
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -99,8 +55,6 @@ jobs:
             tests/test_gcg_qwen_differentiable_compute_contract.py
             tests/test_gcg_qwen_self_hosted_attestation.py
           )
-          ruff check --fix "${targets[@]}"
-          ruff format "${targets[@]}"
           ruff check "${targets[@]}"
           ruff format --check "${targets[@]}"
           python -m py_compile \
@@ -175,15 +129,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email \
             "41898282+github-actions[bot]@users.noreply.github.com"
-          git add \
-            "$RECORD" \
-            configs/natural_language_localization/gcg_qwen_differentiable_compute_contract_v1.json \
-            scripts/freeze_gcg_qwen_differentiable_compute_contract.py \
-            scripts/attest_gcg_qwen_self_hosted_runner.py \
-            tests/test_gcg_qwen_differentiable_compute_contract.py \
-            tests/test_gcg_qwen_self_hosted_attestation.py \
-            docs/GCG_QWEN_DIFFERENTIABLE_COMPUTE_CONTRACT_V1.md
-          git rm -r .bootstrap/gcg_qwen_compute_contract
+          git add "$RECORD"
           if git diff --cached --quiet; then
             exit 0
           fi
