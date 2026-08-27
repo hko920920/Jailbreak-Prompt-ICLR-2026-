@@ -1,0 +1,96 @@
+{
+  "attack_optimization_performed": false,
+  "attack_success_observed": false,
+  "attestation_workflow_git_blob_sha": "b0dcd75ad8b8bce178d4501c49d5c9a11469f7f1",
+  "causal_oracle_opened": false,
+  "contract_git_blob_sha": "25367b06177fc382bed5cfc4ed898d9244ba3cc3",
+  "contract_sha256": "66ec18ad36f40869b7b3f4d007299d48495784ea1eacacf55281e336eb360072",
+  "evidence_class": "PROTOCOL",
+  "execution_ready": false,
+  "freeze_checks": {
+    "attestation_workflow_identity_match": true,
+    "cuda_12_4_torch_2_6_contract_frozen": true,
+    "four_job_two_gpu_sharding_frozen": true,
+    "no_attack_optimization": true,
+    "no_model_weight_download": true,
+    "no_target_inference": true,
+    "oom_microbatch_only_policy_frozen": true,
+    "predecessor_identity_match": true,
+    "predecessor_status_match": true,
+    "private_storage_contract_frozen": true,
+    "safe_output_contract_frozen": true,
+    "sealed_boundaries_preserved": true,
+    "two_a100_80gb_contract_frozen": true
+  },
+  "heldout_opened": false,
+  "keep_only_oracle_opened": false,
+  "model_inference_performed": false,
+  "model_weight_downloaded": false,
+  "next_authorized_operation": "REGISTER_AND_ATTEST_GCG_QWEN_SELF_HOSTED_RUNNER",
+  "operational_pass": true,
+  "optimizer_compute_contract": {
+    "maximum_concurrent_jobs": 2,
+    "maximum_total_elapsed_minutes": 1440,
+    "maximum_wall_clock_minutes_per_job": 720,
+    "num_steps_per_job": 500,
+    "optimizer_job_count": 4,
+    "search_width": 512,
+    "starting_search_batch_size": 64,
+    "topk": 256
+  },
+  "paper_validity": false,
+  "predecessor_git_blob_sha": "a33cd70c00b7c4c631f77e66de012d6305514b05",
+  "predecessor_sha256": "e77895017b495d34a80372d61c2c77bdac336e7b922e1a514b9942db531888dc",
+  "private_storage_contract": {
+    "minimum_free_disk_bytes": 68719476736,
+    "raw_paths_recorded": false,
+    "required_directory_mode": "0700",
+    "required_file_mode": "0600"
+  },
+  "raw_payload_prompt_target_control_response_or_evaluator_output_recorded": false,
+  "runner_attestation_observed": false,
+  "runner_contract": {
+    "allowed_architectures": [
+      "x86_64",
+      "AMD64"
+    ],
+    "allowed_gpu_names": [
+      "NVIDIA A100 80GB PCIe"
+    ],
+    "maximum_driver_version_exclusive": "580.0.0",
+    "minimum_driver_version": "525.60.13",
+    "minimum_free_memory_mib_per_gpu": 65536,
+    "minimum_gpu_count": 2,
+    "minimum_total_memory_mib_per_gpu": 81920,
+    "required_labels": [
+      "self-hosted",
+      "Linux",
+      "X64",
+      "gpu",
+      "a100-80gb",
+      "private-research"
+    ],
+    "required_os": "Linux"
+  },
+  "schema_version": "gcg-qwen-differentiable-compute-contract-result-v1",
+  "scientific_pass": false,
+  "software_contract": {
+    "dtype": "bfloat16",
+    "gradient_enabled": true,
+    "package_lock_sha256": "df551694984cccbfe9f1bf747e3984a12e42613b6e2d21d9bc2bfcb1b9a3e605",
+    "python_version": "3.11",
+    "quantization": "none",
+    "torch_cuda_build": "12.4",
+    "torch_version": "2.6.0",
+    "transformers_version": "4.48.3"
+  },
+  "source_commit": "d1d2a0d69f0966bcd8db2bc2247d2db5e37410a2",
+  "stage_a_opened": false,
+  "status": "GCG_QWEN_DIFFERENTIABLE_COMPUTE_CONTRACT_FREEZE_PASS_AWAITING_RUNNER_ATTESTATION",
+  "wavelet_used": false,
+  "workflow_run": {
+    "run_attempt": "1",
+    "run_id": "33092900591",
+    "workflow_sha": "d1d2a0d69f0966bcd8db2bc2247d2db5e37410a2"
+  }
+}

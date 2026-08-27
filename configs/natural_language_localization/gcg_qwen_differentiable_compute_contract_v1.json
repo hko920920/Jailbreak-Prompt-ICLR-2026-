@@ -1,0 +1,202 @@
+{
+  "schema_version": "gcg-qwen-differentiable-compute-contract-v1",
+  "status": "FROZEN_BEFORE_SELF_HOSTED_RUNNER_ATTESTATION",
+  "frozen": true,
+  "paper_validity": false,
+  "evidence_class": "PROTOCOL",
+  "purpose": "Freeze the exact private GPU-runner, software, storage, sharding, and safety contract required to execute four 500-step GCG optimizations and the downstream 36-generation h4rm3l/GCG signal screen without exposing raw research material.",
+  "predecessor": {
+    "path": "data/natural_language_localization/topology_micro_pilot_v1/h4rm3l_gcg_signal_screen_runtime_bundle_v1.safe.json",
+    "git_blob_sha": "a33cd70c00b7c4c631f77e66de012d6305514b05",
+    "required_status": "H4RM3L_GCG_SIGNAL_SCREEN_RUNTIME_BUNDLE_FREEZE_PASS_EXECUTION_BLOCKED",
+    "required_operational_pass": true,
+    "required_execution_ready": false,
+    "required_next_operation": "FREEZE_GCG_QWEN_DIFFERENTIABLE_RUNTIME_AND_COMPUTE_CONTRACT",
+    "required_model_repository": "Qwen/Qwen2.5-7B-Instruct",
+    "required_model_revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+    "required_weight_bytes": 15231271888,
+    "required_optimizer_jobs": 4,
+    "required_total_target_generations": 36
+  },
+  "attestation_workflow": {
+    "path": ".github/workflows/gcg_qwen_self_hosted_attestation.yml",
+    "git_blob_sha": "b0dcd75ad8b8bce178d4501c49d5c9a11469f7f1",
+    "dispatch_only": true,
+    "must_not_download_model_weights": true,
+    "must_not_execute_attack_optimization": true
+  },
+  "runner_contract": {
+    "required_labels": [
+      "self-hosted",
+      "Linux",
+      "X64",
+      "gpu",
+      "a100-80gb",
+      "private-research"
+    ],
+    "required_os": "Linux",
+    "allowed_architectures": ["x86_64", "AMD64"],
+    "hardware": {
+      "allowed_gpu_names": ["NVIDIA A100 80GB PCIe"],
+      "minimum_gpu_count": 2,
+      "minimum_total_memory_mib_per_gpu": 81920,
+      "minimum_free_memory_mib_per_gpu": 65536,
+      "minimum_driver_version": "525.60.13",
+      "maximum_driver_version_exclusive": "580.0.0",
+      "cuda_minor_compatibility_family": "12.x",
+      "bf16_required": true,
+      "mig_must_be_disabled": true
+    },
+    "private_storage": {
+      "cache_root_env": "GCG_PRIVATE_CACHE_ROOT",
+      "cache_root_default": "~/.cache/gcg-qwen-private-v1",
+      "venv_root_env": "GCG_PRIVATE_VENV_ROOT",
+      "venv_root_default": "~/.venvs/gcg-qwen-2.6.0-cu124",
+      "work_root_env": "GCG_PRIVATE_WORK_ROOT",
+      "work_root_default": "/tmp/h4rm3l-gcg-signal-screen-private-v1",
+      "minimum_free_disk_bytes": 68719476736,
+      "required_directory_mode": "0700",
+      "required_file_mode": "0600",
+      "must_be_outside_github_workspace": true,
+      "raw_private_material_destroyed_after_safe_record": true,
+      "safe_records_store_paths_as_sha256_only": true
+    }
+  },
+  "software_contract": {
+    "environment_kind": "isolated_python_venv_on_self_hosted_gpu_runner",
+    "python_version": "3.11",
+    "pytorch": {
+      "version": "2.6.0",
+      "wheel_index_url": "https://download.pytorch.org/whl/cu124",
+      "cuda_build": "12.4",
+      "quantization": "none",
+      "dtype": "bfloat16",
+      "gradient_enabled": true
+    },
+    "packages": {
+      "accelerate": "1.3.0",
+      "einops": "0.8.0",
+      "fschat": "0.2.36",
+      "huggingface-hub": "0.28.1",
+      "jinja2": "3.1.6",
+      "numpy": "2.1.3",
+      "packaging": "24.2",
+      "pandas": "2.2.3",
+      "psutil": "6.1.1",
+      "safetensors": "0.5.2",
+      "sentencepiece": "0.2.0",
+      "tokenizers": "0.21.0",
+      "tqdm": "4.67.1",
+      "transformers": "4.48.3"
+    },
+    "install_policy": {
+      "hash_runtime_environment_after_materialization": true,
+      "record_pip_freeze_sha256_only": true,
+      "record_cuda_and_torch_runtime_versions": true,
+      "no_unpinned_package_upgrade_during_signal_screen": true
+    }
+  },
+  "model_contract": {
+    "repository": "Qwen/Qwen2.5-7B-Instruct",
+    "revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+    "tokenizer_revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+    "total_weight_bytes": 15231271888,
+    "weight_files": [
+      {
+        "filename": "model-00001-of-00004.safetensors",
+        "sha256": "a1333e6293854747c481288ea83b348226af178dd565c49b6f9495ba1966aba7",
+        "size_bytes": 3945441440
+      },
+      {
+        "filename": "model-00002-of-00004.safetensors",
+        "sha256": "f5d25a2772cb825164a2a2c0fb6d51a87e282abf21e4dd75bc5cfb3cd0ea6185",
+        "size_bytes": 3864726352
+      },
+      {
+        "filename": "model-00003-of-00004.safetensors",
+        "sha256": "8efdec4c1bc12317ae1a38dc42b595ce777738a64deea3fcb8a0a91381bcdfd5",
+        "size_bytes": 3864726424
+      },
+      {
+        "filename": "model-00004-of-00004.safetensors",
+        "sha256": "1a72d403cdf0c1ec3cb7f289f17b394a01e64394c2e9b3c0f94dbce3faf879bd",
+        "size_bytes": 3556377672
+      }
+    ],
+    "download_allowed_only_after_runner_attestation": true,
+    "download_to_private_cache_only": true
+  },
+  "optimizer_compute_contract": {
+    "algorithm": "GCG",
+    "optimizer_job_count": 4,
+    "num_steps_per_job": 500,
+    "search_width": 512,
+    "topk": 256,
+    "starting_search_batch_size": 64,
+    "automatic_oom_batch_halving_allowed": true,
+    "allow_non_ascii": false,
+    "control_token_count": 20,
+    "maximum_concurrent_jobs": 2,
+    "gpu_assignment": {
+      "gpu_0_payload_positions": [0, 2],
+      "gpu_1_payload_positions": [1, 3]
+    },
+    "maximum_wall_clock_minutes_per_job": 720,
+    "maximum_total_elapsed_minutes": 1440,
+    "one_optimized_control_per_payload": true,
+    "optimized_control_reused_across_three_frozen_generation_seeds": true,
+    "search_width_must_not_change_after_oom": true,
+    "only_candidate_evaluation_microbatch_may_halve_after_oom": true
+  },
+  "attestation_gate": {
+    "runner_attestation_required": true,
+    "environment_materialization_required_after_attestation": true,
+    "gradient_smoke_required_before_full_optimization": true,
+    "gradient_smoke_steps": 1,
+    "gradient_smoke_uses_synthetic_nonharmful_fixture": true,
+    "full_model_download_before_attestation": false,
+    "full_attack_optimization_before_gradient_smoke": false,
+    "next_on_static_freeze_pass": "REGISTER_AND_ATTEST_GCG_QWEN_SELF_HOSTED_RUNNER",
+    "next_on_runner_attestation_pass": "MATERIALIZE_GCG_QWEN_DIFFERENTIABLE_ENVIRONMENT_AND_VERIFY_GRADIENT_SMOKE",
+    "next_on_runner_attestation_fail": "REPAIR_SELF_HOSTED_RUNNER_OR_PRIVATE_STORAGE_ONLY"
+  },
+  "safe_output_contract": {
+    "raw_payload": false,
+    "raw_optimizer_target": false,
+    "raw_prompt": false,
+    "raw_control": false,
+    "raw_response": false,
+    "raw_evaluator_output": false,
+    "raw_hostname": false,
+    "raw_private_path": false,
+    "allowed_fields": [
+      "hashes",
+      "byte_lengths",
+      "token_lengths",
+      "package_versions",
+      "gpu_model_names",
+      "gpu_memory_counts",
+      "driver_version",
+      "parse_statuses",
+      "aggregate_counts",
+      "coded_failure_reasons"
+    ]
+  },
+  "sealed_boundaries": {
+    "model_weight_downloaded": false,
+    "model_inference_performed": false,
+    "attack_optimization_performed": false,
+    "attack_success_observed": false,
+    "automated_label_observed": false,
+    "human_label_observed": false,
+    "stage_a_opened": false,
+    "heldout_opened": false,
+    "causal_oracle_opened": false,
+    "keep_only_oracle_opened": false,
+    "wavelet_used": false
+  },
+  "primary_sources": {
+    "pytorch_2_6_cuda_12_4": "https://docs.pytorch.org/get-started/previous-versions/",
+    "cuda_12_minor_compatibility": "https://docs.nvidia.com/deploy/cuda-compatibility/minor-version-compatibility.html"
+  }
+}
