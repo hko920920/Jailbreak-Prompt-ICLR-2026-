@@ -45,15 +45,13 @@ def test_token_slice_rejects_boundary_overlap() -> None:
 
 def test_contract_preserves_sealed_boundaries() -> None:
     contract = json.loads(
-        Path(
-            "configs/natural_language_localization/e0_gcg_qwen_preflight_v1.json"
-        ).read_text(encoding="utf-8")
+        Path("configs/natural_language_localization/e0_gcg_qwen_preflight_v1.json").read_text(
+            encoding="utf-8"
+        )
     )
     assert contract["coarse_partition"]["block_count"] == 6
     assert contract["coarse_partition"]["subset_count"] == 64
-    assert contract["compatibility_gate"][
-        "required_position_preserving_neutralizer_count"
-    ] == 2
+    assert contract["compatibility_gate"]["required_position_preserving_neutralizer_count"] == 2
     assert all(value is False for value in contract["sealed_boundaries"].values())
 
 

@@ -154,9 +154,7 @@ def build_result(
         "tokenizer": tokenizer_metadata,
         "audit": audit,
         "next_authorized_operation": (
-            decision["on_pass"]
-            if compatibility_pass
-            else decision["on_compatibility_fail"]
+            decision["on_pass"] if compatibility_pass else decision["on_compatibility_fail"]
         ),
         "model_weights_downloaded": False,
         "model_forward_pass": False,

@@ -234,8 +234,7 @@ def audit_tokenizer(
         raise ValueError("chat template is missing")
 
     control_text = str(fixture["control_separator"]).join(
-        [str(fixture["control_lexical_unit"])]
-        * int(fixture["control_lexical_unit_count"])
+        [str(fixture["control_lexical_unit"])] * int(fixture["control_lexical_unit_count"])
     )
     synthetic_goal = str(fixture["synthetic_goal"])
     synthetic_target = str(fixture["synthetic_target"])
