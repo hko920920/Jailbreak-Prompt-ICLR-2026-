@@ -119,9 +119,7 @@ def attest(config: dict[str, Any], workspace: Path) -> dict[str, Any]:
 
     if platform.system() != runner["required_os"]:
         raise ContractError("RUNNER_OS_MISMATCH")
-    if platform.machine().lower() not in {
-        item.lower() for item in runner["allowed_architectures"]
-    }:
+    if platform.machine().lower() not in {item.lower() for item in runner["allowed_architectures"]}:
         raise ContractError("RUNNER_ARCH_MISMATCH")
 
     command = [
@@ -200,9 +198,7 @@ def attest(config: dict[str, Any], workspace: Path) -> dict[str, Any]:
                 "minimum_total_memory_mib_per_gpu": minimum_total,
                 "minimum_free_memory_mib_per_gpu": minimum_free,
                 "minimum_driver_version": hardware["minimum_driver_version"],
-                "maximum_driver_version_exclusive": hardware[
-                    "maximum_driver_version_exclusive"
-                ],
+                "maximum_driver_version_exclusive": hardware["maximum_driver_version_exclusive"],
                 "mig_must_be_disabled": hardware.get("mig_must_be_disabled", False),
             },
             "private_storage_attestation": {
@@ -253,9 +249,7 @@ def main() -> int:
                 "runner_attestation_observed": True,
                 "execution_ready": False,
                 "failure_code": str(exc),
-                "next_authorized_operation": (
-                    "REPAIR_SELF_HOSTED_RUNNER_OR_PRIVATE_STORAGE_ONLY"
-                ),
+                "next_authorized_operation": ("REPAIR_SELF_HOSTED_RUNNER_OR_PRIVATE_STORAGE_ONLY"),
             }
         )
         args.output.write_text(
@@ -263,9 +257,7 @@ def main() -> int:
         )
         return 1
 
-    args.output.write_text(
-        json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-    )
+    args.output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return 0
 
 
