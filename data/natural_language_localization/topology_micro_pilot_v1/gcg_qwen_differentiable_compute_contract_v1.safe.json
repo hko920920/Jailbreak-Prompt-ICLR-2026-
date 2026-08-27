@@ -84,13 +84,13 @@
     "torch_version": "2.6.0",
     "transformers_version": "4.48.3"
   },
-  "source_commit": "931bfc67b1e11fbdfa4f79dc887119d16a7a4d14",
+  "source_commit": "d77b0e1a061410d43a568f5bed4b8197bd13b57c",
   "stage_a_opened": false,
   "status": "GCG_QWEN_DIFFERENTIABLE_COMPUTE_CONTRACT_FREEZE_PASS_AWAITING_RUNNER_ATTESTATION",
   "wavelet_used": false,
   "workflow_run": {
     "run_attempt": "1",
-    "run_id": "33093112029",
-    "workflow_sha": "931bfc67b1e11fbdfa4f79dc887119d16a7a4d14"
+    "run_id": "33094163211",
+    "workflow_sha": "d77b0e1a061410d43a568f5bed4b8197bd13b57c"
   }
 }
