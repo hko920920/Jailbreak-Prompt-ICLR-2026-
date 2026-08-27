@@ -1,0 +1,205 @@
+name: gcg-qwen-differentiable-compute-contract
+
+"on":
+  push:
+    branches:
+      - agent/programmatic-agentharm-pivot
+    paths:
+      - .github/workflows/gcg_qwen_differentiable_compute_contract.yml
+      - .github/workflows/gcg_qwen_self_hosted_attestation.yml
+      - configs/natural_language_localization/gcg_qwen_differentiable_compute_contract_v1.json
+      - scripts/freeze_gcg_qwen_differentiable_compute_contract.py
+      - scripts/attest_gcg_qwen_self_hosted_runner.py
+      - tests/test_gcg_qwen_differentiable_compute_contract.py
+      - tests/test_gcg_qwen_self_hosted_attestation.py
+      - docs/GCG_QWEN_DIFFERENTIABLE_COMPUTE_CONTRACT_V1.md
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gcg-qwen-differentiable-compute-contract
+  cancel-in-progress: false
+
+env:
+  TARGET_BRANCH: agent/programmatic-agentharm-pivot
+  CONFIG: configs/natural_language_localization/gcg_qwen_differentiable_compute_contract_v1.json
+  SAFE_DIR: artifacts/gcg-qwen-differentiable-compute-contract-v1
+  SAFE_RESULT: artifacts/gcg-qwen-differentiable-compute-contract-v1/gcg_qwen_differentiable_compute_contract_v1.safe.json
+  RECORD: data/natural_language_localization/topology_micro_pilot_v1/gcg_qwen_differentiable_compute_contract_v1.safe.json
+
+jobs:
+  freeze:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out exact contract commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TARGET_BRANCH }}
+          fetch-depth: 0
+
+      - name: Restore validated compute-contract source bundle
+        env:
+          SOURCE_BUNDLE_SHA256: 507639a2032ce5aff9755eb1680a79c443b2a370f5b8d639db88b7f58fefdcd2
+        run: |
+          python - <<'PY'
+          import base64
+          import hashlib
+          import json
+          import os
+          import zlib
+          from pathlib import Path
+
+          bundle_dir = Path(".bootstrap/gcg_qwen_compute_contract")
+          parts = sorted(bundle_dir.glob("bundle.part.*"))
+          if [path.name for path in parts] != [
+              "bundle.part.00",
+              "bundle.part.01",
+              "bundle.part.02",
+              "bundle.part.03",
+          ]:
+              raise RuntimeError("compute-contract bundle parts are incomplete")
+          encoded = "".join(path.read_text(encoding="utf-8") for path in parts)
+          raw = zlib.decompress(base64.b64decode(encoded, validate=True))
+          observed = hashlib.sha256(raw).hexdigest()
+          if observed != os.environ["SOURCE_BUNDLE_SHA256"]:
+              raise RuntimeError(f"source bundle SHA mismatch: {observed}")
+          files = json.loads(raw)
+          expected = {
+              "configs/natural_language_localization/"
+              "gcg_qwen_differentiable_compute_contract_v1.json",
+              "scripts/freeze_gcg_qwen_differentiable_compute_contract.py",
+              "scripts/attest_gcg_qwen_self_hosted_runner.py",
+              "tests/test_gcg_qwen_differentiable_compute_contract.py",
+              "tests/test_gcg_qwen_self_hosted_attestation.py",
+              "docs/GCG_QWEN_DIFFERENTIABLE_COMPUTE_CONTRACT_V1.md",
+          }
+          if set(files) != expected:
+              raise RuntimeError("unexpected compute-contract bundle membership")
+          for relative in sorted(expected):
+              path = Path(relative)
+              path.parent.mkdir(parents=True, exist_ok=True)
+              path.write_text(files[relative], encoding="utf-8")
+          PY
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate static contract implementation
+        run: |
+          python -m pip install \
+            'pytest==8.3.5' \
+            'ruff==0.16.4'
+          targets=(
+            scripts/freeze_gcg_qwen_differentiable_compute_contract.py
+            scripts/attest_gcg_qwen_self_hosted_runner.py
+            tests/test_gcg_qwen_differentiable_compute_contract.py
+            tests/test_gcg_qwen_self_hosted_attestation.py
+          )
+          ruff check "${targets[@]}"
+          ruff format --check "${targets[@]}"
+          python -m py_compile \
+            scripts/freeze_gcg_qwen_differentiable_compute_contract.py \
+            scripts/attest_gcg_qwen_self_hosted_runner.py
+          python -m pytest -q \
+            tests/test_gcg_qwen_differentiable_compute_contract.py \
+            tests/test_gcg_qwen_self_hosted_attestation.py
+          python -m json.tool "$CONFIG" >/dev/null
+          git diff --check
+
+      - name: Freeze compute contract without GPU execution
+        run: |
+          umask 077
+          mkdir -p "$SAFE_DIR"
+          python scripts/freeze_gcg_qwen_differentiable_compute_contract.py \
+            --root . \
+            --config "$CONFIG" \
+            --output "$SAFE_RESULT"
+          test "$(jq -r '.status' "$SAFE_RESULT")" = \
+            "GCG_QWEN_DIFFERENTIABLE_COMPUTE_CONTRACT_FREEZE_PASS_AWAITING_RUNNER_ATTESTATION"
+          test "$(jq -r '.operational_pass' "$SAFE_RESULT")" = "true"
+          test "$(jq -r '.execution_ready' "$SAFE_RESULT")" = "false"
+          test "$(jq -r '.runner_attestation_observed' "$SAFE_RESULT")" = "false"
+          test "$(jq -r '.model_weight_downloaded' "$SAFE_RESULT")" = "false"
+          test "$(jq -r '.model_inference_performed' "$SAFE_RESULT")" = "false"
+          test "$(jq -r '.attack_optimization_performed' "$SAFE_RESULT")" = "false"
+          test "$(jq -r '.next_authorized_operation' "$SAFE_RESULT")" = \
+            "REGISTER_AND_ATTEST_GCG_QWEN_SELF_HOSTED_RUNNER"
+
+      - name: Audit safe-output boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          forbidden = (
+              '"Behavior"',
+              '"BehaviorID"',
+              '"payload_text"',
+              '"raw_payload"',
+              '"optimizer_target_text"',
+              '"raw_prompt"',
+              '"raw_response"',
+              '"optimized_control"',
+              '"evaluator_output"',
+              '"hostname"',
+              '"cache_root"',
+              '"venv_root"',
+              '"work_root"',
+          )
+          safe_dir = Path("artifacts/gcg-qwen-differentiable-compute-contract-v1")
+          for path in safe_dir.rglob("*"):
+              if not path.is_file():
+                  continue
+              text = path.read_text(encoding="utf-8")
+              for token in forbidden:
+                  assert token not in text, (path, token)
+          PY
+
+      - name: Upload safe static-freeze artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gcg-qwen-differentiable-compute-contract-v1-safe
+          path: ${{ env.SAFE_DIR }}
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Commit safe static-freeze record
+        run: |
+          mkdir -p "$(dirname "$RECORD")"
+          cp "$SAFE_RESULT" "$RECORD"
+          git config user.name "github-actions[bot]"
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            "$RECORD" \
+            configs/natural_language_localization/gcg_qwen_differentiable_compute_contract_v1.json \
+            scripts/freeze_gcg_qwen_differentiable_compute_contract.py \
+            scripts/attest_gcg_qwen_self_hosted_runner.py \
+            tests/test_gcg_qwen_differentiable_compute_contract.py \
+            tests/test_gcg_qwen_self_hosted_attestation.py \
+            docs/GCG_QWEN_DIFFERENTIABLE_COMPUTE_CONTRACT_V1.md
+          git rm -r .bootstrap/gcg_qwen_compute_contract
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "Record GCG-Qwen differentiable compute contract"
+          git fetch origin "$TARGET_BRANCH"
+          frozen_inputs=(
+            .github/workflows/gcg_qwen_differentiable_compute_contract.yml
+            .github/workflows/gcg_qwen_self_hosted_attestation.yml
+            configs/natural_language_localization/gcg_qwen_differentiable_compute_contract_v1.json
+            scripts/freeze_gcg_qwen_differentiable_compute_contract.py
+            scripts/attest_gcg_qwen_self_hosted_runner.py
+            tests/test_gcg_qwen_differentiable_compute_contract.py
+            tests/test_gcg_qwen_self_hosted_attestation.py
+          )
+          if ! git diff --quiet \
+            "$GITHUB_SHA" "origin/$TARGET_BRANCH" -- "${frozen_inputs[@]}"; then
+            echo "Frozen compute-contract inputs changed during the run." >&2
+            exit 1
+          fi
+          git rebase "origin/$TARGET_BRANCH"
+          git push origin "HEAD:$TARGET_BRANCH"
