@@ -640,3 +640,23 @@ allowance4–5h (not4–5h additional), approximately3–4h remaining including 
 checks at this point. No scientific rule/call budget/window change. Current
 authorization expires12:14:03.064755UTC. Details and latest status are in the
 [stage5 live record](PA_STAGE5_EXECUTION_RECORD_2026-09-07_V2.md). No later stage.
+
+### 2026-09-07 10:30 UTC - stage5 complete; stop before stage6
+
+JailMeter collection and frozen final verification completed:856 actual
+responses+26 fixed-rule skips, exact882 science rows, additional technical
+UNKNOWN0, controls0. PANEL_STAGE_COMPLETE10:23:50.123059UTC; runner exit0
+observed10:24:57UTC. Independent SAFE journal/resource/final-publication checks
+passed, including37,952 recorded resource samples and two final matching
+6082-file inventories. No scientific outcome join or paper-validity claim.
+
+[Stage5 result](PA_STAGE5_RESULT_2026-09-07_V2.md),
+[execution record](PA_STAGE5_EXECUTION_RECORD_2026-09-07_V2.md), and updated
+[stage-gated plan](PA_STAGE_GATED_CONTINUATION_PLAN_2026-09-07_V1.md).
+Result SHA`f4e1fb565d6354ad5a304d438604c47d978a57c814fd58e613fb69750e1ce5ba`.
+Execution-record SHA`e2cac22b48993c74752b62a38feeda78d726dd19ee41115dd51fcf8486f61a46`.
+Proof identity`192ed167c4bf8bda3324eef756961d1fc8dfac8d1f0dc9817d031f6b157c3cde`.
+Post-run frozen pins passed; owned runtime/port18082 absent at10:25:33UTC,
+free disk~28.51GiB. New axis files~30.25MiB logical size. Original failures
+and DEVELOPMENT status preserved. Total through10:30 closeout~4h24min.
+STOP: stage6 is unstarted/unapproved,30-60min after fresh user direction.

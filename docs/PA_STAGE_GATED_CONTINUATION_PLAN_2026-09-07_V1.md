@@ -1,6 +1,6 @@
 # P/A research: stage-gated continuation plan — 2026-09-07
 
-Status: STAGES 1–4 COMPLETE; STAGE5 AUTHORIZED/RUNNING after fresh user direction.
+Status: STAGES 1-5 COMPLETE; STOP. Stage6 requires fresh user direction.
 No experiment launch is authorized by this document. This is an operational breakdown of the existing original-P/A
 route, not a replacement scientific hypothesis or a revival of failed gates.
 
@@ -24,9 +24,9 @@ The user additionally requires durable automatic recording and the ability to
 continue after interruption. These are mandatory stage-2 acceptance criteria,
 not a claim that the existing failed-continuation runner already supports them.
 Stage 1 is complete; stage 2 was authorized by the user's subsequent "진행".
-That direction covered implementation and synthetic verification only. Stages3
-and4 have since been authorized separately and completed. Stage5 still requires
-its own fresh user direction before JailMeter inference.
+That direction covered implementation and synthetic verification only. Stages3,
+4 and5 have since been authorized separately and completed. Stage6 still requires
+its own fresh user direction before combined scientific table construction.
 
 - Cover target generation, Qwen evaluation and JailMeter evaluation separately.
   Persist the execution identity, request ID, pre-dispatch intent, received
@@ -109,7 +109,7 @@ not promises. Revise them from actual observations at each stage boundary.
 | 2 | COMPLETE: separate frozen continuation, raw archive pins, automatic durable records/recovery, full target/two-judge adapters and explicit downstream acceptance. New tests219pass/1platformskip; old regressions246pass. Frozen actual-data preflight passed; no inference. [Result and limits](PA_STAGE2_RESULT_2026-09-07_V2.md). | Approximately55min actual; allowance was2–4h |
 | 3 | COMPLETE: missing388 generated, retained1082 preserved, full1470 verified; independent SAFE consistency passed. New technical UNKNOWN4science/0controls; full-frame26science/84controls. Both new chunks have matching worker-release records; prior failures preserved. No judges. [Result](PA_STAGE3_RESULT_2026-09-07_V2.md). | About41min actual including final checks/records; initial allowance45–75min |
 | 4 | COMPLETE: Qwen856 actual responses+26 fixed-rule skips, full882 verified; additional parser/output-limit UNKNOWN0, controls0. Independent SAFE/epoch/resource checks passed. Single-axis labels only, no combined scientific conclusion. [Result](PA_STAGE4_RESULT_2026-09-07_V2.md). | About32min actual including checks/records; allowance20–40min |
-| 5 | AUTHORIZED/RUNNING: JailMeter on the same full882 science frame under fixed evaluator/skip rules; preserve all disagreements and unknowns. [Live record](PA_STAGE5_EXECUTION_RECORD_2026-09-07_V2.md). | Initially3–4h; revised4–5h total at07:01UTC from actual timing |
+| 5 | COMPLETE: JailMeter856 actual responses+26 fixed-rule skips; full882 frozen verification and independent SAFE/resource/publication checks passed. Additional technical UNKNOWN0, controls0. No combined scientific conclusion. [Result](PA_STAGE5_RESULT_2026-09-07_V2.md). | Automatic completion4h17min after direction, plus final checks/records; initial3-4h revised4-5h total |
 | 6 | Verify full target/panel/control joins and generate the complete per-P, per-mask, operator/seed tables with both primary and control-qualified interpretations. Publish verification last. | 30–60 min |
 | 7 | Evaluate the strongest P-dependent ordering-reversal claim: shared-order null, same-witness repetition across all six tables, minimum label-change distance, UNKNOWN sensitivity, control confounding and epoch/time confounding. Report positive, negative or unidentified findings. | 1–2 h |
 | 8 | Match those actual findings against the recorded nearest-work matrix, refresh only directly relevant literature as needed, and report whether the original claim merits independent confirmation or needs narrowing/stopping. | 1–2 h |
@@ -129,8 +129,13 @@ work before any conditional independent confirmation. Stage4 is next,20–40min,
 but is not approved by completion of stage3 or by this planning estimate.
 
 After separately authorized stage4 completion, stages5–8 remain approximately
-5.5–9hours of active work. Stage5/JailMeter is next,3–4h, and awaits fresh user
-direction. Current Qwen results do not preauthorize that run or scientific analysis.
+5.5–9hours of active work was the then-current estimate. Stage5 was subsequently
+authorized and completed; this historical estimate did not preauthorize it.
+
+After stage5 completion, stages6-8 remain approximately2.5-5hours of active work,
+excluding user-direction waits and conditional independent confirmation. Stage6
+is next,30-60min, and is unstarted/unapproved. Complete two-axis accounting is
+not a combined scientific result and does not authorize later analysis.
 
 ## Conditional downstream work
 

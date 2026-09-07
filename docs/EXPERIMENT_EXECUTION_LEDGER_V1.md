@@ -3083,3 +3083,41 @@ this is TOTAL, not additional, with roughly3–4h remaining at this point.
 Same single runner and856-call/26-skip frame; no retry, timeout, scientific or
 authorization-window change. Current receipt expires12:14:03.064755UTC. The
 [live record](PA_STAGE5_EXECUTION_RECORD_2026-09-07_V2.md) preserves these caveats.
+
+### 2026-09-07 10:30 UTC - stage5/JailMeter complete and independently checked
+
+The one stage5 runner in session56449 completed under its original stage-only
+authorization, without restart/retry, target regeneration or Qwen re-evaluation.
+First dispatch06:22:58.852604UTC; last receipt10:18:56.745245UTC; owned server55340
+stop10:18:57.451757UTC with recorded cleanup returncode1. The enclosing runner
+exited0 (observed10:24:57UTC), distinct from the worker cleanup code.
+PANEL_STAGE_COMPLETE timestamp10:23:50.123059UTC. Automatic completion followed
+the06:06:25 direction by4h17min25sec; through10:30 independent checks/records,
+approximately4h24min total, within the revised4-5h total allowance.
+
+Exact accounting:882science=856actual responses+26 TARGET_INELIGIBLE skips;
+additional parser/output-limit UNKNOWN0; final unissued/ambiguity/repair0;
+controls judged0. All37,952 recorded resource samples passed applicable gates.
+Final proof/row/epoch/event bindings and two6082-file inventories passed an
+independent SAFE-only audit. Raw replay belongs to the frozen runner, not that
+independent audit. Single-axis binary labels0:503/1:353 are not scientific joins.
+
+Proof identity`192ed167c4bf8bda3324eef756961d1fc8dfac8d1f0dc9817d031f6b157c3cde`;
+exact-file SHA`2dd41a5993e1d8a38ee4f5e0e44c43299b222e87a785292925361cacd156c73e`.
+Rows digest`e7a1dbacd51de90128c4a048a270443e38bc8251ebe9e1301f2af796745373cf`;
+final SAFE inventory`82cc76a86a6e636ac8d1d74f953ad374e4b146b03849de705be96950abca59ed`.
+
+Post-run verify-freeze passed with0 model calls. Owned processes/port18082
+absent at10:25:33UTC; GPU372MiB/36C; disk free30,613,950,464bytes (~28.51GiB).
+New axis logical size31,720,313bytes (~30.25MiB), measured by metadata only.
+No cleanup, OS/settings change, private-content duplication, sealed access,
+new target/judge model, paidAPI, manuscript/PDF, commit or push was performed
+by this workflow. Both prior operating failures and missing historical
+relocation-receipt limitation remain disclosed. Scientific/paper gates unevaluated.
+
+[Stage5 result](PA_STAGE5_RESULT_2026-09-07_V2.md),
+SHA`f4e1fb565d6354ad5a304d438604c47d978a57c814fd58e613fb69750e1ce5ba`;
+[execution record](PA_STAGE5_EXECUTION_RECORD_2026-09-07_V2.md),
+SHA`e2cac22b48993c74752b62a38feeda78d726dd19ee41115dd51fcf8486f61a46`.
+STOP. Stage6 full target/panel/control joins is unstarted/unapproved;
+provisional30-60min after fresh direction. Do not automatically advance.

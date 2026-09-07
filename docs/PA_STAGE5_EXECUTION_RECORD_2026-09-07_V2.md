@@ -1,8 +1,10 @@
 # Stage 5 JailMeter execution record — 2026-09-07
 
-Status: RUNNING; one frozen JailMeter-only runner. Initial allowance3–4h,
-revised to approximately4–5h total at07:01UTC from actual throughput. Later
-stages are not authorized or started. Append actual observations/failures below.
+Status: STAGE5 COMPLETE; runner exit0, full882 final verification and independent
+SAFE/resource/publication checks passed. STOP: stage6 is not authorized or started.
+Initial allowance3-4h, revised4-5h total; automatic completion10:23:50.123059UTC.
+See [final result](PA_STAGE5_RESULT_2026-09-07_V2.md). Prior observations below
+are retained as historical progress, not retroactively rewritten outcomes.
 
 <a id="user-direction-2026-09-07-0606-utc"></a>
 
@@ -208,3 +210,200 @@ segment, not changed model settings, skipped work or scientific rules.
 At07:42:07UTC monitor:291responses+26skips, unknown_count26, ambiguous0,
 repair0. Stage5 continues under the same authorization. The user's status/time
 question did not authorize a later stage or stop the current execution.
+
+## Refreshed remaining-time estimate - 07:57 UTC / 16:57 KST
+
+Fresh SAFE timing at07:57:16UTC covered361 actual completions, last receipt
+07:57:11.884587UTC. Prefix mean15.65936837sec/call; recent50 mean12.90472436:
+remaining495-call projections129.19min and106.46min, excluding final checks.
+Root reported approximately2h to2h30 ADDITIONAL including final verification
+and records, roughly19:00-19:30KST, as an estimate of stage5 only, not paper
+completion. Response length and cooling variability remain; no execution
+window, scientific setting, or stage authorization was changed.
+At07:57:14UTC monitor:361responses+26skips, unknown_count26, ambiguous0,
+repair0, disk free27,129,778,176bytes. Runner session56449 remained active.
+
+## Four-hundred-response milestone - 08:10 UTC
+
+At08:10:15UTC401 actual responses plus26 fixed-rule skips were observed,
+unknown_count26 and no reported ambiguity or repair. Free disk~25.11GiB.
+SAFE timing at08:10:32UTC:401 completions, prefix16.04920046sec/call,
+recent50 mean18.1508478sec/call; remaining455-call projections121.71min
+and137.64min before final checks. Recent throughput slowed again, illustrating
+why the prior live ETA is not a deadline guarantee. No scientific rule changed.
+
+The user asked what a good outcome of this stage would mean. Root distinguished
+operationally complete two-axis evaluation from support for the scientific
+hypothesis. Stages6-8 remain separately authorized: full joins, robustness of
+P-dependent ordering reversal including controls/UNKNOWNs/epochs, then nearest-
+work comparison (combined allowance2.5-5h). A positive development result would
+motivate independently preregistered confirmation, not establish paper validity
+or acceptance. No downstream analysis or sealed-data access was initiated.
+
+## Mid-run independent SAFE prefix audit
+
+The independent auditor checked the first400 completed JailMeter chains in
+planned order (science ordinals1 through670, excluding intervening controls
+and skips) plus all26 deterministic TARGET_INELIGIBLE skips. The full882
+science-ID digest matched the supplied frozen anchor. Selected sets were unique
+and disjoint; intent/completion/skip seals, row hashes, scientific bindings,
+target-proof joins, authorization, epoch1/serverPID55340/command identity,
+recorded token envelopes, timestamp order and admission metadata passed.
+Two reads of the selected1228 SAFE files and request-directory memberships
+matched. The400th audited response was received08:09:51.951607UTC.
+
+400-request ordered-ID digest:
+`d48cf748bd8f7c455b6e131a05cb3c47faea8ec2a2248dcc0d85bd120058b5dd`.
+Selected SAFE inventory digest:
+`5b06834cbda155263210478881ebdda5221a47328c386de5f988d5e3fe546c7e`.
+
+This was not final-axis certification or whole-tree quiescence: the run remained
+active, later responses were outside the audit, and neither private request
+bodies/raw parsing nor continuous resource samples were independently replayed.
+The auditor made no writes, model calls, process actions, or outcome joins.
+
+At08:17:28UTC an independent resource snapshot recorded disk free26,702,376,960
+bytes, direct WMI pagefileallocated53,495MiB/currentusage12,474MiB. Resource
+guards were not changed and no deletion or OS reconfiguration occurred.
+
+## Report discussion and resumed progress reporting - 08:48 UTC
+
+The user supplied an external research-readiness report and requested comparison
+with existing records only. Root switched from continuous conversational progress
+updates to that read-only review. The original stage5 runner and its automatic
+journal were not stopped or restarted. Intervening SAFE checks observed441
+responses at08:24:00UTC,492 at08:40:28UTC and514 at08:46:37UTC; each retained26
+skips, unknown_count26, ambiguity0 and repair0. At08:40:29UTC the scoped process
+snapshot still showedPython27600 and server55340, with port18082 owned by55340.
+
+The report's historical numerical claims and scientific limitations matched the
+existing records, including69/70 in-sample common-order fit/one-cell fragility,
+LOCA overlap, finite-unit/coarsening limitations, selective-panel qualification
+and disagreement, and development rather than independent-confirmation status.
+Seven directly compared scientific/plan/result documents had no working-copy
+diff from the report's actual reference commitabfedd6 (2026-09-07T16:52:05+09:00).
+No raw responses were relabeled, no new experiment/analysis stage was launched,
+and no scientific configuration or sealed-data boundary changed during review.
+
+At08:48:21UTC the user's new direction was to resume the previous style of
+continuing progress reports. This authorizes monitoring of the existing stage5,
+not a new runner, a new execution window or stage6. Root reaffirmed completion
+verification/records and a stop at the stage5 boundary. Session56449 was active.
+
+SAFE timing at08:48:57UTC covered522 responses; latest receipt08:48:49.431874UTC,
+prefix16.76356182sec/call and recent50 mean17.84671074sec/call. Remaining334-call
+projections were93.32min and99.35min before final checks. Root reported roughly
+1h45-2h ADDITIONAL including verification/records, with response/cooling variability.
+At08:48:22UTC monitor:520responses+26skips, unknown_count26, ambiguity0, repair0,
+free disk~24.59GiB. The existing authorization still expires12:14:03.064755UTC.
+
+## Six-hundred-response milestone - 09:12 UTC / 18:12 KST
+
+Monitor at09:12:10UTC observed602 completed responses plus26 fixed-rule skips,
+unknown_count26 and no reported ambiguity, repair, or interruption. A SAFE-only
+timing sample at09:12:29UTC covered603 completions: latest receipt
+09:12:21.601465UTC; prefix16.85364654sec/call, recent50 mean17.19847158sec/call.
+Remaining253-call projections were71.07min and72.52min before final verification
+and records. This is a variable-time planning estimate, not a completion claim,
+new admission window, or authorization for later-stage scientific analysis.
+
+At09:12:29UTC direct resource snapshot: disk free25,741,889,536bytes (~23.97GiB),
+WMI pagefileallocated54,327MiB/currentusage11,465MiB. The existing runner remained
+active. No restart, cleanup, scientific-rule change or extra model call was
+introduced by monitoring.
+
+## Bounded resource follow-up - 09:22-09:25 UTC
+
+Following a decrease in free disk, root took a scoped snapshot at09:22:34UTC:
+disk free25,051,738,112bytes; WMI pagefileallocated55,031MiB/current12,587MiB;
+Python27600 private2,020,139,008bytes/working-set226,459,648bytes; server55340
+private13,050,695,680bytes/working-set5,368,049,664bytes. Server private commit
+was higher than the06:31 snapshot. Recent diagnostic commit~93.01%, headroom
+~5.97GiB and availableRAM~3.55GiB are point observations, not new admission gates.
+
+An independent resource-only auditor took two bounded snapshots at09:23:58-
+09:24:01UTC and09:25:17UTC, without touching runtime state or private evidence:
+
+- disk free24,908,083,200 ->24,907,538,432bytes (~23.20GiB);
+- pagefileallocated55,159MiB unchanged; currentusage13,697 ->13,625MiB;
+- system commit85,683,724,288 ->85,151,817,728bytes against limit91,893,088,256;
+- commit~93.24% ->92.66%, final headroom~6.28GiB;
+- availableRAM4,865 ->5,207MiB;
+- server private12,975,063,040 ->13,077,360,640bytes; Python private +~0.91MiB.
+
+No immediate frozen disk-floor violation was observed. Short-window system
+commit fell while server private commit rose; neither a monotone memory leak
+nor future stability is established. SAFE launch metadata did not expose cache/
+slot command arguments, so no cache-allocation cause was claimed. The fixed
+guards remain active; no restart, deletion, settings change, additional model
+call, or new scientific rule was introduced. At09:25:43UTC the live monitor
+observed644responses+26skips, unknown_count26, no reported ambiguity or repair.
+
+## Seven-hundred-response milestone - 09:44 UTC / 18:44 KST
+
+At09:44:13UTC monitor observed701responses+26skips, unknown_count26, no reported
+ambiguity or repair, free disk~22.81GiB. The most recent diagnostic sample
+(09:43:55UTC) showed commit~93.63%, headroom~5.48GiB, availableRAM~4.48GiB.
+These remain diagnostic observations rather than additional admission rules.
+
+SAFE timing at09:44:33UTC covered702 responses, latest receipt09:44:22.776749UTC:
+prefix17.21356716sec/call and recent50 mean19.50432938sec/call. Remaining154-call
+projections were44.18min and50.06min before final verification/records. Root
+reported approximately1h-1h15 ADDITIONAL including those final checks, explicitly
+noting the slower recent segment and variable timing. No execution window,
+configuration, scientific rule, or stage authority was changed.
+
+## Eight-hundred-response milestone - 10:08 UTC / 19:08 KST
+
+Monitor at10:08:04UTC observed802responses+26skips, unknown_count26, no reported
+ambiguity or repair, free disk~22.69GiB. SAFE timing at10:08:24UTC covered803
+responses, latest receipt10:08:11.488191UTC: prefix16.82769064sec/call and
+recent50 mean11.83048986sec/call. Remaining53-call projections were14.86min
+and10.45min before final checks. The recent segment was faster without any
+setting or scientific-rule change. Root estimated10-15min collection and25-40min
+ADDITIONAL through final verification, independent SAFE checks and records,
+with timing variability and no completion claim based solely on response count.
+
+## Full response collection; final verification pending - 10:19 UTC
+
+At10:19:09UTC the SAFE monitor observed856 complete response chains,856 intents,
+26 fixed-rule skips and0 pending request-publication files. The last progress
+event at10:18:56.815243UTC accounted for all882 records: unissued0, ambiguous0,
+repair_required0, unknown_count26 (no additional judge UNKNOWN beyond skips).
+The final axis proof was not yet present and session56449 remained active.
+
+Root explicitly reported collection completion, not final stage completion.
+The existing frozen runner is performing its final verification. An independent
+SAFE-only full-axis audit was assigned in parallel, extending the earlier400-
+chain check to the entire frame, epoch/resource closure and eventual proof.
+No fresh evaluator/target call or stage6 scientific join was started.
+
+## Final verification and closeout
+
+PANEL_STAGE_COMPLETE was published10:23:50.123059UTC; root observed session56449
+exit0 at10:24:57UTC. Proof identity
+`192ed167c4bf8bda3324eef756961d1fc8dfac8d1f0dc9817d031f6b157c3cde`, exact-file
+SHA`2dd41a5993e1d8a38ee4f5e0e44c43299b222e87a785292925361cacd156c73e`,
+1,398,293bytes. All882 science rows were retained:856dispatches+26skips,
+controls0, additional parser/output-limit UNKNOWN0. The original failures,
+missing historical relocation-receipt limitation and false scientific/paper
+validity flags remain disclosed.
+
+Independent full journal/epoch/resource checks and final publication checks
+passed. All37,952 recorded samples passed their applicable gates; full882 ID
+and row bindings matched, with one owned epoch and no missing-stop/additional
+attempt. All6080 pre-publication SAFE files stayed unchanged; only proof and
+completion event were added. Two final6082-file/18,342,382-byte inventories
+matched with digest82cc76a86a6e636ac8d1d74f953ad374e4b146b03849de705be96950abca59ed.
+The independent auditor did not read private/history data or perform inference.
+
+Post-run verify-freeze passed with0 model calls. At10:25:33UTC ownedPython27600
+and server55340 were absent, port18082 had no listener, disk free~28.51GiB;
+GPU372MiB/36C. Direct pagefileallocated49,668MiB/current9,633MiB. Exact axis
+metadata sizes at10:26:52UTC totaled31,720,313logical bytes (~30.25MiB), not
+physical allocation. No cleanup or settings change was performed.
+
+Actual scientific interpretation remains deferred: no cross-judge outcome join,
+control-qualified topology, robustness or independent confirmation was run.
+See [stage5 result and full limits](PA_STAGE5_RESULT_2026-09-07_V2.md).
+STOP. Stage6 requires fresh direction and has a provisional30-60min allowance.
