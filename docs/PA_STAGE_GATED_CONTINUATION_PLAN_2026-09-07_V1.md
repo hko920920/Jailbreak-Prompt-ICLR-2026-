@@ -1,6 +1,12 @@
 # P/A research: stage-gated continuation plan — 2026-09-07
 
-Status: STAGES 1-5 COMPLETE; STOP. Stage6 requires fresh user direction.
+Status: STAGES 1-8 COMPLETE. Strong repeated C3 is unsupported; Stage8 recommends
+conditional continuation only to a bounded original-P/A inference-validity
+feasibility DESIGN, not a validated method/paper or automatic topic pivot.
+STOP: Stage9 is unapproved. See [Stage8 decision](PA_STAGE8_CONTRIBUTION_DECISION_2026-09-07_V2.md)
+and [execution record](PA_STAGE8_EXECUTION_RECORD_2026-09-07_V2.md).
+See [Stage7 result](PA_STAGE7_RESULT_2026-09-07_V2.md) and
+[execution record](PA_STAGE7_EXECUTION_RECORD_2026-09-07_V2.md).
 No experiment launch is authorized by this document. This is an operational breakdown of the existing original-P/A
 route, not a replacement scientific hypothesis or a revival of failed gates.
 
@@ -25,8 +31,8 @@ continue after interruption. These are mandatory stage-2 acceptance criteria,
 not a claim that the existing failed-continuation runner already supports them.
 Stage 1 is complete; stage 2 was authorized by the user's subsequent "진행".
 That direction covered implementation and synthetic verification only. Stages3,
-4 and5 have since been authorized separately and completed. Stage6 still requires
-its own fresh user direction before combined scientific table construction.
+4,5,6,7 and8 have since been authorized separately and completed. Stage9 and
+any new experiment remain unapproved.
 
 - Cover target generation, Qwen evaluation and JailMeter evaluation separately.
   Persist the execution identity, request ID, pre-dispatch intent, received
@@ -110,9 +116,9 @@ not promises. Revise them from actual observations at each stage boundary.
 | 3 | COMPLETE: missing388 generated, retained1082 preserved, full1470 verified; independent SAFE consistency passed. New technical UNKNOWN4science/0controls; full-frame26science/84controls. Both new chunks have matching worker-release records; prior failures preserved. No judges. [Result](PA_STAGE3_RESULT_2026-09-07_V2.md). | About41min actual including final checks/records; initial allowance45–75min |
 | 4 | COMPLETE: Qwen856 actual responses+26 fixed-rule skips, full882 verified; additional parser/output-limit UNKNOWN0, controls0. Independent SAFE/epoch/resource checks passed. Single-axis labels only, no combined scientific conclusion. [Result](PA_STAGE4_RESULT_2026-09-07_V2.md). | About32min actual including checks/records; allowance20–40min |
 | 5 | COMPLETE: JailMeter856 actual responses+26 fixed-rule skips; full882 frozen verification and independent SAFE/resource/publication checks passed. Additional technical UNKNOWN0, controls0. No combined scientific conclusion. [Result](PA_STAGE5_RESULT_2026-09-07_V2.md). | Automatic completion4h17min after direction, plus final checks/records; initial3-4h revised4-5h total |
-| 6 | Verify full target/panel/control joins and generate the complete per-P, per-mask, operator/seed tables with both primary and control-qualified interpretations. Publish verification last. | 30–60 min |
-| 7 | Evaluate the strongest P-dependent ordering-reversal claim: shared-order null, same-witness repetition across all six tables, minimum label-change distance, UNKNOWN sensitivity, control confounding and epoch/time confounding. Report positive, negative or unidentified findings. | 1–2 h |
-| 8 | Match those actual findings against the recorded nearest-work matrix, refresh only directly relevant literature as needed, and report whether the original claim merits independent confirmation or needs narrowing/stopping. | 1–2 h |
+| 6 | COMPLETE: full1470 target/both882-axis replay; complete measurement/control tables; independent SAFE publication and measurement reconstruction passed. All21 development P have robust recovery; primary20 certified minimum sets across16 P, with disclosed control/UNKNOWN limitations. No Stage7 claim test. [Result](PA_STAGE6_RESULT_2026-09-07_V2.md). | About26min through independent audits plus final documentation; automatic runtime13min27sec; initial30–60min |
+| 7 | COMPLETE: primary d2/eight crossovers, but same-oriented all-six witnesses0 in ordinary and qualified frames; both uniform tables d0 with UNKNOWNs. Strong repeated C3 unsupported. All15 numeric matrices independently matched; judge/control/epoch/length limits disclosed. Existing six deletion orders reach all20 certified minima. [Result](PA_STAGE7_RESULT_2026-09-07_V2.md). | About38min through scientific/audit checks plus final records; core13min31sec; allowance1–2h |
+| 8 | COMPLETE: existing/updated primary literature and independent whole-frame SAFE checks found no stable alternate interaction headline. Generic PAC/minimality/measurement claims collide with prior work. Conditional GO only to feasibility design for out-of-sample strict-minimal repair validity; original C3 not revived, no paper guarantee or automatic privacy pivot. [Decision](PA_STAGE8_CONTRIBUTION_DECISION_2026-09-07_V2.md). | About22min through evidence/reviews plus final records; allowance1–2h |
 
 The original stages 1–8 allowance was roughly 8.5–15 hours; after stage-1
 findings, the remaining stages 2–8 allowance is roughly 8.5–15 hours of active work;
@@ -132,10 +138,32 @@ After separately authorized stage4 completion, stages5–8 remain approximately
 5.5–9hours of active work was the then-current estimate. Stage5 was subsequently
 authorized and completed; this historical estimate did not preauthorize it.
 
-After stage5 completion, stages6-8 remain approximately2.5-5hours of active work,
-excluding user-direction waits and conditional independent confirmation. Stage6
-is next,30-60min, and is unstarted/unapproved. Complete two-axis accounting is
-not a combined scientific result and does not authorize later analysis.
+After stage5 completion, stages6-8 were estimated at2.5-5hours of active work,
+excluding user-direction waits and conditional independent confirmation. This
+historical estimate did not authorize Stage6, which was subsequently directed
+and completed separately.
+
+After Stage6 completion, stages7-8 were estimated at2-4hours of active work.
+That estimate did not authorize Stage7; it was subsequently directed and
+completed separately. Complete measurement tables, recovery or minimum-set
+counts did not preempt the core C3/ordering analysis or authorize confirmation.
+
+After Stage7 completion, Stage8 was estimated at1–2hours of active work after
+fresh direction; it was then separately directed and completed. The strong
+repeated-ordering claim was not established, and six-order
+baseline union reaches all20 certified minima. Judge/UNKNOWN/time/tokenization
+limitations are not resolved into a causal rescue explanation. Stage8 must assess
+the remaining actual contribution before proposing any prospective confirmation;
+neither an automatic topic pivot nor more model calls are authorized here.
+
+After Stage8 completion, next is ONE bounded Stage9 prospective feasibility
+design,2–4hours after fresh direction. Its proposed primary question is whether
+selected strict-minimal P-preserving repair explanations remain valid on fresh
+measurements, separating finite-sample noise, missing control evidence and
+unidentified judge error. Direct same-estimand simultaneous-confidence/exact-table
+and simple recheck baselines are mandatory for a method claim. A pilot allowance
+of6–12hours is provisional, not an approved call budget or promised positive
+result. No main-study or paper-completion date is established by this assessment.
 
 ## Conditional downstream work
 

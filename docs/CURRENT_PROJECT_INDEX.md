@@ -660,3 +660,112 @@ Post-run frozen pins passed; owned runtime/port18082 absent at10:25:33UTC,
 free disk~28.51GiB. New axis files~30.25MiB logical size. Original failures
 and DEVELOPMENT status preserved. Total through10:30 closeout~4h24min.
 STOP: stage6 is unstarted/unapproved,30-60min after fresh user direction.
+
+### 2026-09-07 11:07 UTC — Stage6 complete; stop before Stage7
+
+The user's "진행 다음 하나" separately authorized Stage6 only. The frozen
+measurements-only finalizer completed11:00:11.147756UTC; runner exit0 observed
+11:00:13UTC. All1470 targets and both882 evaluator frames were reverified.
+Independent SAFE publication and separately implemented measurement checks
+passed; no Stage7 analysis or model inference was performed.
+
+All21 selected DEVELOPMENT P have six-slice robust recovery for at least one
+mask. Primary table168cells:60recovered/89not-recovered/9abstained/10truncated,
+including21 reused baseline cells. Primary minimum-set certification20sets
+across16 P. These are observed measurements, not the shared-order/C3 claim.
+Masks3 and7 recover for every P; a common sufficient intervention exists.
+
+Panel428SAFE/348HARMFUL/106ABSTAIN. Control content504/588 versus210/588
+whole-answer diagnostic; all84 noncertifying controls belong to mask2.
+Qualified nonempty science cells424recovered/246not-recovered/212unknown.
+All21 P retain qualified unknowns;10 fully identified PRIMARY tables do not
+mean10 fully control-qualified tables. Prior failures/DEVELOPMENT limits remain.
+
+[Stage6 result](PA_STAGE6_RESULT_2026-09-07_V2.md),
+SHA`3ffc8cdd6d595cc59f449d686632e73166c0ee1a6a95036493f7ce007b6f8e82`;
+[execution record](PA_STAGE6_EXECUTION_RECORD_2026-09-07_V2.md),
+SHA`37177c9baa30248bc05190497f8da64f285c15c5a7f449a9ac825de555644ab1`;
+[stage-gated plan](PA_STAGE_GATED_CONTINUATION_PLAN_2026-09-07_V1.md).
+Result identity`75b89efa187c4e6b3419df914c0a94707c94abf6668edc3571b1ceac08077020`;
+verification`86d7251b86943ff8bc62e2b19de5d8ebb4d13610a8a6afb786f90de6f9279d07`.
+Automatic runtime13min27sec; through audit/document closeout about27min.
+Publication~1.91MiB, completion free disk~28.59GiB. No current experiment runtime.
+STOP: Stage7 is unstarted/unapproved,1–2hours only after fresh direction.
+
+### 2026-09-07 11:52 UTC — Stage7 complete; strongest repeated C3 unsupported
+
+The user separately authorized Stage7 at11:09:55UTC. Frozen analysis completed
+11:29:55UTC, exit0; all15 SAFE numerical matrices were independently reconstructed
+and matched. Final metadata, baseline, source/publication and document checks
+passed. These engineering checks are not scientific positive gates.
+
+Primary149 known/19 UNKNOWN: common-order distance2 and8 strict crossovers,
+all mask1 versus5. Ordinary and qualified slice distances0/0/3/0/1/1; same-oriented
+all-six witnesses0 in both frames. Uniform tables d0 with45/59 UNKNOWNs, not proof
+of a scalar mechanism. Strong repeated P-dependent reversal is NOT SUPPORTED.
+The two primary lex-optimal error cells have4R/1N/1ABSTAIN and5R/1N; no labels
+were changed or deemed erroneous. The unfavorable finding is not a code failure.
+
+Recovery persists in all21 selected DEVELOPMENT P;20 primary-certified minima
+span16 P. However, the existing six deletion orders together reach20/20, so
+fixed-path misses do not establish a unique exhaustive-search advantage.
+Judge/control UNKNOWNs, mask/time/restart association and token-length changes
+remain limitations, not demonstrated causal explanations. Restricted14-P null
+distance was not recomputed; empty witness restriction is not robustness proof.
+
+Authority: [Stage7 result](PA_STAGE7_RESULT_2026-09-07_V2.md),
+SHA`092e0f06f97740aaea110941129f8e17c386c271f9e467ab6137950c895d4f8f`;
+[execution record](PA_STAGE7_EXECUTION_RECORD_2026-09-07_V2.md),
+SHA`0d259eb1374de7065db75db0a0e889be9aac4723e1b6eb639daea33fdb5c2a6d`;
+[stage-gated plan](PA_STAGE_GATED_CONTINUATION_PLAN_2026-09-07_V1.md).
+Core analysis identity`c99308269def9766328d6020129ba87f03abdd640fc7359fe5dd0d575ba2c9bf`;
+independent numeric report`e84e530b2ba3d83769e82d9b987562af408f9e3f3f922e7ef062be28bb30f3d7`.
+
+Core runtime13min31sec; about42min through records, within1–2h allowance.
+Final focused tests188pass/1 Windows privilege skip, prelaunch frozen110pass,
+Ruff/frozen pins passed; Stage6 products/documents unchanged. New SAFE products
+and runtime~8.42MiB, disk~28.48GiB. No current model process/experiment, new calls,
+sealed access, cleanup, manuscript/PDF, commit or push. Prior failures preserved.
+STOP: Stage8 remains unstarted/unapproved;1–2h evidence/nearest-work assessment
+only after fresh direction, not an automatic topic pivot or confirmation run.
+
+### 2026-09-07 11:55 UTC — Stage8 separately directed; evidence/nearest-work assessment running
+
+The user's new continuation request authorizes the next Stage8 assessment only.
+[Stage8 live record](PA_STAGE8_EXECUTION_RECORD_2026-09-07_V2.md) fixes the1–2h
+allowance and read-only scientific boundary. Original P/A remains first priority;
+existing SAFE results, prior rescue records and directly relevant primary
+literature are being compared. No new inference, raw/sealed access, changed C3,
+manuscript, topic execution or Stage9 is authorized. Stage7 remains completed
+with its negative repeated-C3 result and unchanged anchored documents.
+
+### 2026-09-07 12:18 UTC — Stage8 complete; design-only conditional continuation
+
+Original P/A remains preferred. The strongest repeated C3 is not revived, and
+whole-frame posthoc checks found no stable nested-removal or UNKNOWN-robust
+same-direction frequency reversal in both operators. Exact minimum cardinality2
+counts are primary7/ordinary-uniform1/qualified-uniform0; these are different
+estimands, not seven disproven mechanisms. Mask2 control censoring remains real.
+
+Primary literature directly occupies generic minimality, nonmonotonicity, repeat
+measurement, PAC deletion, family-wide bounds and judge disagreement. Conditional
+GO is ONLY to feasibility design for out-of-sample validity of selected strict-
+minimal P-preserving repair explanations, separating sampling, missing data and
+unidentified judge error. No false-certification rate, correction advantage or
+independent ICLR-main novelty is established. Privacy pruning is a recorded
+fallback with already acknowledged heuristic limitations, not an automatic pivot.
+
+[Stage8 decision](PA_STAGE8_CONTRIBUTION_DECISION_2026-09-07_V2.md),
+SHA`5277293c32472d5938620f685d8af89098098ef38de6df7797408435789a3cd1`;
+[execution record](PA_STAGE8_EXECUTION_RECORD_2026-09-07_V2.md),
+SHA`aea7d74537f533a2f3c11e12c1d6c946a06557b8068c2b1fcfeeda8d56f88d47`.
+Independent math/evidence and contribution reviews completed; root independently
+matched all descriptive counts. Final frozen pins and both Stage7 document hashes
+unchanged; local-link/UTF8/whitespace checks passed. About23min through closeout.
+No new model calls, raw/sealed reads, code changes, manuscript, cleanup or push;
+no Python/llama process observed at12:18UTC, disk30,557,954,048B (~28.46GiB).
+
+STOP before Stage9. Next requires fresh direction: ONE2–4h protocol/feasibility
+decision with mandatory simple same-estimand confidence/exact-table and recheck
+baselines, explicit reference/controls and actual call ceiling. A later6–12h
+pilot remains provisional/unapproved; no paper-completion guarantee.

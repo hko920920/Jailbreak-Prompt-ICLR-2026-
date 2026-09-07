@@ -3121,3 +3121,221 @@ SHA`f4e1fb565d6354ad5a304d438604c47d978a57c814fd58e613fb69750e1ce5ba`;
 SHA`e2cac22b48993c74752b62a38feeda78d726dd19ee41115dd51fcf8486f61a46`.
 STOP. Stage6 full target/panel/control joins is unstarted/unapproved;
 provisional30-60min after fresh direction. Do not automatically advance.
+
+### 2026-09-07 11:07 UTC — Stage6 measurement join completed and independently checked
+
+User direction "진행 다음 하나" first clocked10:40:00UTC authorized Stage6,
+not inference or Stage7. One non-frozen logging wrapper invoked the unchanged
+frozen finalizer with `run_analysis=False`. Wrapper SHA
+`d6835f0d01bd3fc6cd423bc9c679ffa1d70f88d65598ec5900e0d96adf1c0947`.
+Prelaunch frozen regression87tests and final wrapper6tests passed; Ruff clean.
+Independent review corrected two logging/publication hardening gaps before the
+real-data run. No frozen science source, test, protocol or pin was modified.
+
+Direction identity`e8fd8c1d3053a1d6bd1fee4e26884b134d43e9086b49af224303c73c756f1630`;
+unchanged window10:46:44.338000–12:46:44.338000UTC. Session4200/PID43464,
+single attempt`bea824ebff494fd7af6deb9d743ecc65`, started10:46:44.341001UTC.
+Context verified10:51:56.186224UTC; Stage6 complete11:00:11.147756UTC,
+elapsed806.812sec. Runner exit0 and PID absence observed11:00:13UTC.
+Five automatic events; no interruption, retry or subsequent analysis invocation.
+
+Full1470 target and two882-row evaluator replays passed. Measurement products
+contain882 science/588control observations,168primary cells,1008ordinary and
+1008qualified slices,294control groups,21families,126reused screen references.
+Independent SAFE reconstruction matched every measurement-derived row/group/
+family without production measurement functions, and matched independently
+reconstructed panel428SAFE/348HARMFUL/106ABSTAIN.
+
+Primary60RECOVERED/89NOT_RECOVERED/9ABSTAINED/10TRUNCATED includes21 baseline
+NOT_RECOVERED cells. All21 DEVELOPMENT P have at least one six-slice recovered
+mask;20primary-certified minimum sets span16 P. Masks3/7 recover universally
+in this selected frame, so minimum-set diversity is not proof against a shared
+ordering/threshold explanation. Stage7 remains unevaluated.
+
+Control content504/588, diagnostic exact whole answer210/588. All84 noncertifying
+controls occur atmask2 and retain cap/truncation failure. Qualified nonempty
+science424recovered/246not-recovered/212unknown; no UNKNOWN imputation or cap
+change. All21 P have qualified unknowns, despite10 fully identified primary
+tables. These are selected development measurements, not independent confirmation.
+
+Independent publication audit verified exact product/seal/direction/event and
+pinned upstream proof bindings, two stable inventories and no pending/Stage7
+artifacts. Measurement/result/verification raw file hashes respectively:
+`b9ce483fbb633d5bd533190f1d7b2324c45caedd16ed3e83f69d324fbdb41ac1`,
+`b427c21a70700d7ad0995df48b7d79a378e374d629ff8f1b0716c204b747eda3`,
+`c4f91f03091b5a9675de8594e275a92ee786c5fec41cb875a2d7ecf68086cf1f`.
+Verification identity`86d7251b86943ff8bc62e2b19de5d8ebb4d13610a8a6afb786f90de6f9279d07`.
+Publication4files/2,006,524logical bytes including lock; runtime7files/3,829bytes.
+Completion free disk30,694,268,928bytes (~28.59GiB); no cleanup/settings change.
+
+Auditors read SAFE/source only, not private responses or human labels. The
+frozen entrypoint performed the approved NEW raw replay, excluding historical
+D3/C1N raw and sealed60/60. No new model calls/raw-copy logs, manuscript/PDF,
+commit or push. Both previous operation failures and missing contemporaneous
+relocation receipt limitation remain. No original PASS or paper validity claim.
+
+[Stage6 result](PA_STAGE6_RESULT_2026-09-07_V2.md),
+SHA`3ffc8cdd6d595cc59f449d686632e73166c0ee1a6a95036493f7ce007b6f8e82`;
+[execution record](PA_STAGE6_EXECUTION_RECORD_2026-09-07_V2.md),
+SHA`37177c9baa30248bc05190497f8da64f285c15c5a7f449a9ac825de555644ab1`.
+Through audit/doc closeout about27min versus initial30–60min allowance.
+STOP before Stage7 (unapproved/unstarted), provisional1–2hours after direction.
+
+### 2026-09-07 11:52 UTC — Stage7 frozen hypothesis analysis and independent audits completed
+
+User's explicit Stage7 direction first clocked11:09:55UTC authorized analysis,
+not favorable-result selection, new inference, sealed P or Stage8. One new
+non-frozen logging wrapper invoked unchanged `finalize(run_analysis=True)`.
+Wrapper SHA`4ebb22e1055a69e0c5b441a28ed36cb52a4910ba3f0a6b585c6b4418fd32b1f9`;
+direction`0b8d4267de2b18e289c570903c0233559ba4ee5ad7bc855e2acf56bccbdf6d70`,
+window11:16:24.169351–13:16:24.169351UTC, no extension. Single session30090/PID9236,
+attempt`dbdad86aeecb481c86e0c06dde7eb652`; launch11:16:24.172352UTC,
+context11:21:29.056450UTC, core completion11:29:55.212819UTC,811.047sec.
+Exit0/PID absence observed11:29:59UTC. Six durable SAFE events; no core retry.
+
+Core primary149known/19UNKNOWN, exact common-order d2,8 strict crossovers
+among3771 fully observed comparisons, all masks1/5 with shared cells. Ordinary
+and qualified slice d0/0/3/0/1/1; same-oriented all-six intersection0/0. Both
+uniform tables d0 with45/59UNKNOWNs. Leading repeated C3 is unsupported on this
+DEVELOPMENT frame. Positive aggregate d is not statistical rejection; uniform
+d0 is not proof the full process is scalar. No thresholds/labels/P were changed.
+
+All21P still have robust recovery,20primary-certified minima across16P. Existing
+six fixed deletion orders reach20/20 certified minima and7unresolved candidates:
+504uncached/143cached table lookups, not a matched-inference-budget experiment
+or complete minimality certificate from those143cells alone. Independent set-
+inclusion/permutation reconstruction matched. No unique exhaustive-search gain
+over that baseline union was observed. Constant mask3 repair remains sufficient.
+
+Separate SAFE metadata audit reconstructs1470target rows/59realized groups;
+independent regrouping/source pins matched. Time/restarts associate with masks5–7;
+BLANK preserves characters/P-position but not tokens. These do not prove or
+resolve causal confounding. Failed-screen-dependent selected7P remain primary;
+restricted14-P d was not computed, and restricting empty witness lists proves
+no additional robustness. Judge/control limits and original failed gates remain.
+
+Diagnostic first actual invocation failed prepublication because control tasks
+were wrongly required to carry P offsets. New module corrected controls only;
+science remains strict,17tests passed, retry exit0. Error/source provenance is
+embedded; no core/source-data/scientific-rule changes. A separate unsupported
+freeze-check `--action` argument was rejected by argparse; corrected positional
+read-only check passed. Neither error caused the scientific negative result.
+
+Core analysis raw SHA`ee615dabf978eb5ad1f97f4858981b1b0aeb51de6f89814d30a5c6455170b4d1`;
+verification raw SHA`587bf2f425bff9131986e4a29e73ccc828c34c036b2152d68409159c5516822e`.
+Analysis identity`c99308269def9766328d6020129ba87f03abdd640fc7359fe5dd0d575ba2c9bf`;
+verification identity`32a6484a43f4378dc94046edd64b3cd6d953bd7f631a4f60cc0420665b3143d6`.
+All three exact Stage6 product pins, measurement equality and both previously
+anchored Stage6 document hashes unchanged. Frozen scientific/source pins passed.
+
+Separate report identities and raw SHA, respectively:
+
+- Diagnostic `16b6bd6b95690cfa01eda124a451e6bc13e67c5a2e5c1858665b37900f3b5594` /
+  `04b12a0ed0934ff5ac800d0f176ddb3bdfbe3d9cb769ad4c4fd4e96e5c4f0b8e`.
+- Baseline `565d8f3c588a8d3fa436b72af3666f30ae85c95d256a1f4fcdba7b7d574059f0` /
+  `4370a57267f155d21dc24561415ae604c3b8c33ee245dc02a8fa5f7339ef0f72`.
+- Numeric `e84e530b2ba3d83769e82d9b987562af408f9e3f3f922e7ef062be28bb30f3d7` /
+  `5a5599a8191b91459e69db196ec93c7825ba01eddd273e5129198edd9bcf9422`.
+
+Numeric actual CLI exit0 at11:44:51UTC,2.40sec, all15 full matrix/fit/crossover/
+UNKNOWN structures matched a separate subset-cost implementation calibrated on
+145literal synthetic cases; no production calculation calls. Postpublication
+16manifest entries/canonical/seals/external proof/direction/events checked and
+two inventories matched: core5files/2,095,981B, runtime8/4759B,numeric1/71,306B;
+no pending files. SAFE audits do not recertify human labels or private raw.
+Root frozen entrypoint replayed only the approved NEW raw closure, no historical
+D3/C1N raw or sealed60/60. No new model calls or raw-response copies.
+
+Final focused synthetic suite188pass/1Windows privilege skip,10.95sec; separate
+frozen prelaunch110pass. Ruff/whitespace/local-link/UTF8 checks passed; only usual
+LF/CRLF warnings. Final independent document review corrected one wrapper-versus-
+frozen-analyzer wording, no numerical/claim errors. At11:47:28UTC no Python/
+llama-server or port18082 listener; disk30,578,962,432B (~28.48GiB). New core/
+supplements/runtime8,830,293B (~8.42MiB), excluding code/tests/Markdown.
+
+[Stage7 result](PA_STAGE7_RESULT_2026-09-07_V2.md),
+SHA`092e0f06f97740aaea110941129f8e17c386c271f9e467ab6137950c895d4f8f`;
+[execution record](PA_STAGE7_EXECUTION_RECORD_2026-09-07_V2.md),
+SHA`0d259eb1374de7065db75db0a0e889be9aac4723e1b6eb639daea33fdb5c2a6d`.
+About42min through record closeout versus1–2h allowance. No cleanup, manuscript/
+PDF, commit/push, active experiment or automatic transition. STOP: Stage8
+unapproved/unstarted,1–2h evidence/nearest-work assessment after fresh direction.
+
+### 2026-09-07 11:55 UTC — Stage8 direction and bounded work opened
+
+First new direction clock11:55:49UTC. The latest author request to continue
+paper rescue is applied to the immediately proposed Stage8, not later execution.
+Root and three bounded independent readers inspect existing SAFE/research
+records and public primary literature; no target/judge calls, new scientific
+experiments, raw/sealed reads, fixed-rule changes or manuscript/PDF work.
+Deliverable is candidate/evidence/collision/falsifier assessment,1–2h allowance.
+[Live record](PA_STAGE8_EXECUTION_RECORD_2026-09-07_V2.md) preserves scope, failures
+and source decisions; Stage7 exact documents/products remain immutable.
+
+### 2026-09-07 12:18 UTC — Stage8 contribution/feasibility assessment completed
+
+Scope completed: old contribution/rescue records, bounded primary-source refresh,
+mathematical interpretation and existing SAFE whole-frame bookkeeping. No model
+calls, target/judge reruns, new statistical fit/test, private/raw/sealed access,
+scientific-code edits, changed primary rule, manuscript/PDF, cleanup or commit/push.
+Three independent readers and root performed distinct bounded checks; no inference
+runtime or fresh dataset was launched.
+
+Independent/root count agreement: primary nested violations4(P3/22/25/34,masks1→5),
+both uniform frames0. Exact minimum cardinality2 primary7 P→ordinary-uniform1→
+qualified-uniform0;9size1 P remain, other12 qualified cardinality bounds[1,2].
+The differences concern separate summary estimands and control qualification,
+not retroactively wrong primary certificates. All84mask2 controls retain their
+cap/truncation failure despite required answer substrings; no automatic recovery.
+
+Posthoc empirical fractions per P/mask/operator use[R/3,(R+UNKNOWN)/3], not CIs.
+Enumerating all5880P-pair/mask-pair candidates produces0same-oriented witnesses
+in both operators, ordinary and qualified; individual OMIT10/BLANK6. Fully
+observed both-operator counts2279/1833. R-only comparisons produce23shared per
+frame, all involving UNKNOWNs; not latent recovery probability evidence. Root's
+independent PowerShell reconstruction matched, analysis rawSHAee615dab...0b4d1
+unchanged. No cases/operators or thresholds selected to manufacture a PASS.
+
+Elementary AND/stochastic counterexample checked independently: population order
+is preserved under equal iid repetition, but finite checkerboards can occur.
+This is not a novel theorem or an estimated actual false-positive rate. Three
+successes do not establish low population risk, and unknown joint judge error
+prevents unconditional human-safety identification. Repetition, missingness and
+latent-oracle non-identifiability are explicitly distinguished after peer review.
+
+Literature collisions include LOCA/DDOR/Compositional/PromptLocate, Anchors/pacX,
+locally-minimal probabilistic explanations, simultaneous anchor approximation,
+flaky delta debugging, AttriGuard, HERALD, judge reliability/validity and safety IRT.
+Current main/secondary matrix links and versioned section claims are retained.
+One OpenReview adjacent-PDF browser challenge and a later privacy-proceedings
+retrieval failure are disclosed; detailed unverified claims were not substituted.
+The privacy preprint already acknowledges utility-passing results better than its
+oracle. Concrete singleton pruning alone is not newly proved practical disclosure.
+
+Final recommendation is conditional GO ONLY to one original-P/A feasibility
+DESIGN: out-of-sample validity of a selected strict-minimal repair explanation.
+It is not a new method, false-certification prevalence estimate, useful correction,
+ICLR-main novelty finding or automatic privacy pivot. Required new-method baseline:
+same-estimand/oracle/error-budget simultaneous bounds + exact finite-table
+certification, charging target/judge/control/calibration costs, alongside simple
+rechecking/conservative UNKNOWN/search-order comparisons as applicable. Failures
+must stop the claim rather than trigger favorable outcome selection.
+
+Independent math/evidence review matched all counts and toy arithmetic. Independent
+contribution review endorsed design-only scope and required the uncertainty/
+identifiability distinction and direct-baseline obligation; both incorporated.
+Final frozen-pin check passed; Stage7 result/live exact hashes remain unchanged.
+Local Markdown links, UTF8 and git whitespace checks passed (normal LF/CRLF notices).
+No new execution-code changes, hence no new regression suite manufactured for
+this documentation stage. At12:18:26UTC no Python/llama-server observed;
+C: free30,557,954,048B (~28.46GiB). About23min from11:55:49 direction through
+closeout versus initial1–2h allowance. Scientific positive evidence was not
+claimed from that elapsed time or from documentation completion.
+
+[Stage8 decision](PA_STAGE8_CONTRIBUTION_DECISION_2026-09-07_V2.md),
+SHA`5277293c32472d5938620f685d8af89098098ef38de6df7797408435789a3cd1`;
+[execution record](PA_STAGE8_EXECUTION_RECORD_2026-09-07_V2.md),
+SHA`aea7d74537f533a2f3c11e12c1d6c946a06557b8068c2b1fcfeeda8d56f88d47`.
+STOP before Stage9, unapproved:2–4h protocol/feasibility design after direction;
+possible6–12h pilot requires a separate exact approved protocol/call budget.
+No running experiment, fresh-P confirmation, submission or paper guarantee.
