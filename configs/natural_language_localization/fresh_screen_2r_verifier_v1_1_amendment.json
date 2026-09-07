@@ -1,0 +1,70 @@
+{
+  "schema_version": "jbspan-fresh-screen-2r-verifier-v1-1-amendment",
+  "status": "FROZEN_POST_OUTCOME_ORDERING_ONLY_VERIFIER_REPAIR",
+  "frozen": true,
+  "frozen_at": "2026-09-04T12:40:58+09:00",
+  "evidence_class": "POST_OUTCOME_INSTRUMENTATION_ONLY_NO_MODEL_INFERENCE_NO_SCIENTIFIC_CHANGE",
+  "trigger": "The original independent verifier reconstructed seed 11 exactly but compared seed-23 and seed-47 phase-pair arrays in a different sequence from the execution runner.",
+  "root_cause": "The runner prospectively sorted later-seed active pairs by payload_position then attack_family. The V1 verifier preserved the seed-11 family insertion order before an order-sensitive list equality check.",
+  "repair": "Preserve all V1 reconstruction logic and safe inputs, but normalize later-seed active-pair order to payload_position then attack_family before exact list comparison.",
+  "dependencies": {
+    "contract": {
+      "path": "configs/natural_language_localization/fresh_screen_2r_v1.json",
+      "sha256": "624920f1ef1732d29d7d30ca13ed8392d91304ce4d1b7a1a46a9b0b3a8b3c76b"
+    },
+    "v1_verifier": {
+      "path": "scripts/verify_fresh_screen_2r.py",
+      "sha256": "804dac640143187cd007a2b8143601760621b241920489a63724fc2fbe22442f"
+    },
+    "v1_1_verifier": {
+      "path": "scripts/verify_fresh_screen_2r_v1_1.py",
+      "sha256": "2d92b1526b115c22ba134bfd0f35b65191a063d6e47a30ef8568cf90e92d6edf"
+    },
+    "phase_11_result": {
+      "path": "data/natural_language_localization/fresh_screen_2r_v1/phase_11_result.safe.json",
+      "sha256": "b04ba01e2093d5dcbd4769ea2cc7ae85a6381eb6836bd88495afe3c5dbf10ef6"
+    },
+    "phase_23_result": {
+      "path": "data/natural_language_localization/fresh_screen_2r_v1/phase_23_result.safe.json",
+      "sha256": "657654a91fe5457b770df1f8d32702ae1d6cc608d4c2653fdb44ebbd8e0e40a4"
+    },
+    "phase_47_result": {
+      "path": "data/natural_language_localization/fresh_screen_2r_v1/phase_47_result.safe.json",
+      "sha256": "95d6ea2988ec6f61c82ca98e7320c680793576fea0954b928a48e34cce594b04"
+    },
+    "final_result": {
+      "path": "data/natural_language_localization/fresh_screen_2r_v1/result.safe.json",
+      "sha256": "f42a746fcabe6a24bb457e98b9a599fa3e62cf46181abfd0bcd899ef442674a7"
+    }
+  },
+  "observed_failure_audit": {
+    "seed_11_order_and_content_exact": true,
+    "seed_23_pair_id_sets_exact": true,
+    "seed_23_content_by_pair_id_exact": true,
+    "seed_47_pair_id_sets_exact": true,
+    "seed_47_content_by_pair_id_exact": true,
+    "labels_metrics_routing_or_selection_changed": false,
+    "model_inference_performed_during_audit": false,
+    "private_raw_records_read_during_audit": false
+  },
+  "expected_immutable_result": {
+    "route": "AUTHORIZE_D2_EXACT_H4RM3L_MICRO_PILOT",
+    "stable_pairs_by_family": {
+      "DeepInception": 2,
+      "h4rm3l": 17
+    }
+  },
+  "recording": {
+    "parent_capture_target_path": "data/natural_language_localization/fresh_screen_2r_v1/independent_verification.safe.json",
+    "verification_path": "data/natural_language_localization/fresh_screen_2r_v1/independent_verification_v1_1.safe.json"
+  },
+  "prohibited_changes": [
+    "TARGET_OR_EVALUATOR_MODEL_INFERENCE",
+    "RAW_PRIVATE_RECORD_ACCESS",
+    "LABEL_OR_PANEL_RULE_CHANGE",
+    "PAIR_STATUS_OR_ROUTING_CHANGE",
+    "D2_SELECTION_CHANGE",
+    "RESULT_ARTIFACT_CHANGE"
+  ],
+  "next_operation": "RUN_V1_1_SAFE_ARTIFACT_RECONSTRUCTION_ON_IMMUTABLE_RESULTS"
+}

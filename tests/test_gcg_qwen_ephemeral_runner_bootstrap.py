@@ -14,9 +14,9 @@ def test_runner_release_is_pinned_with_sha256() -> None:
     text = _text()
     assert 'RUNNER_VERSION="2.337.0"' in text
     assert (
-        'RUNNER_ARCHIVE_SHA256="70920811a4f8ad4328818682bca5c6469c1c942f'
-        'ab52448868071d0063816613"'
-    ) in text
+        'RUNNER_ARCHIVE_SHA256="70920811a4f8ad4328818682bca5c6469c1c942fab52448868071d0063816613"'
+        in text
+    )
     assert "sha256sum --check --status" in text
 
 
@@ -32,7 +32,7 @@ def test_runner_is_ephemeral_and_label_restricted() -> None:
 def test_registration_token_is_memory_only() -> None:
     text = _text()
     assert "actions/runners/registration-token" in text
-    assert "REGISTRATION_TOKEN=\"\"" in text
+    assert 'REGISTRATION_TOKEN=""' in text
     assert "set -x" not in text
     assert "echo $GH_TOKEN" not in text
     assert "printf $GH_TOKEN" not in text

@@ -1,6 +1,6 @@
 # Systematic Literature and Claim Matrix
 
-Last audited: 2026-08-14 (Asia/Seoul)
+Last audited: 2026-09-05 (Asia/Seoul)
 
 ## Audit protocol
 
@@ -30,7 +30,8 @@ No literature search can prove mathematical exhaustiveness. Therefore this docum
 
 ## Decision summary
 
-**Verdict: CONDITIONAL PASS (narrow gap, meaningful collision risk).**
+**Verdict: CONDITIONAL PASS FOR AN h4rm3l-ONLY, VOCABULARY-RELATIVE CLAIM (narrow gap,
+meaningful collision and significance risk).**
 
 The broad topic is occupied. The following are already established in prior work:
 
@@ -44,9 +45,18 @@ The broad topic is occupied. The following are already established in prior work
 - wavelet-domain feature attribution;
 - minimal sufficient input subsets and compact rationales in general NLP/XAI.
 
-The project remains potentially distinct only if it studies the **joint object and validity contract** below:
+After the completed D3 development result, the project remains potentially distinct only if it
+studies the **joint object and validity contract** below:
 
-> Given an original harmful request that is refused and a successful jailbreak prompt that preserves the same requested behavior, identify a minimal human-editable input-text span set whose direct text-level neutralization restores refusal, while preserving the underlying harmful intent, remaining robust across multiple neutralizers / decoding seeds / judges, and abstaining when the cause is distributed.
+> Given a frozen successful h4rm3l jailbreak with an immutable explicit harmful payload and a
+> source-native, predeclared three-unit vocabulary, enumerate every strict-subset-minimal unit set
+> whose direct text neutralization restores safe non-assistance under multiple neutralizers,
+> decoding seeds, a qualified abstaining evaluator panel, and matched capability controls.
+
+The contribution is **not** that jailbreak components interact. It is the complete recovery family
+for a fixed successful attack, the validity contract around that family, and a measured account of
+what singleton and one-path procedures omit. Completeness is only over the declared finite unit
+vocabulary, never over arbitrary natural-language edits.
 
 The novelty cannot rest on any single phrase in that sentence. It must be established by the full conjunction and by experiments against the closest methods.
 
@@ -55,6 +65,10 @@ The novelty cannot rest on any single phrase in that sentence. It must be establ
 | Work | Status | Explanatory object | Intervention / objective | What it already occupies | Concrete remaining distinction |
 |---|---|---|---|---|---|
 | [LOCA: Minimal, Local, Causal Explanations for Jailbreak Success](https://arxiv.org/abs/2605.00123) | 2026 arXiv preprint | token-specific SAE concepts in intermediate representations | activation patching to induce refusal with a small number of representation changes | local, minimal, causal explanation of a specific jailbreak; token-specific localization inside the model | editable input-text spans; direct text intervention; full-response validation; intent preservation; neutralizer robustness; black/gray-box path |
+| [DDOR: Delta Debugging for Explainable Overrefusal Testing and Repair](https://arxiv.org/abs/2606.03601) | 2026 arXiv preprint | phrase-level minimal refusal-triggering fragments in benign overrefusal cases | black-box delta debugging, multi-oracle validation, and prompt repair | minimal input-fragment localization and a one-path delta-debugging procedure | opposite starting population and outcome direction; immutable harmful payload; attack-added units only; every minimal recovery set rather than one path |
+| [Jailbreak LEGO](https://openreview.net/pdf?id=Wc0VC0wUl6) | ICLR 2026 submission; no acceptance claim | atomic strategy components extracted from existing attacks | forward component composition and guided search for stronger attacks | atomic component interfaces, compositional jailbreak construction, and efficient guided search | reverse intervention on one fixed successful attack; recovery rather than attack generation; exact all-minimal family |
+| [Compositional Jailbreaking](https://arxiv.org/abs/2605.15598) | 2026 arXiv preprint | ordered pairs from twelve attack mutators | forward measurement of persistence, destructive interference, and synergy | systematic component-interaction and synergy language across models | reverse payload-preserving recovery; all subsets of one declared prompt vocabulary; strict-subset minimality and controls |
+| [The Anatomy of a Prompt Injection](https://arxiv.org/abs/2608.07808) | 2026 arXiv preprint | seven structural prompt-injection components | taxonomy and structured analysis record | component-level decomposition of prompt-injection artifacts | jailbreak behavior rather than taxonomy; outcome-linked neutralization; exact minimal recovery families and robustness |
 | [Token Highlighter](https://ojs.aaai.org/index.php/AAAI/article/view/34943) | AAAI 2025 | individual input tokens | gradient of Affirmation Loss; soft embedding removal | jailbreak-critical token localization and mitigation | semantic span sets rather than independent saliency; text edits rather than embedding shrinkage; minimality and intent-preservation constraints |
 | [GuardNet](https://arxiv.org/abs/2509.23037) | 2025 arXiv preprint | token-level adversarial spans | supervised graph-attention filtering before inference | fine-grained adversarial-span localization with token labels and IoU/F1 evaluation | behavioral/interventional rather than supervised change-label detection; minimal cause of observed refusal failure; intent preservation and abstention |
 | [Certifying LLM Safety against Adversarial Prompting](https://arxiv.org/abs/2309.02705) | 2023 arXiv preprint | erased token subsequences | erase-and-check safety filtering; certified defense against bounded inserted tokens | systematic token erasure, greedy/gradient erasure, and safety checking | explanation rather than certification; target-model refusal recovery; human-readable minimal spans; preservation of original harmful goal |
@@ -89,7 +103,7 @@ Mechanistic analysis in this project is therefore supporting evidence only. It m
 
 ## Evaluation-adjacent work
 
-The response judge must avoid equating any non-refusal or superficially unsafe text with a genuinely successful jailbreak. [How Real Is Your Jailbreak?](https://arxiv.org/abs/2601.03288) explicitly argues for fine-grained categories such as rejective, irrelevant, unhelpful, incorrect, and successful responses. This supports the planned human audit and multi-class response-judge design.
+The response judge must avoid equating any non-refusal or superficially unsafe text with a genuinely successful jailbreak. [How Real Is Your Jailbreak?](https://arxiv.org/abs/2601.03288) explicitly argues for fine-grained categories such as rejective, irrelevant, unhelpful, incorrect, and successful responses. This supports the already qualified, conservative full-response panel and explicit abstention. It does not make that automatic panel human-equivalent ground truth.
 
 ## Forbidden claims
 
@@ -110,27 +124,35 @@ The paper must not state or strongly imply any of the following:
 
 Use conservative wording until the phenomenon and algorithm gates pass:
 
-> We study intent-preserving interventional localization of human-editable jailbreak-enabling span sets. An explanation is accepted only when direct text neutralization restores the target model's refusal while retaining the underlying requested behavior, remains stable across intervention realizations, and passes subset-minimality checks; the method may abstain when no localized explanation is supported.
+> We study vocabulary-relative recovery topologies of successful h4rm3l jailbreaks. For each fixed
+> attack and immutable payload, we enumerate every strict-subset-minimal set of source-native
+> attack units whose direct neutralization restores safe non-assistance under a predeclared
+> neutralizer, seed, evaluator, and capability-control contract.
 
 A stronger novelty sentence may be considered only after the weekly refresh:
 
-> We did not identify prior work that jointly enforces text-level editability, target-model refusal recovery, harmful-intent preservation, multi-neutralizer robustness, subset minimality, and explicit distributed-case abstention for successful jailbreak prompts.
+> In a bounded search through 2026-09-05, we did not identify prior work that jointly preserves the
+> harmful payload, intervenes only on source-native attack-added text units, and enumerates every
+> robust strict-subset-minimal recovery set for a fixed successful jailbreak.
 
 This is a literature-search statement, not proof of priority.
 
 ## Required closest baselines
 
-At minimum, the empirical comparison must include or faithfully adapt:
+The current exact-topology study must include, under the same frozen behavioral oracle:
 
-- Token Highlighter;
-- Erase-and-Check, GreedyEC, or GradEC as appropriate;
-- SHAP / feature-ablation token excision;
-- GuardNet when compatible token labels and code are available;
-- random length- and position-matched spans;
-- leave-one-out and a wavelet-free hierarchical search;
-- exhaustive contiguous-span search on tractable prompts.
+- all declared singletons;
+- leave-one-out ranking;
+- DDMIN as the operational analogue of DDOR's one-path delta debugging;
+- greedy forward and greedy backward one-path searches;
+- the exact all-subset family as the oracle, with family precision, recall, Jaccard, query cost,
+  and missed-path counts.
 
-PromptLocate is primarily a threat-model comparison rather than necessarily an executable baseline. LOCA is a mechanistic comparison and may be evaluated on a smaller open-weight subset rather than across the full black/gray-box benchmark.
+Token Highlighter and Erase-and-Check remain method-level comparisons and optional compatible
+extensions; the present paper must not pretend that unit-level exact enumeration and gradient
+token saliency share the same intervention vocabulary. PromptLocate, Jailbreak LEGO,
+Compositional Jailbreaking, and Anatomy are threat-object comparisons rather than executable
+recovery baselines. LOCA is a mechanistic comparison, not an input-text oracle.
 
 ## Project gates created by this audit
 
@@ -148,3 +170,91 @@ PromptLocate is primarily a threat-model comparison rather than necessarily an e
 - Re-run exact-title and citation-neighbor searches for LOCA, Token Highlighter, GuardNet, PromptLocate, TriageFuzz, and Robust Harmful Features.
 - Record the refresh date even when no new direct competitor is found.
 - Immediately narrow or pivot the claim if a work satisfies the full joint validity contract above.
+
+## 2026-09-04 bounded refresh
+
+Primary-source searches were rerun for jailbreak prompt ablation, minimal subsets, causal input
+intervention, refusal recovery, token interaction, and all-minimal enumeration, including recent
+2026 arXiv and ICLR/OpenReview records. No work was identified that occupies the complete joint
+object of payload-preserving input-text intervention plus enumeration of every robust
+strict-subset-minimal recovery set. This is a bounded search result, not proof of priority.
+
+One additional relevant paper was added to the collision boundary:
+
+- [Breaking Refusal in the First Half: A Mechanistic Study of the Prefill Jailbreak](https://arxiv.org/abs/2607.14147)
+  studies a one-line prefill attack and localizes a response-site mechanism with causal probes. It
+  does not enumerate input-side minimal recovery families, but it strengthens the simplest-cause
+  objection: an attack can have an obvious local failure surface even when its internal mechanism
+  is diffuse. The present project therefore cannot treat one obvious singleton as sufficient
+  evidence for a topology paper.
+
+The refresh also reconfirmed the active closest set: LOCA, Beyond "I'm Sorry, I Can't", Token
+Highlighter, Mask-GCG, Causal Analyst, Adversarial Deja Vu, PromptLocate, TriageFuzz, GuidedBench,
+and SAHARA. The current novelty status remains **conditional pass with meaningful collision and
+significance risk**.
+
+## 2026-09-05 D3-conditioned refresh
+
+The search was repeated after the exact D3 outcome because that outcome changes which novelty
+claim is still supportable. Exact-title and concept searches covered reverse jailbreak ablation,
+all-minimal recovery, minimal cut sets, delta debugging, component interactions, and refusal
+restoration. The bounded search did not surface a paper that already reports the same complete
+payload-preserving recovery family. It did expose a tighter and less forgiving claim boundary:
+
+- [LOCA](https://arxiv.org/abs/2605.00123), now listed as published at COLM 2026, already owns
+  minimal local causal explanations of individual jailbreaks in internal representation space.
+- [DDOR](https://arxiv.org/abs/2606.03601) already owns black-box phrase-level delta debugging and
+  intent-preserving repair for overrefusal. DDMIN therefore cannot be presented as a new search
+  idea; it is a required one-path baseline.
+- [Jailbreak LEGO](https://openreview.net/pdf?id=Wc0VC0wUl6),
+  [Compositional Jailbreaking](https://arxiv.org/abs/2605.15598), and
+  [Concept2Scenario](https://arxiv.org/abs/2607.23496) already occupy atomic attack components,
+  forward composition, interaction, and synergy language.
+- [Adversarial Deja Vu](https://proceedings.iclr.cc/paper_files/paper/2026/hash/ab41709d06e9303c25ad6742ae661198-Abstract-Conference.html)
+  is an ICLR 2026 paper that models unseen jailbreaks as sparse recombinations of previously seen
+  adversarial skills. This blocks any broad claim that jailbreaks have reusable compositional
+  primitives.
+- [Robust Harmful Features](https://arxiv.org/abs/2606.28153), an ICML 2026 Oral, already links
+  attack-template tokens to selective suppression of safety-relevant attention heads. Input-unit
+  recovery cannot be marketed as the first token-to-mechanism account.
+- [The Anatomy of a Prompt Injection](https://arxiv.org/abs/2608.07808) formalizes a seven-part
+  component model for prompt-injection artifacts. A component taxonomy is not a contribution here.
+
+The completed D3 coarsening result is now the dominant significance objection: all nine h4rm3l
+instances become the same singleton macro-group when the first two adjacent source decorators are
+merged. Consequently, even a successful confirmation may support only a
+**source-native-vocabulary-relative complete-family** claim. It cannot support
+granularity-invariant synergy, universal attack decomposition, or cross-attack-family generality.
+
+The surviving empirical test is therefore narrow and falsifiable: on fresh payloads and two target
+model families, does exact enumeration repeatedly recover more robust source-native minimal
+families than every admitted singleton or one-path baseline, while passing the unchanged
+neutralizer, fresh-seed, evaluator, and capability gates? A negative second-model or baseline-gap
+result should stop the central paper claim rather than trigger another scope repair.
+
+## 2026-09-05 STEP1 update -- latest independent-main claim decision
+
+The immediately preceding exact-family continuation proposal is historical. The
+author's latest priority and completed STEP1 decision are recorded in
+[STEP1_ICLR_MAIN_CLAIM_AND_CLOSEST_WORK_AUDIT_2026-09-05.md](STEP1_ICLR_MAIN_CLAIM_AND_CLOSEST_WORK_AUDIT_2026-09-05.md).
+No earlier conditional pass establishes the latest candidate's paper readiness.
+
+Material claim-boundary corrections from the linked primary-source audits:
+
+- DDOR explicitly recognizes nonmonotonicity, multiple triggers and the limits of
+  1-minimality. A hypothetical consumer's global-necessity or upward-safety claim
+  must not be attributed to DDOR/ddmin.
+- FAME is verified in the official ICLR 2026 proceedings. Finite erasure observations
+  must not be equated to its universal-completion sufficiency certificates.
+- PromptLocate already measures post-removal attack outcomes AND legitimate task
+  recovery, including AgentDojo; it is not merely a span-overlap baseline.
+- AttnTrace v3 is a direct collision: observed-output attribution, post-removal
+  attack success, agent settings, collaborating malicious texts, and existing
+  PromptLocate overlocalization evidence. See the reviewer audit, Section 8,
+  for the primary paper, official acceptance list and code boundaries.
+
+The retained question is therefore conditional and narrower: isolate a published
+learned-oracle search assumption from detector/length/renderer error, establish
+material final security/utility consequences, and show value beyond simple
+rechecking. Neither this gap nor a new corrective method is demonstrated yet.
+GO is limited to bounded feasibility/falsification, not a paper-scale run.

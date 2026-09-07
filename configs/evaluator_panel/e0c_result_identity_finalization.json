@@ -1,0 +1,59 @@
+{
+  "schema_version": "jbspan-evaluator-panel-e0c-result-identity-finalization-v1",
+  "status": "FROZEN_AFTER_E0C_V1_1_PASS_BEFORE_IDENTITY_FINALIZATION",
+  "frozen": true,
+  "frozen_at": "2026-09-01T23:38:00+09:00",
+  "paper_validity": false,
+  "purpose": "Repair only the non-recomputable result-identity serialization scheme in the already-complete E0C V1.1 PASS artifact.",
+  "failure_cause": "The V1 lineage hashed insertion-order JSON in memory and then wrote sorted-key JSON, so the declared identity could not be recomputed from the saved bytes.",
+  "allowed_changes": {
+    "add_identity_scheme_field": true,
+    "add_identity_finalization_audit": true,
+    "replace_result_identity_sha256": true
+  },
+  "prohibited_changes": [
+    "status",
+    "operational_pass",
+    "runtime_or_model_identity",
+    "model_outputs_or_output_hashes",
+    "parsed_values",
+    "checks",
+    "performance_metrics",
+    "scope_and_seal_fields",
+    "next_authorized_operation"
+  ],
+  "scope_boundary": {
+    "model_inference_allowed": false,
+    "harmful_prompt_allowed": false,
+    "external_calibration_rows_allowed": false,
+    "external_heldout_rows_allowed": false,
+    "preserved_p3_responses_allowed": false,
+    "metric_recomputation_allowed": false,
+    "paper_claim_allowed": false
+  },
+  "dependencies": {
+    "e0c_v1_1_result": {
+      "path": "data/evaluator_panel_v2/e0c_runtime_qualification_v1_1.safe.json",
+      "bytes": 35528,
+      "sha256": "d6ee8d08c7972ab4cfdbbfef10de9e9f0aa30012394555771ae05be7ec263c7e",
+      "declared_result_identity": "099a62a4d5fc189f237a84de27b1cfb7698277f62e6d3ae2d6c38705b24413a0"
+    },
+    "e0c_v1_1_contract": {
+      "path": "configs/evaluator_panel/runtime_qualification_e0c_v1_1.json",
+      "bytes": 14920,
+      "sha256": "5400cda7cea4bc1b564a63bd7fdc2ada765ca93eb105cda7b282766d60ca3b98"
+    },
+    "e0c_v1_1_runner": {
+      "path": "scripts/run_evaluator_panel_runtime_qualification_e0c_v1_1.py",
+      "bytes": 9339,
+      "sha256": "3115b26ef500223ad1c8cec851a6b2dd165eeb998b95a8b2b56efe564425522e"
+    },
+    "identity_finalizer": {
+      "path": "scripts/finalize_evaluator_panel_e0c_result_identity.py",
+      "bytes": 7725,
+      "sha256": "30cf36cced36c70d26febcf00cb734e05bf09b6afb4aaa02894a22048ec996fb"
+    }
+  },
+  "identity_scheme": "sha256_of_utf8_json_ensure_ascii_false_sort_keys_true_compact_separators_with_result_identity_sha256_omitted",
+  "safe_output_path": "data/evaluator_panel_v2/e0c_runtime_qualification_final.safe.json"
+}

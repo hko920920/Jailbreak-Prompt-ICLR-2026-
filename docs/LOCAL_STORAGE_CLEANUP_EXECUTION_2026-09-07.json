@@ -1,0 +1,115 @@
+{
+  "schema_version": "local-storage-cleanup-execution-v1",
+  "status": "COMPLETED_FOUR_FILES_DELETED_AND_VERIFIED",
+  "date_asia_seoul": "2026-09-07",
+  "root": "C:/Users/SOGANG/Documents/jailbreak iclr 2027",
+  "authorization": "User explicitly authorized cleanup of currently unnecessary files after review of these four obsolete model caches.",
+  "scope": "Exactly four GGUF files; no directories, evidence, source code, active models, or OS files.",
+  "deletion_method": "Permanent exact-file Remove-Item -LiteralPath; no recursive deletion, same-drive archive, or recycle-bin copy.",
+  "expected_removed_bytes": 14833346048,
+  "preflight_free_c_bytes": 22911574016,
+  "hash_checks_utc": "2026-09-07T03:02:23Z/2026-09-07T03:02:33Z",
+  "preflight": {
+    "all_four_hashes_match_recorded_provenance": true,
+    "phi_files_are_byte_identical_by_sha256": true,
+    "targets_and_ancestors_checked_for_reparse_points": true,
+    "no_active_python_or_llama_runtime_observed": true,
+    "no_exact_filename_reference_in_reviewed_active_pa_llama_path": true,
+    "historical_evaluator_and_guidedeval_configs_still_reference_some_targets": true,
+    "remote_availability_or_reconstruction_not_retested": true
+  },
+  "files": [
+    {
+      "path": "artifacts/p3_signal_screen_v1/wildguard_runtime/wildguard-q8_0.gguf",
+      "bytes": 7702573664,
+      "sha256": "0c11d34ecd7e0034621c956c65f7372f0dc159eca9112bd2b20011239fdc0247",
+      "recovery": {
+        "method": "Download pinned source and reconstruct Q8_0_DIRECT; this is not a directly downloadable GGUF cache.",
+        "repository": "allenai/wildguard",
+        "revision": "cbba4823f3e8020e5a74a5e29bf85072def6f2ff",
+        "llama_cpp_revision": "0177dcc7300bad8914bb838baabce87899812491",
+        "llama_cpp_release": "b10441",
+        "conditions": "Include official README and .gitattributes. Name conversion input directory exactly as the source revision. Match recorded output hash before historical reuse.",
+        "limitations": "Requires source access, download bandwidth, conversion environment and extra working disk space. Original source checkpoint was already removed. Recovery was not performed during cleanup.",
+        "preserved_provenance": "data/natural_language_localization/p3_local_signal_screen_v1/p3_wildguard_runtime_preparation.safe.json",
+        "preserved_provenance_sha256": "b24b21eee1d4728ab22b1ca3c0b03554692e3c80fc7255e48e679d55f264c0eb"
+      }
+    },
+    {
+      "path": "artifacts/evaluator_panel_v2/runtime_qualification_e0c/models/ministral_3_3b_instruct_2512_q4_k_m/Ministral-3-3B-Instruct-2512-Q4_K_M.gguf",
+      "bytes": 2147023008,
+      "sha256": "9ed150d4367e68df0ac8e1540f6ddc65b42d0ee26378329d1ecbca60f93fc5f8",
+      "recovery": {
+        "method": "Redownload pinned GGUF and verify SHA-256.",
+        "repository": "mistralai/Ministral-3-3B-Instruct-2512-GGUF",
+        "revision": "eb599d408350ea2bb60452cb86be7c7b2fc28227",
+        "filename": "Ministral-3-3B-Instruct-2512-Q4_K_M.gguf",
+        "preserved_provenance": "configs/evaluator_panel/runtime_qualification_e0c_v1_1.json",
+        "preserved_provenance_sha256": "5400cda7cea4bc1b564a63bd7fdc2ada765ca93eb105cda7b282766d60ca3b98"
+      }
+    },
+    {
+      "path": "artifacts/evaluator_panel_v2/runtime_qualification_e0c/models/phi_4_mini_instruct_q4_k_m/microsoft-Phi-4-mini-instruct-Q4_K_M.gguf",
+      "bytes": 2491874688,
+      "sha256": "01999f17c39cc3074afae5e9c539bc82d45f2dd7faa3917c66cbef76fce8c0c2",
+      "recovery": {
+        "method": "Redownload pinned GGUF, verify SHA-256, and restore this alternate local spelling if required by historical code.",
+        "repository": "bartowski/microsoft_Phi-4-mini-instruct-GGUF",
+        "revision": "7ff82c2aaa4dde30121698a973765f39be5288c0",
+        "filename": "microsoft_Phi-4-mini-instruct-Q4_K_M.gguf",
+        "preserved_provenance": "configs/natural_language_localization/rescue_local_guidedeval_smoke_phi_v3.json",
+        "preserved_provenance_sha256": "383ea86dd66e30059bb24c818a8da21df47488e98f0ce1946247e281439946ce"
+      }
+    },
+    {
+      "path": "artifacts/evaluator_panel_v2/runtime_qualification_e0c/models/phi_4_mini_instruct_q4_k_m/microsoft_Phi-4-mini-instruct-Q4_K_M.gguf",
+      "bytes": 2491874688,
+      "sha256": "01999f17c39cc3074afae5e9c539bc82d45f2dd7faa3917c66cbef76fce8c0c2",
+      "recovery": {
+        "method": "Redownload pinned GGUF and verify SHA-256.",
+        "repository": "bartowski/microsoft_Phi-4-mini-instruct-GGUF",
+        "revision": "7ff82c2aaa4dde30121698a973765f39be5288c0",
+        "filename": "microsoft_Phi-4-mini-instruct-Q4_K_M.gguf",
+        "preserved_provenance": "configs/natural_language_localization/rescue_local_guidedeval_smoke_phi_v3.json",
+        "preserved_provenance_sha256": "383ea86dd66e30059bb24c818a8da21df47488e98f0ce1946247e281439946ce"
+      }
+    }
+  ],
+  "protected_models": [
+    {"path": "artifacts/p2_runtime_qualification_v1/models/meta-llama-3.1-8b-instruct-q4-k-m/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf", "bytes": 4920739232},
+    {"path": "artifacts/p2_runtime_qualification_v1/models/qwen2.5-7b-instruct-q4-k-m/qwen2.5-7b-instruct-q4_k_m-00001-of-00002.gguf", "bytes": 3993201344},
+    {"path": "artifacts/p2_runtime_qualification_v1/models/qwen2.5-7b-instruct-q4-k-m/qwen2.5-7b-instruct-q4_k_m-00002-of-00002.gguf", "bytes": 689872288},
+    {"path": "artifacts/evaluator_panel_v3/models/jailmeter-slm-6a492b5/jailmeter-slm-lora-f16.gguf", "bytes": 40397440},
+    {"path": "artifacts/evaluator_panel_v3/models/qwen3guard-gen-0.6b-fada3b2/model.safetensors", "bytes": 1503300328}
+  ],
+  "protected_contracts": [
+    {"path": "configs/natural_language_localization/pa_llama_topology_execution_v1.json", "sha256": "d05f91c14625217e191837c0abbef0bc2e78eebaa7cecec18c97ce30b0cf19f0"},
+    {"path": "configs/natural_language_localization/pa_llama_topology_target_continuation_v1.json", "sha256": "6ac6b915bfebc3f2e7351a1533af78a9aafd2fdb041e12ffc37cecd67ff677f0"}
+  ],
+  "result": {
+    "started_utc": "2026-09-07T03:05:43.9351010Z",
+    "completed_utc": "2026-09-07T03:05:44.3111030Z",
+    "deleted_file_count": 4,
+    "removed_logical_file_bytes": 14833346048,
+    "free_c_before_bytes": 22913880064,
+    "free_c_after_bytes": 35255361536,
+    "observed_free_delta_bytes": 12341481472,
+    "free_c_after_gib": 32.834,
+    "measurement_note": "Logical file bytes removed are 13.815 GiB; observed free-space increase is 11.494 GiB. Shared allocation or concurrent filesystem activity could affect this comparison. Hard-link identity was not established; do not claim the logical total as physical space reclaimed.",
+    "verification_utc": "2026-09-07T03:06:37.7634392Z",
+    "verification_free_c_bytes": 35254947840,
+    "deleted_targets_confirmed_absent": 4,
+    "protected_models_present_with_unchanged_sizes": 5,
+    "protected_execution_contract_hashes_unchanged": 2,
+    "recovery_record_hash_checks_passed": 4,
+    "protected_model_contents_rehashed_after_deletion": false,
+    "raw_responses_read_or_modified": false,
+    "directories_deleted": 0,
+    "os_or_pagefile_settings_changed": false,
+    "pagefile_allocated_mib_after": 45680,
+    "recovery": "Not available in Recycle Bin. Ministral/Phi require pinned redownload; WildGuard requires pinned-source reconstruction. Remote availability and reconstruction were not tested."
+  },
+  "scientific_gate_evaluated": false,
+  "experiments_restarted": false,
+  "automatic_cleanup_installed": false
+}

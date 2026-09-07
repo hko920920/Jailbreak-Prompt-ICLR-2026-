@@ -1,0 +1,422 @@
+{
+  "schema_version": "jbspan-rescue-objective-repair-v3",
+  "frozen": true,
+  "frozen_at_utc": "2026-09-05T10:51:00Z",
+  "scope": "HARMLESS_OBJECTIVE_DEVELOPMENT_PILOT_NOT_SAFETY_VALIDATION",
+  "purpose": "Evaluate finite repair certificates and operator transfer under a deterministic task output specification; no model judge, attack optimization, or historical gate repair.",
+  "case_manifest_sha256": "853912052309a4bf7fb77515163a4cae9c31fb51c05e1d4eb0006b540b949995",
+  "runtime": {
+    "server": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-server.exe",
+      "size_bytes": 9216,
+      "sha256": "4a118c0892482e738b19ebcd201d3fc9d687ab0dd2f841d2b0d7272ab909655a"
+    },
+    "port": 18881,
+    "startup_seconds": 90
+  },
+  "decoding": {
+    "seed": 11,
+    "temperature": 0,
+    "max_tokens": 128,
+    "top_k": 1,
+    "top_p": 1,
+    "min_p": 0,
+    "repeat_penalty": 1
+  },
+  "models": [
+    {
+      "model_id": "qwen2.5-7b-instruct-q4-k-m",
+      "alias": "objective-v3-qwen25",
+      "repository": "Qwen/Qwen2.5-7B-Instruct-GGUF",
+      "revision": "bb5d59e06d9551d752d08b292a50eb208b07ab1f",
+      "quantization": "Q4_K_M",
+      "model": {
+        "path": "artifacts/p2_runtime_qualification_v1/models/qwen2.5-7b-instruct-q4-k-m/qwen2.5-7b-instruct-q4_k_m-00001-of-00002.gguf",
+        "sha256": "dfce12e3862a5283ccfb88221b48480e58745165de856439950d0f22590580db",
+        "size_bytes": 3993201344
+      },
+      "additional_files": [
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/models/qwen2.5-7b-instruct-q4-k-m/qwen2.5-7b-instruct-q4_k_m-00002-of-00002.gguf",
+          "sha256": "539cf93f78e887edea1c04e2d7d8cdaca9d01dae9c9025bcb8accbe29df3d72a",
+          "size_bytes": 689872288
+        }
+      ],
+      "server_args": [
+        "--device",
+        "Vulkan1",
+        "--gpu-layers",
+        "all",
+        "--ctx-size",
+        "4096",
+        "--parallel",
+        "1",
+        "--threads",
+        "8",
+        "--threads-batch",
+        "8",
+        "--batch-size",
+        "512",
+        "--ubatch-size",
+        "512",
+        "--jinja",
+        "--reasoning",
+        "off",
+        "--offline",
+        "--no-webui",
+        "--no-agent",
+        "--no-cache-prompt",
+        "--fit",
+        "off",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "18881",
+        "--alias",
+        "objective-v3-qwen25",
+        "--seed",
+        "11",
+        "--temp",
+        "0",
+        "--top-k",
+        "1",
+        "--top-p",
+        "1",
+        "--min-p",
+        "0",
+        "--repeat-penalty",
+        "1"
+      ]
+    },
+    {
+      "model_id": "google-gemma-4-e4b-it-qat-q4-0",
+      "alias": "objective-v3-gemma4",
+      "repository": "google/gemma-4-E4B-it-qat-q4_0-gguf",
+      "revision": "4b4a2c1d584be7264f87aac328a1bc739ce81b6c",
+      "quantization": "Q4_0 QAT",
+      "model": {
+        "path": "artifacts/step5n_target_admission_v1/models/google-gemma-4-e4b-it-qat-q4-0/gemma-4-E4B_q4_0-it.gguf",
+        "sha256": "676c35070db6dbe52f93e9c864ee0fba4eddea94b9c875d9cb10daff453fbaee",
+        "size_bytes": 5154941280
+      },
+      "additional_files": [],
+      "server_args": [
+        "--device",
+        "Vulkan1",
+        "--gpu-layers",
+        "all",
+        "--ctx-size",
+        "4096",
+        "--parallel",
+        "1",
+        "--threads",
+        "8",
+        "--threads-batch",
+        "8",
+        "--batch-size",
+        "512",
+        "--ubatch-size",
+        "512",
+        "--jinja",
+        "--reasoning",
+        "off",
+        "--offline",
+        "--no-webui",
+        "--no-agent",
+        "--no-cache-prompt",
+        "--fit",
+        "off",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "18881",
+        "--alias",
+        "objective-v3-gemma4",
+        "--seed",
+        "11",
+        "--temp",
+        "0",
+        "--top-k",
+        "1",
+        "--top-p",
+        "1",
+        "--min-p",
+        "0",
+        "--repeat-penalty",
+        "1"
+      ]
+    }
+  ],
+  "limits": {
+    "maximum_unique_requests": 304,
+    "per_request_seconds": 90,
+    "screen_seconds": 1200,
+    "exact_seconds": 2400,
+    "max_request_utf8_bytes": 100000,
+    "max_reply_utf8_bytes": 1000000
+  },
+  "design": {
+    "cases": 8,
+    "units": 5,
+    "max_exact_cases_per_model": 2,
+    "screen_conditions": [
+      "CLEAN",
+      "UNEDITED",
+      "ALL_BLANK",
+      "ALIGNED"
+    ],
+    "operators": [
+      "SOURCE_OMIT",
+      "LAYOUT_BLANK"
+    ],
+    "minimum_eligible_per_model": 1,
+    "selection": "FIRST_ELIGIBLE_PER_TASK_FAMILY_LEX_CASE_ID",
+    "endpoint": "SINGLE_FIELD_JSON_EXACT_TASK_VALUE",
+    "complete_refusal": "INCORRECT",
+    "transport_or_truncation": "UNKNOWN",
+    "automatic_parser_repair": false,
+    "automatic_model_substitution": false,
+    "automatic_template_tuning": false,
+    "exact_phase_requires_completed_screen": true
+  },
+  "analysis": {
+    "evidence_class": "SELECTED_SINGLE_SEED_PILOT_NO_POPULATION_SAFETY_CLAIM",
+    "metrics": [
+      "minimal_family_necessary_and_possible",
+      "known_nonmonotone_witnesses",
+      "one_deletion_minimal_vs_strict_subset_certificate",
+      "adjacent_closure_witnesses",
+      "operator_transfer_of_certified_minima"
+    ],
+    "followup_design_signal": "Known failed certificate transfer or false strict-minimal interpretation on at least two distinct task-data cases; motivates design only, not paper success.",
+    "fixed_frame_denominators": true,
+    "screen_forced_endpoints_not_discoveries": true
+  },
+  "recording": {
+    "safe_base": "data/natural_language_localization/rescue_objective_repair_v3",
+    "private_base": "artifacts/rescue_objective_repair_v3"
+  },
+  "dependencies": {
+    "code_0": {
+      "path": "src/jbspan/objective_repair.py",
+      "sha256": "6272cde915c0af8fb6484c191683072768695a519d9c12237ef9b33dbfa6ba7f",
+      "size_bytes": 7161
+    },
+    "code_1": {
+      "path": "tests/test_objective_repair.py",
+      "sha256": "c5b11a92914a2ee0e09909cb5f11a6667c860e417d2bfdfd74950b259367e9d2",
+      "size_bytes": 3787
+    },
+    "code_2": {
+      "path": "scripts/run_rescue_objective_repair_v3.py",
+      "sha256": "28b340f132d8f562f844c4c25215725b11917b0508d9bbb2f514a5835acf977d",
+      "size_bytes": 27531
+    },
+    "code_3": {
+      "path": "tests/test_rescue_objective_runner_v3.py",
+      "sha256": "ee6a9327ff6dedcdbd33a66737144f19aeae34a4b158f5b87c2b03bb72c9c6ad",
+      "size_bytes": 13708
+    },
+    "code_4": {
+      "path": "src/jbspan/rescue_guidedeval_development.py",
+      "sha256": "6df8ad9dca3edd131a11970952a77ffebdb4091591a53b8909fd635071e0dc45",
+      "size_bytes": 33399
+    },
+    "code_5": {
+      "path": "src/jbspan/guided_recovery.py",
+      "sha256": "b88c122fad52070c243c3275863f839cdb198134b02d0d1c38ea697443b9f755",
+      "size_bytes": 9200
+    },
+    "code_6": {
+      "path": "scripts/run_rescue_local_development_v2.py",
+      "sha256": "a600047f48f16983bda88fbe4af9915cfcff10de75a8fe5d735eb680c20dc85f",
+      "size_bytes": 17978
+    },
+    "runtime_dll_0": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-base.dll",
+      "sha256": "44994a675412afb73e51dbbe5cdfb180b49a79d7253b20c669bbcfba6328145c",
+      "size_bytes": 773632,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_1": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-alderlake.dll",
+      "sha256": "89792c10745f034f1facf75f496fea5446b46d90220f2377f129df8c782c742d",
+      "size_bytes": 1181184,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_2": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-cannonlake.dll",
+      "sha256": "a42178d16753c9a5b7e344df7c7719ed6ce24dbc36f8b75632543a671c7be174",
+      "size_bytes": 1395712,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_3": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-cascadelake.dll",
+      "sha256": "3e5872cb5f98711e585cd7c8b5c781a70c002fdc9697b2470407725468724d34",
+      "size_bytes": 1382400,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_4": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-cooperlake.dll",
+      "sha256": "0bae40057f10b034ee9a38d56a6435fcb2067421eaf7a33792021efb89ef550e",
+      "size_bytes": 1383424,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_5": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-haswell.dll",
+      "sha256": "4bf25eeb5dc78d4a0cc928bcd7a301fbd81cba6d31068c5d5bc5b4b836aebf8a",
+      "size_bytes": 1185280,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_6": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-icelake.dll",
+      "sha256": "e380cd930685e0d84e4ed8369ab2db2ea742ef41b0df97c853d27a5777b0cfc6",
+      "size_bytes": 1389056,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_7": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-ivybridge.dll",
+      "sha256": "aac4d53c8b7d8b33918acf89b4b4a5b463f930e06e89cedbca5acf401ee759f3",
+      "size_bytes": 1074176,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_8": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-piledriver.dll",
+      "sha256": "1b719e09866aedcb37cabe6735dac6207be3d6219d4d3fd4ec8c5317630ad442",
+      "size_bytes": 1077760,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_9": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-sandybridge.dll",
+      "sha256": "74f29644b3cbddbcb5bae3b6b78401aee6f0f0898548be7265d2165e206bd8f4",
+      "size_bytes": 1054208,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_10": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-sapphirerapids.dll",
+      "sha256": "f5e72e9162e3ca9483dad7332621989b4efa3737db94dcd8a2f27e11e9f2cc9c",
+      "size_bytes": 1660416,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_11": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-skylakex.dll",
+      "sha256": "09b7d91416897b051eb522faafefb92a324abc65afb1b9786a1d8562d6477b9d",
+      "size_bytes": 1389568,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_12": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-sse42.dll",
+      "sha256": "2082c92a205510936558998182be19019d93e4a99fcd793039081d33a3d5ad70",
+      "size_bytes": 877568,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_13": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-x64.dll",
+      "sha256": "60971ca51406a002c099d5db41e03de454ee98f963ca60c05fa570f018e2fdf2",
+      "size_bytes": 870400,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_14": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-zen4.dll",
+      "sha256": "987cac33a360bedbfe3e92926ca04b36de55ec48cb7224a9a552782068b30d6b",
+      "size_bytes": 1390080,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_15": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-rpc.dll",
+      "sha256": "4ae2a0e852e0915350eac1761f75ac2ab4a09fc64675e100ebe000ce498506cd",
+      "size_bytes": 137728,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_16": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-vulkan.dll",
+      "sha256": "a7ac1389844210f50fcf8fce9a07c2d9193fbdb1c97e377471bbd06dfb7f334a",
+      "size_bytes": 53586944,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_17": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml.dll",
+      "sha256": "53c2833d6cd55d80ec6863a570a0bfc97e4b1510594b3dc36059261378139da1",
+      "size_bytes": 86016,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_18": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/libomp140.x86_64.dll",
+      "sha256": "4a20c1e5c115c29771a12324513eb109badac72180f79481527ad79d996ffb33",
+      "size_bytes": 661856,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_19": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-batched-bench-impl.dll",
+      "sha256": "df98bc6bb3bc48a1a8ccd1f87c116bc1b21c23d9c05c35b2df111742594117d2",
+      "size_bytes": 61440,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_20": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-bench-impl.dll",
+      "sha256": "6204d16e40e143e72005461c176c8ae8e7ce410e7b4edc5a2948f5111342993c",
+      "size_bytes": 395264,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_21": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-cli-impl.dll",
+      "sha256": "2eb02096b7b95a45d201a64c65aee2a6429d1672fe511d0f6036b5db377a50c2",
+      "size_bytes": 3523584,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_22": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-common.dll",
+      "sha256": "b98ab6df2f15001c711925f09b4d3b914f08681c01c1ed36375a8051f30144c0",
+      "size_bytes": 8056832,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_23": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-completion-impl.dll",
+      "sha256": "bc32de22e8d6fa65d7ce1102d8bd0826fec973a6cc23a39c2e9850ed64b1235d",
+      "size_bytes": 133120,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_24": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-fit-params-impl.dll",
+      "sha256": "8e8d3abe5c22b413beb3d7e837cb1322f7ea9b21cda2d61b889bfae805eb46da",
+      "size_bytes": 40960,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_25": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-perplexity-impl.dll",
+      "sha256": "97ccf248df09c8f311c328522050209979bee08d0a796d9ecc20951a786e87b7",
+      "size_bytes": 194048,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_26": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-quantize-impl.dll",
+      "sha256": "1017584fa31b5f119818216b303794c5c51e1dbec76c6c46083c439ab0c6bd91",
+      "size_bytes": 136704,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_27": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-server-impl.dll",
+      "sha256": "57a5ef7a34bf3bfa5ef732158d185b2c7eb14ffce131c3ea9af0a89934fbaa6e",
+      "size_bytes": 10023936,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_28": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama.dll",
+      "sha256": "70a209eca689a91734b026d77648a01ac7ea094c883816afe29e772af88dbcbb",
+      "size_bytes": 2898432,
+      "verification_stage": "execute"
+    },
+    "runtime_dll_29": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/mtmd.dll",
+      "sha256": "de7169905bb0f1c6cd2fb7f881f80d76dfb9dc3a46d05161dcf551259c13ff68",
+      "size_bytes": 1606144,
+      "verification_stage": "execute"
+    },
+    "runtime_archive": {
+      "path": "artifacts/p2_runtime_qualification_v1/downloads/llama-b10441-bin-win-vulkan-x64.zip",
+      "size_bytes": 34580767,
+      "sha256": "7fdbac5860ad1c64bf1e5703e4491612562e953a709a9f190affd6141147c6aa",
+      "verification_stage": "execute"
+    }
+  }
+}

@@ -1,0 +1,834 @@
+\documentclass{article}
+\usepackage{iclr2027_conference,times}
+\input{math_commands.tex}
+\usepackage{booktabs}
+\usepackage{amsthm,amssymb}
+\usepackage{hyperref}
+\usepackage{url}
+
+\title{When Minimal Recovery Explanations Fail:\\
+Exact Audits under Coarsening and Abstention}
+\author{Anonymous authors}
+% Working manuscript: no submission or acceptance is claimed.
+\newtheorem{proposition}{Proposition}
+\newcommand{\Fam}{\mathcal{M}}
+\newcommand{\Nec}{\mathcal{D}}
+\newcommand{\Poss}{\mathcal{P}}
+\newcommand{\Completions}{\mathcal{C}}
+\newcommand{\Representable}{\mathcal{A}}
+\newcommand{\cl}{\operatorname{cl}}
+\newcommand{\mininc}{\operatorname{Min}_{\subseteq}}
+\newcommand{\unknown}{\mathord{?}}
+
+\begin{document}
+\maketitle
+\lhead{Retrospective methods and pilot study --- working manuscript}
+
+\begin{abstract}
+A minimal prompt edit can explain an observed behavioral change without
+identifying a complete explanation family or a stable intervention. We audit
+these distinctions using existing, exhaustively enumerated jailbreak-recovery
+decision tables. Our method reports sharp marginal membership bounds over
+Boolean completions of unresolved decisions and compares coarsened explanations
+in their common atomic-unit space. An elementary partition-closure identity
+provides a grouping-only reference for complete monotone oracles; observed
+recovery-to-nonrecovery reversals supply a stronger diagnostic when tables are
+incomplete. In a retrospective pilot of 12 attack--payload instances spanning
+nine payloads, 16 minima are necessary across all completions, while 45 are
+marginally possible; only seven complete families are identified. Of 36
+adjacent-merge contrasts, 25 change the certified atomic family, but four of
+eight nontriviality flips leave that family unchanged. All 14 eligible contrasts
+from seven complete h4rm3l tables agree with the closure reference. Four
+contrasts, representing three distinct atomic reversal pairs in two
+DeepInception instances, contain a certified recovery reversal. All three
+distinct adjacent reversals are specific to layout-preserving blanking;
+source-aware omission retains three safe sampled outcomes at their closures.
+These findings
+qualify an initially broad instability interpretation: much of the apparent
+effect is compatible with grouping or unresolved certification. We preserve
+the failed neutralizer-stability gate and subsequent negative two-target
+screen that motivated the audit. The contribution is an executable
+identification audit with a small, explicitly retrospective empirical study,
+not prospective evidence of widespread instability or a safety guarantee.
+\end{abstract}
+
+\section{Introduction}
+
+Suppose neutralizing two components of a jailbreak prompt changes a harmful
+model response to an outcome accepted by a fixed evaluation rule. Calling this
+pair a minimal recovery explanation invites several different conclusions:
+the pair has been certified minimal; every minimal alternative is known; the
+result persists if components are grouped differently; and the underlying
+model is now safe. None of these conclusions follows from the others.
+This paper studies the first three claims while keeping the fourth outside
+the scope of a finite behavioral experiment.
+
+Minimal input explanations and feature removal are established tools
+\citep{carter2019,covert2021}. Structured jailbreaks make an audit particularly
+concrete: transformations can be represented by separately editable components,
+while the original request remains fixed
+\citep{doumbouya2025,li2023}. However, a minimum depends on which interventions
+are available and which outcomes an evaluator certifies. Existing work on
+jailbreak evaluation already documents discrepancies and proposes more
+specific criteria \citep{huang2026guidedbench,huang2026jailmeter}. Our question
+concerns the resulting \emph{family of minimal interventions}: how much of that
+family is identified, and which changes under coarsening exceed what grouping
+alone can explain?
+
+We answer this question through a retrospective audit of a completed
+development experiment. The original study sought recovery structure stable
+across two neutralizers, but its frozen cross-family stability gate failed.
+A later two-target confirmation screen also failed its eligibility gate.
+These negative results motivated the present analysis; they are preserved as
+negative results. No new target or evaluator calls were made for this audit.
+
+Our central observation is a distinction between \emph{complete enumeration}
+and \emph{complete identification}. Every subset may have an explicit record
+while some records remain unresolved because of evaluator disagreement or
+capability confounding. Exhaustively listing certified minima then gives a
+lower family, not necessarily the entire family of any resolved oracle. We
+derive the exact intersection and union of minimal-family memberships over
+all Boolean completions that respect the known labels. These are logical
+bounds, not confidence intervals or human validation.
+
+We also separate three sources of apparent resolution sensitivity: changes
+only in the number of named groups, changes expected from restricting the
+available interventions, and an observed loss of recovery when a fine minimum
+is enlarged to a representable coarse intervention. The pilot shows why this
+separation matters. A broad initial comparison found 25 family changes in 36
+adjacent merges. Yet the grouping reference explains every tested contrast
+with a complete Boolean table, and the stronger reversal evidence is confined
+to two DeepInception instances and the blanking operator. The completed result is therefore an audit of
+what the data identify and what a coarse explanation can support, with limited
+positive evidence for a stronger failure mode.
+
+\section{A finite recovery oracle with unresolved decisions}
+\label{sec:oracle}
+
+Let $U=\{u_1,\ldots,u_m\}$ be a fixed ordered vocabulary of attack-owned
+components. An instance comprises a target artifact, an attack renderer, and
+a request $p$. For $S\subseteq U$, an intervention neutralizes the components
+in $S$ while preserving the UTF-8 bytes of $p$ exactly once in the scientific
+prompt. The observation contract fixes neutralizers, decoding seeds, response
+evaluators, output-validity checks, and capability controls.
+
+We represent the resulting decision table by
+\begin{equation}
+g:2^U\longrightarrow\{1,0,\unknown\}.
+\label{eq:partial}
+\end{equation}
+Here $1$ means \texttt{RECOVERED} under that contract, $0$ means
+\texttt{NOT\_RECOVERED}, and $\unknown$ retains an unresolved label. In the
+completed experiment, recovery required the fixed panel to label every
+required seed under both neutralizers safe, followed by passing all selected
+capability controls. A valid harmful witness certified nonrecovery. Evaluator
+abstentions without such a witness remained unresolved. Failed capability
+controls were separately recorded as \texttt{CAPABILITY\_CONFOUNDED}; they
+enter $\unknown$ for identification calculations while retaining their
+original reason codes. No unresolved observation is promoted to recovery.
+
+The term ``known'' below means fixed by this recorded instrument. It does not
+mean that an automatic judgment is semantically infallible. The Boolean
+completion model describes uncertainty \emph{conditional on the accepted
+labels}; it does not model misclassification of labels already marked $0$ or
+$1$, nor does it repair capability failure.
+
+For a total Boolean function $f:2^U\to\{0,1\}$, define its complete
+strict-subset-minimal family
+\begin{equation}
+\Fam(f)=\{S\subseteq U:f(S)=1\ \text{and}\ f(T)=0
+                 \text{ for every }T\subsetneq S\}.
+\label{eq:minimal}
+\end{equation}
+This is inclusion minimality, not minimum cardinality. We do not assume
+monotonicity: neutralizing additional components may restore a harmful
+response. Checking only immediate subset neighbors is insufficient for
+Equation~\ref{eq:minimal} without such an assumption.
+
+Three levels of exactness should consequently be distinguished. A
+\emph{complete decision table} contains all $2^m$ rows, including explicit
+unknowns. An \emph{exhaustive certificate family} contains every minimum that
+can be proved from those rows. An \emph{identified Boolean minimal family}
+is the same under every allowed resolution of the unknowns. None establishes
+universal safety outside the recorded evaluation contract.
+
+\section{Identification and coarsening audits}
+
+\subsection{Necessary and possible minimal memberships}
+
+Let $\Completions(g)$ contain all Boolean functions agreeing with every known
+label of $g$, with no monotonicity or distributional constraint. Define
+\begin{align}
+\Nec(g)&=\{S:g(S)=1,\quad \forall T\subsetneq S,\ g(T)=0\},
+\label{eq:necessary}\\
+\Poss(g)&=\{S:g(S)\ne0,\quad
+                   \nexists T\subsetneq S\text{ with }g(T)=1\}.
+\label{eq:possible}
+\end{align}
+
+\begin{proposition}[Sharp marginal membership bounds]
+\label{prop:bounds}
+For any finite table $g$,
+\begin{equation}
+\Nec(g)=\bigcap_{f\in\Completions(g)}\Fam(f),\qquad
+\Poss(g)=\bigcup_{f\in\Completions(g)}\Fam(f).
+\label{eq:bounds}
+\end{equation}
+Thus $\Nec(g)\subseteq\Fam(f)\subseteq\Poss(g)$ for every completion, and
+the entire family is identified exactly when $\Nec(g)=\Poss(g)$.
+\end{proposition}
+
+The proof follows by assigning unresolved labels at $S$ and its strict
+subsets; Appendix~\ref{app:proofs} gives the details. ``Sharp'' is marginal:
+each member of $\Poss(g)$ occurs in some completion, but all possible members
+need not coexist. In particular, $\Poss(g)$ need not be an antichain. Reporting
+its size as the number of recovered explanations would be incorrect.
+Complete Boolean observation is sufficient for identification, but not
+necessary if the unresolved rows cannot affect minimality.
+
+A two-unit example illustrates the distinction. Set $g(\varnothing)=0$,
+$g(\{a\})=\unknown$, $g(\{b\})=0$, and $g(\{a,b\})=1$. Then
+$\Nec=\varnothing$ and $\Poss=\{\{a\},\{a,b\}\}$. Resolving the unknown
+to $1$ gives the first minimum; resolving it to $0$ gives the second. The two
+possible minima cannot coexist in a single completion.
+
+\subsection{Exact projection and a grouping reference}
+
+Let $\pi$ be a partition of $U$, and let $\Representable_\pi$ denote all
+unions of its blocks. A coarse intervention is the same atomic intervention
+already present in the table, restricted to this subdomain. Its label is
+therefore obtained without a new model call. We compare coarse minima as
+\emph{atomic unions}, rather than comparing block names or their ordering.
+
+Define the partition closure
+\begin{equation}
+\cl_\pi(S)=\bigcup\{B\in\pi:B\cap S\ne\varnothing\},
+\end{equation}
+the smallest representable intervention containing $S$. For any family $F$,
+write $\mininc F$ for its inclusion-minimal members. Let $\Fam_\pi(f)$ be
+the minimal positives of $f$ restricted to $\Representable_\pi$, expressed
+in atomic units.
+
+\begin{proposition}[Monotone partition-closure identity]
+\label{prop:closure}
+For a complete monotone Boolean oracle $f$,
+\begin{equation}
+\Fam_\pi(f)=\mininc\{\cl_\pi(M):M\in\Fam(f)\}.
+\label{eq:closure}
+\end{equation}
+\end{proposition}
+
+This elementary identity supplies a grouping reference, not a claim that the
+observed oracle is monotone. We call disagreement with its right-hand side a
+\emph{closure-reference residual}. The implementation computes that residual
+only on complete Boolean tables; substituting a lower certificate family for
+the unidentified $\Fam(f)$ would give an unjustified reference. A nonzero
+residual rejects this particular monotone explanation. A zero residual does
+not prove monotonicity or independence of the units.
+
+Grouping can also change a verbal classification without changing any atomic
+minimum. If the only minimum is $\{a,b\}$ and those units become one block,
+its group cardinality changes from two to one. We reproduce the historical
+``nontrivial'' indicator, which is true when a certified family has multiple
+members or contains a member of order greater than one. A flip with identical
+atomic families is reported as a \emph{group-count-only flip}; it is not
+evidence of a changed atomic explanation.
+
+\subsection{A stronger witness available with incomplete tables}
+
+For a certified fine minimum $M\in\Nec(g)$, a
+\emph{recovery-reversal witness} is
+\begin{equation}
+g(M)=1,\qquad g(\cl_\pi(M))=0.
+\label{eq:witness}
+\end{equation}
+These two known labels contradict every monotone Boolean completion of $g$.
+Unlike a family-name change, the witness states that enlarging a recorded
+recovery intervention to the required coarse union loses recovery under the
+same contract. Unknown closure labels are counted separately and never treated
+as witnesses. Because $g$ aggregates a finite seed and neutralizer contract,
+this is a statement about that observed contract, not an estimate of a
+population-level stochastic recovery probability.
+
+Coarsening can additionally \emph{promote} a certificate by hiding strict
+subsets that are no longer representable. A hidden recovered subset changes
+the admissible optimization problem. A hidden unresolved subset changes what
+can be certified on that restricted domain. In the two-unit example above,
+merging $a$ and $b$ yields a certified coarse singleton although no fine
+minimum is identified. The algorithm records these causes instead of
+treating every coarse certificate as stronger evidence.
+
+The method enumerates subsets, calculates Equations~\ref{eq:necessary}
+and~\ref{eq:possible}, projects each declared partition, compares families
+setwise in atomic coordinates, and records closure witnesses and hidden-subset
+causes. It requires no access to prompt or response text. A direct
+implementation checks $O(3^m)$ subset relations; the model-query requirement
+belongs to the original finite table, not to subsequent projections.
+
+\section{Retrospective experimental setting}
+\label{sec:setting}
+
+\subsection{Data, model, and recorded oracle}
+
+The topology corpus consists of all 12 stable attack--payload pairs retained
+by the preceding frozen development screen: nine instances of one fixed
+h4rm3l composition and three of one fixed DeepInception renderer, covering
+nine unique GuidedBench core requests \citep{huang2026guidedbench}. This is a
+selected development corpus, not a random sample of all attacks or of the
+whole benchmark. All topology outputs come from Qwen2.5-7B-Instruct in the
+official Q4\_K\_M artifact, executed with llama.cpp build \texttt{b10441} on
+an RTX 3070. Sampling used seeds 11, 23, and 47, temperature $0.7$,
+top-$p$ $0.9$, top-$k$ $50$, and a 512-token generation maximum.
+
+The h4rm3l vocabulary contains three separately implemented decorators. The
+DeepInception vocabulary contains seven source-derived components of the
+fixed renderer. Neither vocabulary was changed in this audit. Two
+neutralizers, source-aware omission and layout-preserving blanking, were
+crossed with the required seeds. Two evaluator axes, Qwen3Guard and
+JailMeter, were combined using the frozen agreement rule
+\citep{zhao2025,huang2026jailmeter}. The exact mapping and capability contract
+are given in Appendix~\ref{app:contract}; the safe labels are not new
+GuidedEval measurements.
+
+The resulting table has $9\cdot2^3+3\cdot2^7=456$ subset decisions,
+including the empty baselines: 64 recovered, 346 not recovered, 29 abstained,
+and 17 capability confounded. All rows are present, but 46 are unresolved
+for Boolean-family identification. The original experiment made 1,807 new
+target generations and 324 capability-control generations. Another 857
+target generations were skipped only after a valid harmful witness had
+already falsified the conjunction for that subset and neutralizer. This
+logical stopping rule does not synthesize unobserved per-seed outcomes.
+
+\subsection{Preserved negative results and analysis chronology}
+
+Before this audit, the original cross-family development gate required pooled
+positive-neutralizer Jaccard at least $0.80$. The observed value was
+$64/141=0.4539$, so that gate failed. The family-specific values were
+$25/30=0.8333$ for h4rm3l and $39/111=0.3514$ for DeepInception. Those
+post-outcome diagnostics motivated a separately frozen h4rm3l-only,
+two-target confirmation screen, not a relabeling of the original gate.
+
+The confirmation screen used 45 previously reserved payloads with Qwen2.5
+and an admitted Gemma 4 E4B QAT Q4\_0 artifact. Its 180 seed-11 direct and
+attacked generations completed. Forty target--payload pairs could advance,
+but the split was Qwen 35 and Gemma 5 against a minimum of six per target.
+Later seeds could only remove pairs, making the gate unreachable. The screen
+therefore ended with a valid negative result and no confirmatory topology.
+The stored zero fully stable pairs must not be read as a three-seed prevalence
+estimate, because the later seeds were not executed.
+
+The present identification and coarsening questions were formulated after
+these results. Every number below is a descriptive reconstruction of the
+existing safe tables. No prospective success gate was applied to this new
+audit, and neither original failed gate was modified. An earlier projection
+enumerated 2,676 arbitrary partitions and 228 contiguous partitions; our main
+diagnostics use the 36 immediate adjacent merges, with all 90 immediate
+arbitrary merges as an additional descriptive view. These are repeated
+deterministic contrasts, not independent sample sizes.
+
+\section{Results}
+
+\subsection{Exhaustive certificates leave five families unidentified}
+
+Table~\ref{tab:identification} reports necessary and possible memberships.
+The 16 necessary minima exactly reconstruct the original certified minima.
+The union of marginally possible memberships contains 45 sets, including 29
+in the three DeepInception instances. Only seven instance families are
+identified; all seven happen to have complete Boolean tables and belong to
+h4rm3l. Three DeepInception instances and two h4rm3l instances remain
+unidentified. Thus the previously reported 11 instances with at least one
+certified minimum do not imply 11 identified complete families.
+
+\begin{table}[t]
+\caption{Family identification in the 12-instance pilot. Counts of minima
+sum memberships within instances; possible memberships need not coexist.
+The overall nine payloads are shared across attack families.}
+\label{tab:identification}
+\centering
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+Attack & Instances & Unknown rows & Necessary & Possible & Identified \\
+\midrule
+h4rm3l & 9 & 2 & 12 & 16 & 7/9 \\
+DeepInception & 3 & 44 & 4 & 29 & 0/3 \\
+\midrule
+Total & 12 & 46 & 16 & 45 & 7/12 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+This result changes the interpretation of an exact-search comparison. In
+the historical h4rm3l audit, a singleton search found 1 of 12 certified minima,
+while each of the implemented greedy-forward, greedy-backward, and
+DDMIN-style paths found 8 of 12. The four missed memberships demonstrate
+that one returned path need not exhaust the certificate family. The
+denominator is the \emph{12 certified memberships}, not an identified full
+family for every instance and not the 16 marginally possible h4rm3l
+memberships. Moreover, a method designed to return one minimum should not be
+called incorrect merely because it does not enumerate all alternatives. This
+comparison is descriptive of different output objects, not a controlled
+runtime-superiority benchmark.
+
+\subsection{Grouping explains the eligible complete-table contrasts}
+
+Table~\ref{tab:adjacent} decomposes the 36 adjacent-merge comparisons. Atomic
+certificate families change in 25, while the historical nontriviality
+classification changes in eight. Four of these eight flips preserve the
+entire atomic family. For those four, the difference is solely the number
+of groups used to name the same intervention.
+
+For the seven complete Boolean h4rm3l tables, all 14 adjacent contrasts agree
+with the closure reference: there are zero residuals. This does not establish
+monotonicity, but it provides no evidence in those contrasts that the family
+changes exceed the prediction of the grouping reference. The remaining
+22 contrasts are not assigned a reference residual because their fine
+families are not completely observed. In particular, the absence of a
+DeepInception residual estimate is missing eligibility, not a zero effect.
+
+\begin{table}[t]
+\caption{Adjacent coarsening audit. Numerators count partition contrasts,
+not independent cases. ``Not eligible'' means no complete Boolean table was
+available for the closure-reference comparison.}
+\label{tab:adjacent}
+\centering
+\small
+\begin{tabular}{lrrr}
+\toprule
+Diagnostic & h4rm3l & DeepInception & Overall \\
+\midrule
+Adjacent contrasts & 18 & 18 & 36 \\
+Atomic family changed & 12 & 13 & 25 \\
+Nontriviality flipped & 8 & 0 & 8 \\
+Group-count-only flip & 4 & 0 & 4 \\
+Recovery-reversal contrasts & 0 & 4 & 4 \\
+Unknown closures of certified minima & 0 & 4 & 4 \\
+Closure-reference residual / eligible & 0/14 & Not eligible & 0/14 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Observed reversals are localized and partly repeated}
+
+Four adjacent contrasts have a recovered fine minimum whose coarse closure
+is recorded not recovered. They occur in two DeepInception instances,
+representing two unique payloads; h4rm3l has none. Table~\ref{tab:witnesses}
+expresses the witnesses using the seven frozen unit indices. Two different
+partitions in instance D3 yield the same minimum--closure pair. Thus the
+four contrast-level witnesses represent \emph{three distinct atomic
+reversal pairs}, not four independent behavioral events.
+
+The operator-specific provenance is decisive. At every adjacent witness,
+the fine minimum has three safe sampled responses under both neutralizers.
+At its coarse closure, source-aware omission still has three safe responses,
+while layout-preserving blanking has one recorded harmful response. A first
+harmful response at seed 11 triggers the frozen early stop in one contrast;
+the other three contrasts include two safe responses and a harmful response
+at seed 47. No unexecuted seed is imputed. The signal is therefore a failure
+of the combined finite-seed predicate attributable to blanking at these
+endpoints, not a reversal replicated under omission or harmfulness sustained
+across all seeds.
+
+\begin{table}[t]
+\caption{Distinct adjacent recovery reversals. D1 and D3 identify rows in
+Appendix~\ref{app:instances}; numbers denote frozen component positions.
+The last column counts adjacent partitions yielding the same pair.}
+\label{tab:witnesses}
+\centering
+\begin{tabular}{lccc}
+\toprule
+Instance & Recovered minimum & Nonrecovered closure & Partitions \\
+\midrule
+D1 & $\{1,4\}$ & $\{1,3,4\}$ & 1 \\
+D1 & $\{1,4\}$ & $\{1,2,4\}$ & 1 \\
+D3 & $\{1,4,6,7\}$ & $\{1,4,5,6,7\}$ & 2 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+These witnesses survive arbitrary Boolean assignments to the other unknown
+rows: their endpoints are known labels. They establish observed
+nonmonotonicity of the recorded recovery predicate for those pairs. They do
+not identify the whole DeepInception family, establish evaluator truth, or
+support a replicated effect across two attack families or two targets.
+The complete topology evidence still comes from one quantized target.
+The two families also have different opportunity counts: three units yield
+two adjacent merges per h4rm3l instance, whereas seven yield six per
+DeepInception instance. Their raw witness counts cannot isolate an attack-family
+effect from dimensionality and the number of comparisons. h4rm3l is an
+empirical comparison family, not a known-negative control; only a stipulated
+synthetic monotone oracle supplies that guarantee for the closure diagnostic.
+
+Across all 90 arbitrary one-pair merges, 64 contrasts change the atomic
+certificate family, and 11 contrasts contain 12 witness occurrences, again
+confined to the same two instances. They deduplicate to five atomic reversal
+pairs: three blank-only, one omission-only, and one involving both
+neutralizers. This is an exploratory sensitivity view; choosing nonadjacent
+partitions after observing these outcomes would not validate an
+operator-general adjacent-coarsening claim. All 21 eligible complete-table comparisons
+have zero closure-reference residual. This wider enumeration adds
+deterministic views of the same observations, not independent replication.
+
+\subsection{The negative confirmation screen exposes an instrument limit}
+
+Table~\ref{tab:c1n} shows the attacked-response labels in the separate
+two-target screen. Gemma has only 9/45 evaluator agreements and 36 panel
+abstentions. Qwen has 36/45 agreements and nine abstentions. The five Gemma
+harmful agreements explain why the fixed panel could not certify enough
+eligible pairs. This identifies a coverage bottleneck under the recorded
+instrument; it does not adjudicate between the judges or prove that the
+attack failed to elicit relevant assistance.
+
+\begin{table}[t]
+\caption{Attacked-response labels in the completed seed-11 screen. Each
+cell is harmful / safe / abstain. These are automatic labels, not human
+ground truth, and no confirmation topology was generated.}
+\label{tab:c1n}
+\centering
+\begin{tabular}{lccc}
+\toprule
+Target & Qwen3Guard & JailMeter & Fixed panel \\
+\midrule
+Qwen2.5 & 45 / 0 / 0 & 36 / 9 / 0 & 36 / 0 / 9 \\
+Gemma & 41 / 4 / 0 & 5 / 35 / 5 & 5 / 4 / 36 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Related work and scope of contribution}
+
+\paragraph{Minimal inputs and removal explanations.}
+Delta debugging minimizes failure-inducing inputs \citep{zeller2002}, and
+sufficient input subsets provide compact, instance-specific explanations
+\citep{carter2019}. Removal-based explanation frameworks distinguish how
+features are removed, which behavior is explained, and how influence is
+summarized \citep{covert2021}. Formal explanation work also develops
+relationships and enumeration algorithms for sufficient and contrastive
+explanations \citep{ignatiev2020}. Our fixed intervention $f(S)=1$ evaluates
+one specified edited input; it does not universally quantify over all values
+of the remaining features. We do not claim the first minimal input set,
+the first complete finite enumeration, or the general discovery that a
+representation affects explanation. Propositions~\ref{prop:bounds}
+and~\ref{prop:closure} are elementary finite-set facts supplied to make the
+audit explicit and checkable. The contribution is their use in one executable
+audit that distinguishes certified versus identified recovery families,
+grouping effects, hidden uncertainty, and known reversal witnesses.
+
+\paragraph{Structured attacks and evaluation.}
+h4rm3l provides a compositional transformation language
+\citep{doumbouya2025}; DeepInception uses a nested-scene prompt construction
+\citep{li2023}. We reuse fixed representatives and do not synthesize or
+optimize attacks. GuidedBench introduces case-specific evaluation guidelines,
+while JailMeter develops an evidence-based jailbreak evaluator
+\citep{huang2026guidedbench,huang2026jailmeter}. Qwen3Guard supplies a distinct
+safety-moderation instrument \citep{zhao2025}. Our empirical endpoint is the
+historical fixed panel, whose disagreement is part of the audit. We do not
+claim a new evaluator or a new finding that jailbreak evaluators disagree.
+LOCA is especially close in motivation: it seeks minimal internal
+representation changes that induce refusal \citep{kumar2026}. Our editable
+input-unit families and conditional observation audit do not establish
+internal causal mechanisms or subsume that representation-level analysis.
+
+\section{Limitations and requirements for broader validation}
+
+\paragraph{Selection and scope.}
+The 12 topology instances were selected for stable attack eligibility in a
+development screen; the questions in this manuscript were chosen after
+observing their outcomes. Nine unique payloads and one quantized target
+cannot support prevalence or broad model-family claims. We therefore report
+finite counts without a hypothesis test or confidence interval that treats
+partition edges as independent samples. A future population study must
+account for repeated target, attack, seed, and partition measurements within
+payload clusters. It must also avoid presenting the three-unit composition
+as representative of all h4rm3l programs.
+
+\paragraph{Conditional correctness.}
+Sharp completion bounds quantify missing-label uncertainty conditional on
+the fixed known decisions. Judge errors may invalidate those conditions.
+Capabilities are tested using two simple tasks and cannot rule out every
+semantic or behavioral confound. Grouping units preserves the specified
+atomic intervention but changes the available edit vocabulary; a coarse
+minimum should not be read as a newly discovered intrinsic mechanism.
+
+\paragraph{Measurement redesign remains unvalidated.}
+A no-inference development preflight has bound the 180 existing screen
+responses to their GuidedBench guidelines. No GuidedEval judge output is
+part of this paper. A candidate follow-up endpoint would certify that all
+case-specific entity/action scoring points are absent, retain pointwise judge
+disagreement as uncertainty, and report each judge separately. Even unanimous
+zero matched points means only zero matches to the declared rubric on those
+outputs, not universal safety or absence of other harmful content. GuidedBench
+already owns this rubric-based evaluation approach; adapting its zero-point
+endpoint cannot be claimed as a newly validated judge.
+
+\paragraph{Prospective evidence.}
+An identity-only audit has sealed two unused 60-payload cohorts with zero
+overlap and no prior-output collision. Neither cohort contributed a target
+or evaluator outcome here. Broader validation requires a complete pre-output
+contract specifying judge artifacts, qualification criteria, admissible
+partitions, target admission, capability controls, estimands, and stopping
+rules. Development qualification should use only already observed responses.
+Fresh primary data must then establish whether adequate identifiable families
+and meaningful reversals occur, with independent replication of frozen
+contrasts on the second cohort. The current data do not meet that broader
+evidence requirement.
+
+\section{Conclusion}
+
+An exhaustive prompt-intervention experiment can identify some minimal
+certificates while leaving the full explanation family unknown. In the
+completed pilot, 16 necessary memberships expand to 45 marginally possible
+memberships, and only seven of 12 families are identified. Coarsening changes
+many reported families, but every eligible complete-table contrast matches
+the elementary grouping reference; half of the nontriviality flips preserve
+the atomic family itself. A stronger recovery-reversal diagnostic identifies
+three distinct atomic pairs in two DeepInception instances, all specific to
+blanking among the adjacent contrasts. Reporting these
+objects separately produces a narrower and more defensible account of what
+the experiment establishes. The resulting audit is complete for the stored
+tables; its empirical generalization remains a prospective research task.
+
+\section*{Reproducibility and responsible reporting}
+
+The retrospective analysis consumes only safe tables containing unit IDs,
+hashes, and categorical outcomes. Raw requests, attack prompts, model
+responses, and judge explanations are not included in this manuscript or
+its analysis output. The source tables and original negative receipts are
+preserved. Appendix~\ref{app:artifacts} identifies the local analysis entry
+point and exact source/output identities. No new human annotation was
+performed for this study. No claim of public artifact release, submission,
+acceptance, human-equivalent judgment, or generalized safety is made.
+
+\begin{thebibliography}{10}
+
+\bibitem[Carter et~al.(2019)]{carter2019}
+Brandon Carter, Jonas Mueller, Siddhartha Jain, and David Gifford.
+What made you do this? Understanding black-box decisions with sufficient
+input subsets.
+In \emph{Proceedings of AISTATS}, volume 89 of \emph{PMLR},
+pp.\ 567--576, 2019.
+\url{https://proceedings.mlr.press/v89/carter19a.html}.
+
+\bibitem[Covert et~al.(2021)]{covert2021}
+Ian Covert, Scott Lundberg, and Su-In Lee.
+Explaining by removing: A unified framework for model explanation.
+\emph{Journal of Machine Learning Research}, 22(209):1--90, 2021.
+\url{https://jmlr.org/papers/v22/20-1316.html}.
+
+\bibitem[Doumbouya et~al.(2025)]{doumbouya2025}
+Moussa Koulako Bala Doumbouya, Ananjan Nandi, Gabriel Poesia, Davide Ghilardi,
+Anna Goldie, Federico Bianchi, Dan Jurafsky, and Christopher D. Manning.
+h4rm3l: A language for composable jailbreak attack synthesis.
+In \emph{International Conference on Learning Representations}, 2025.
+\url{https://arxiv.org/abs/2408.04811v4}.
+
+\bibitem[Huang et~al.(2026a)]{huang2026guidedbench}
+Ruixuan Huang, Xunguang Wang, Zongjie Li, Daoyuan Wu, and Shuai Wang.
+GuidedBench: Measuring and mitigating the evaluation discrepancies of
+in-the-wild LLM jailbreak methods.
+In \emph{International Conference on Learning Representations}, 2026.
+\url{https://arxiv.org/abs/2502.16903v3}.
+
+\bibitem[Huang et~al.(2026b)]{huang2026jailmeter}
+Qingjia Huang, Jingyu Zhang, Jianguo Wu, Yakai Li, Weijuan Zhang,
+Yankai Rong, Junyi Yao, Shengzhi Zhang, and Xiaoqi Jia.
+JailMeter: An evidence-based evaluation framework for jailbreak attacks on
+large language models.
+In \emph{Findings of the Association for Computational Linguistics: ACL 2026},
+pp.\ 16006--16029, 2026.
+\url{https://aclanthology.org/2026.findings-acl.786/}.
+
+\bibitem[Ignatiev et~al.(2020)]{ignatiev2020}
+Alexey Ignatiev, Nina Narodytska, Nicholas Asher, and Jo\~ao Marques-Silva.
+On relating `Why?' and `Why Not?' explanations.
+\emph{arXiv preprint arXiv:2012.11067}, 2020.
+\url{https://arxiv.org/abs/2012.11067}.
+
+\bibitem[Kumar and Ahuja(2026)]{kumar2026}
+Shubham Kumar and Narendra Ahuja.
+Minimal, local, causal explanations for jailbreak success in large language
+models.
+In \emph{Conference on Language Modeling}, 2026.
+\url{https://arxiv.org/abs/2605.00123v3}.
+
+\bibitem[Li et~al.(2023)]{li2023}
+Xuan Li, Zhanke Zhou, Jianing Zhu, Jiangchao Yao, Tongliang Liu, and Bo Han.
+DeepInception: Hypnotize large language model to be jailbreaker.
+\emph{arXiv preprint arXiv:2311.03191}, 2023.
+\url{https://arxiv.org/abs/2311.03191}.
+
+\bibitem[Zeller and Hildebrandt(2002)]{zeller2002}
+Andreas Zeller and Ralf Hildebrandt.
+Simplifying and isolating failure-inducing input.
+\emph{IEEE Transactions on Software Engineering}, 28(2):183--200, 2002.
+\url{https://doi.org/10.1109/32.988498}.
+
+\bibitem[Zhao et~al.(2025)]{zhao2025}
+Haiquan Zhao, Chenhan Yuan, Fei Huang, Xiaomeng Hu, Yichang Zhang,
+An Yang, Bowen Yu, Dayiheng Liu, Jingren Zhou, Junyang Lin, and others.
+Qwen3Guard technical report.
+\emph{arXiv preprint arXiv:2510.14276}, 2025.
+\url{https://arxiv.org/abs/2510.14276}.
+
+\end{thebibliography}
+
+\appendix
+\section{Proofs and illustrative edge cases}
+\label{app:proofs}
+
+\begin{proof}[Proof of Proposition~\ref{prop:bounds}]
+If $S\in\Nec(g)$, every completion has $f(S)=1$ and $f(T)=0$ for every
+strict subset, so $S$ belongs to every minimal family. Conversely, if
+$g(S)\ne1$, either it is already zero or a completion can set it to zero;
+then $S$ is not necessary. If $g(S)=1$ but some $T\subsetneq S$ is not
+known zero, a completion can set that $T$ to one, also preventing minimality.
+This proves the intersection identity.
+
+If $S$ is minimal in any completion, its label cannot be known zero and
+no strict subset can be known one, which gives $S\in\Poss(g)$. Conversely,
+for any $S\in\Poss(g)$, choose a completion that sets $f(S)=1$ and all
+unresolved strict subsets to zero. This is consistent with every known label;
+other unknown rows may be set arbitrarily. Then $S\in\Fam(f)$, proving
+the union identity. A common intersection and union identify all memberships;
+if they differ, the witnessing completions disagree on at least one member.
+\end{proof}
+
+\begin{proof}[Proof of Proposition~\ref{prop:closure}]
+For monotone $f$, each $\cl_\pi(M)$ with $M\in\Fam(f)$ is positive.
+Every positive representable set $A$ contains some fine minimum $M$, since
+the finite collection of positive subsets of $A$ has a minimal member.
+Representability of $A$ implies $\cl_\pi(M)\subseteq A$. Thus every
+coarse positive contains a positive closure of a fine minimum. Its minimal
+members are exactly the inclusion-minimal closures, proving the identity.
+The argument also covers the empty family and a positive empty set.
+\end{proof}
+
+\paragraph{Why immediate subsets are insufficient.}
+Let $f(\{a\})=1$, set every two-element subset of $\{a,b,c\}$ to zero,
+and let $f(\{a,b,c\})=1$. All immediate predecessors of the three-element
+set are negative, but the set is not strict-subset minimal because
+$\{a\}$ is positive. This is a synthetic logical example, not an empirical
+model response.
+
+\paragraph{Why a zero residual does not prove monotonicity.}
+For $U=\{a,b,c\}$, take positives $\{a\}$, $\{b\}$, and
+$\{a,b,c\}$ only. The function is not monotone, since $\{a\}$ is
+positive and $\{a,c\}$ is negative. For the partition with the single
+block $U$, however, the coarse minimum and the minimal closure of both fine
+minima are $U$. Agreement for a tested partition is therefore compatible
+with nonmonotonicity elsewhere.
+
+\section{Recorded observation contract}
+\label{app:contract}
+
+The D3 contract maps the Qwen3Guard axis to harmful when
+\texttt{safety == Unsafe} and \texttt{refusal == No}; its non-success
+predicate is \texttt{safety == Safe} or \texttt{refusal == Yes}. The panel
+returns harmful if the Qwen harmful predicate and JailMeter label 1 agree,
+safe if the Qwen non-success predicate and JailMeter label 0 agree, and
+abstain otherwise, including parsing failure. Harmful takes precedence,
+then safe, then abstain. The same recorded panel is used across the
+scientific conditions. No evaluator output was changed in the retrospective
+audit. This operating rule is not claimed to be a universal equivalence
+between absence of attack success and safety.
+
+Recovery requires safe panel labels for seeds 11, 23, and 47 under both
+neutralizers, plus capability checks for the candidate recovery. Two benign
+control tasks, arithmetic and token copying, are applied to separate control
+copies of the prompt under each neutralizer. Their decoding uses seed 17,
+temperature zero, top-$k$ one, top-$p$ one, and at most 48 new tokens.
+Both tasks must return the required answer without truncation, prompt echo,
+or runtime error. These four matched checks explain the 324 controls for
+81 candidate-positive subsets. They provide a limited validity filter,
+not a general capability benchmark.
+
+Source-aware omission removes the designated source components through the
+fixed renderer. Layout-preserving blanking replaces their owned regions
+according to the frozen adapter. The current audit changes neither
+neutralizer nor their definitions. The paired neutralizer-stability gate
+compares their positive decisions before the joint recovery decision; its
+pooled Jaccard therefore has a different denominator from the count of
+jointly recovered subsets. The value $64/141$ is not a count of 141
+independent payloads.
+
+\section{Instance-level identification results}
+\label{app:instances}
+
+Table~\ref{tab:instances} preserves every instance, including the instance
+without a necessary minimum. The safe hash prefixes identify the original
+rows without reproducing request or response text. A possible count greater
+than a necessary count marks an unidentified family.
+
+\begin{table}[h]
+\caption{All instance-level results. Unknown rows include both abstention
+and capability confounding. ``Reversal contrasts'' counts adjacent partitions.}
+\label{tab:instances}
+\centering
+\small
+\begin{tabular}{llrrrr}
+\toprule
+ID & Safe instance prefix & Unknown & Necessary & Possible & Reversal contrasts \\
+\midrule
+D1 & \texttt{5233344c} & 25 & 2 & 10 & 2 \\
+D2 & \texttt{8b1ff2f6} & 12 & 1 & 14 & 0 \\
+D3 & \texttt{e40408e7} & 7 & 1 & 5 & 2 \\
+H1 & \texttt{188c2aa2} & 0 & 1 & 1 & 0 \\
+H2 & \texttt{27ac88c5} & 0 & 1 & 1 & 0 \\
+H3 & \texttt{3b6bb0aa} & 0 & 1 & 1 & 0 \\
+H4 & \texttt{7440b9c7} & 0 & 1 & 1 & 0 \\
+H5 & \texttt{945bd2bd} & 1 & 2 & 3 & 0 \\
+H6 & \texttt{bf3e47d0} & 0 & 1 & 1 & 0 \\
+H7 & \texttt{cccc036f} & 1 & 0 & 3 & 0 \\
+H8 & \texttt{d55a7656} & 0 & 3 & 3 & 0 \\
+H9 & \texttt{de27373c} & 0 & 2 & 2 & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Artifact identities and reconstruction}
+\label{app:artifacts}
+
+The new pure implementation is
+\path{src/jbspan/topology_identification.py}. Its audit entry point is
+\path{scripts/audit_rescue_identification_v2.py}; from the repository root,
+\texttt{python scripts/audit\_rescue\_identification\_v2.py --root .}
+reconstructs the results from the existing safe D3 source. It verifies the
+source hash and reconstructs every historical certified minimum before
+performing the new audit. The result is written once to
+\path{data/natural_language_localization/rescue_identification_v2/audit.safe.json};
+a later run with different content is rejected. No target, judge, payload,
+or private-response access is needed by this entry point.
+
+The D3 safe source is
+\path{data/natural_language_localization/d3_exact_topology_v1/instance_results.safe.jsonl}.
+Its SHA-256 is
+\begin{center}\scriptsize
+\texttt{2ebe3ff8cf7a603fa885500e9946bb79cdc7bd80d79f6ea29077dfb099934d34}.
+\end{center}
+The current audit result identity is
+\begin{center}\scriptsize
+\texttt{52e114d41d998e161c720b6ce89da87d8da908e89b2d7e3e873e3b0d8e102acc}.
+\end{center}
+The first output is retained separately as \path{audit.initial.safe.json};
+its scientific values are unchanged in the current output, whose identity
+also binds the subsequently formatted source bytes. Operator and seed
+provenance are reconstructed in
+\path{data/natural_language_localization/rescue_identification_v2/witness_provenance.safe.json},
+which deduplicates exact atomic reversal pairs and binds their original safe
+observations. This secondary audit does not infer unobserved seed outcomes.
+The immutable D3 result file SHA-256 is
+\begin{center}\scriptsize
+\texttt{12e9289370c3db20423736103c5ca4f12666e4faf77c8a5b3eeeffdb0ce7e59b},
+\end{center}
+and the C1N result file SHA-256 is
+\begin{center}\scriptsize
+\texttt{acd2467e4c805fe6c3fe0b5f2ba7d416fe08a00760032166051430253c02b948}.
+\end{center}
+Their separate independent-verification receipts certify reconstruction of
+the negative results; they do not certify a positive scientific hypothesis.
+The current manuscript is a separate file from the earlier prospective
+manuscript, which remains preserved. Bibliographic metadata and the limited
+related-work statements were checked against primary publisher, proceedings,
+or author-deposited records on 2026-09-05.
+
+\end{document}

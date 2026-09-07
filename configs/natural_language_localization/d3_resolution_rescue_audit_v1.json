@@ -1,0 +1,108 @@
+{
+  "schema_version": "jbspan-d3-resolution-rescue-audit-contract-v1",
+  "status": "FROZEN_BEFORE_RESOLUTION_SPECTRUM_OUTPUT",
+  "frozen": true,
+  "frozen_at": "2026-09-05T15:50:03+09:00",
+  "purpose": "Use only the completed content-free D3 exact truth tables to determine whether intervention-vocabulary resolution sensitivity is strong enough to justify a separately frozen fresh-holdout study.",
+  "evidence_class": "POSTOUTCOME_EXPLORATORY_FEASIBILITY_AUDIT_NOT_CONFIRMATORY_EVIDENCE",
+  "official_d3_or_c1n_relabeling_allowed": false,
+  "scope_boundary": {
+    "new_target_inference_allowed": false,
+    "new_evaluator_inference_allowed": false,
+    "new_human_annotation_allowed": false,
+    "private_raw_record_read_allowed": false,
+    "raw_prompt_payload_or_response_output_allowed": false,
+    "c2n_authorized": false,
+    "fresh_rescue_experiment_authorized_by_a_pass": false,
+    "interpretation": "A pass is only a design-feasibility signal. It cannot turn D3 or C1N into a pass and cannot support a paper claim without a separately frozen untouched-data experiment."
+  },
+  "inputs": {
+    "instance_results_path": "data/natural_language_localization/d3_exact_topology_v1/instance_results.safe.jsonl",
+    "expected_instance_count": 12,
+    "expected_attack_families": ["DeepInception", "h4rm3l"],
+    "expected_unit_counts": [3, 7],
+    "truth_table_requirement": "EVERY_ATOMIC_SUBSET_PRESENT",
+    "projection_semantics": "NEUTRALIZING_A_COARSE_GROUP_EQUALS_NEUTRALIZING_THE_UNION_OF_ITS_ATOMIC_UNITS"
+  },
+  "partition_families": {
+    "all_set_partitions": "COMPLETE_BELL_LATTICE_PER_INSTANCE",
+    "contiguous_partitions": "EVERY_ORDER_PRESERVING_SOURCE_CONTIGUOUS_PARTITION",
+    "immediate_coarsening": "EVERY_PARTITION_WITH_EXACTLY_ONE_MERGED_ATOMIC_PAIR",
+    "primary_feasibility_diagnostic": "IMMEDIATE_COARSENING_ONLY_TO_AVOID_THE_TAUTOLOGICAL_ALL_UNITS_IN_ONE_BLOCK_ENDPOINT"
+  },
+  "frozen_outputs": {
+    "reference_reconstruction": [
+      "reportability",
+      "minimal_family",
+      "minimum_recovery_order",
+      "multiple_pathways",
+      "nonsingleton",
+      "nontrivial"
+    ],
+    "partition_spectrum": [
+      "reportability_change",
+      "minimal_family_change",
+      "minimum_recovery_order",
+      "multiple_pathways",
+      "nonsingleton",
+      "nontrivial_classification_change"
+    ],
+    "reporting_levels": ["overall", "attack_family", "instance", "block_count"]
+  },
+  "feasibility_gate": {
+    "minimum_reference_nontrivial_per_family": 2,
+    "minimum_immediately_unstable_per_family": 1,
+    "minimum_unique_payloads_with_immediate_instability": 4,
+    "minimum_reference_nontrivial_overall": 6,
+    "pass_meaning": "AUTHORIZE_ONLY_THE_DESIGN_OF_A_SEPARATELY_FROZEN_FRESH_SPECIFICATION_SENSITIVITY_STUDY",
+    "fail_meaning": "STOP_THE_RESOLUTION_SENSITIVITY_PIVOT"
+  },
+  "dependencies": {
+    "resolution_projection_module": {
+      "path": "src/jbspan/resolution_topology.py",
+      "size_bytes": 10745,
+      "sha256": "be751054873107d3f4501be1cc7e858fe0540f9313006d2052392f6fe1ddc113"
+    },
+    "audit_runner": {
+      "path": "scripts/analyze_d3_resolution_rescue.py",
+      "size_bytes": 18314,
+      "sha256": "d705ca5d898f98f43c6d2082f68107e51d3a0fe3fe7b5a45b8615aa03b4e3320"
+    },
+    "projection_unit_tests": {
+      "path": "tests/test_resolution_topology.py",
+      "size_bytes": 2250,
+      "sha256": "535de8d610bcbab20223929628caaccc00d8ea80b67422eee2a7f4f14409d0cd"
+    },
+    "d3_exact_contract": {
+      "path": "configs/natural_language_localization/d3_exact_topology_v1.json",
+      "size_bytes": 9696,
+      "sha256": "d2824dee65ca65683154795ce52e4bd462a13bb052d19937514dd40a8bbf1ed7"
+    },
+    "d3_official_result": {
+      "path": "data/natural_language_localization/d3_exact_topology_v1/result.safe.json",
+      "size_bytes": 6222,
+      "sha256": "12e9289370c3db20423736103c5ca4f12666e4faf77c8a5b3eeeffdb0ce7e59b"
+    },
+    "d3_instance_results": {
+      "path": "data/natural_language_localization/d3_exact_topology_v1/instance_results.safe.jsonl",
+      "size_bytes": 320934,
+      "sha256": "2ebe3ff8cf7a603fa885500e9946bb79cdc7bd80d79f6ea29077dfb099934d34"
+    },
+    "c1n_valid_negative_result": {
+      "path": "data/natural_language_localization/c1n_h4rm3l_fresh_screen_v1/result.safe.json",
+      "size_bytes": 51733,
+      "sha256": "acd2467e4c805fe6c3fe0b5f2ba7d416fe08a00760032166051430253c02b948"
+    },
+    "c1n_independent_verification": {
+      "path": "data/natural_language_localization/c1n_h4rm3l_fresh_screen_v1/independent_verification.safe.json",
+      "size_bytes": 1588,
+      "sha256": "72d9c56841b8aaff07d069bba6c8e73a3335d0a0cd3b4d3c95573903e6fa4556"
+    },
+    "guidedbench_split_audit": {
+      "path": "data/natural_language_localization/d3_guidedbench_split_v1/split_audit.safe.json",
+      "size_bytes": 1565,
+      "sha256": "8623ec9673c91c83198b9ac62cce732ebc911bdbbab857ca29df66c3ad4637f0"
+    }
+  },
+  "next_operation_on_pass": "AUDIT_THE_UNTOUCHED_120_ROW_FRAME_WITHOUT_TARGET_OR_EVALUATOR_INFERENCE"
+}

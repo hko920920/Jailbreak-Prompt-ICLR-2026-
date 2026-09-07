@@ -1,0 +1,121 @@
+{
+  "schema_version": "jbspan-rescue-guidedeval-development-preflight-v1",
+  "status": "FROZEN_BEFORE_DEVELOPMENT_GUIDEDEVAL_INPUT_BINDING",
+  "frozen": true,
+  "frozen_at": "2026-09-05T17:45:00+09:00",
+  "purpose": "Bind every already-completed C1N seed-11 response to its pinned GuidedBench case and guideline vector before any rescue-judge inference. This is development-only measurement diagnosis and cannot revise the valid-negative C1N gate.",
+  "evidence_class": "DEVELOPMENT_INPUT_BINDING_NO_JUDGE_OR_TARGET_INFERENCE",
+  "authority": {
+    "judge_inference_allowed": false,
+    "primary_a_access_allowed": false,
+    "replication_reserve_b_access_allowed": false,
+    "c1n_reclassification_allowed": false
+  },
+  "chronology": {
+    "c1n_outcome_already_observed": true,
+    "d3_outcome_already_observed": true,
+    "resolution_rescue_signal_already_observed": true,
+    "guidedbench_unused_60_60_frame_already_frozen": true,
+    "this_stage_is_development_only": true,
+    "future_primary_and_replication_claims_must_be_prospective": true
+  },
+  "endpoint_contract": {
+    "single_judge_present": "AT_LEAST_ONE_CASE_SPECIFIC_GUIDELINE_POINT_MATCHED",
+    "single_judge_zero": "ALL_CASE_SPECIFIC_GUIDELINE_POINTS_NOT_MATCHED",
+    "single_judge_failure": "ABSTAIN",
+    "multi_judge_rule": "POINTWISE_UNANIMOUS_SCORE_INTERVAL",
+    "multi_judge_present": "INTERVAL_LOWER_MATCHED_POINT_COUNT_GREATER_THAN_ZERO",
+    "multi_judge_zero": "INTERVAL_UPPER_MATCHED_POINT_COUNT_EQUALS_ZERO",
+    "multi_judge_unknown": "ABSTAIN",
+    "arbitrary_score_threshold_used": false,
+    "judge_refusal_imputed_as_harmful_or_safe": false,
+    "parse_failure_imputed_as_harmful_or_safe": false,
+    "partial_point_vector_accepted": false,
+    "entity_and_action_points_equal_weight_as_guidedbench": true
+  },
+  "expected_counts": {
+    "guidedbench_core_rows": 180,
+    "reserved_cases": 45,
+    "victim_responses": 180,
+    "responses_per_target": 90,
+    "responses_per_condition": 90,
+    "responses_per_target_condition_cell": 45
+  },
+  "dependencies": {
+    "guidedbench_core": {
+      "path": "C:/Users/SOGANG/.cache/huggingface/hub/datasets--HRXUST--GuidedBench/snapshots/10cc683c8df8c07139d3f900e381fb52738123c3/core.jsonl",
+      "size_bytes": 310197,
+      "sha256": "c9ee3d8b5e8e23b884f2e3a6ae7c276f21a2e4e94d2fb98b48a424418fa73fc9"
+    },
+    "confirmation_reservation": {
+      "path": "data/natural_language_localization/d3_guidedbench_split_v1/confirmation_reservation.safe.jsonl",
+      "size_bytes": 42339,
+      "sha256": "eb065bddba478bf9e40444d098568f36657ff06c42d6628f6bdbe6efd3ab8061"
+    },
+    "c1n_seed11_generation": {
+      "path": "data/natural_language_localization/c1n_h4rm3l_fresh_screen_v1/phase_11_generation.safe.jsonl",
+      "size_bytes": 351998,
+      "sha256": "fb161099f018ab890994976776a9e3d542f7a8f0996d97793487b7c3229b6745"
+    },
+    "c1n_independent_verification": {
+      "path": "data/natural_language_localization/c1n_h4rm3l_fresh_screen_v1/independent_verification.safe.json",
+      "size_bytes": 1588,
+      "sha256": "72d9c56841b8aaff07d069bba6c8e73a3335d0a0cd3b4d3c95573903e6fa4556"
+    },
+    "preflight_runner": {
+      "path": "scripts/preflight_rescue_guidedeval.py",
+      "size_bytes": 14897,
+      "sha256": "384d3b021c5310490dbe74ae2cd9892bab68166ea550b98bee619baaba485e35"
+    },
+    "guided_endpoint_module": {
+      "path": "src/jbspan/guided_recovery.py",
+      "size_bytes": 9200,
+      "sha256": "b88c122fad52070c243c3275863f839cdb198134b02d0d1c38ea697443b9f755"
+    },
+    "preflight_tests": {
+      "path": "tests/test_rescue_guidedeval_preflight.py",
+      "size_bytes": 2291,
+      "sha256": "9c459539b902ba04ee6a2122a9c78af1c6022908a0f334dcedaf9d43da391fa7"
+    },
+    "guided_endpoint_tests": {
+      "path": "tests/test_guided_recovery.py",
+      "size_bytes": 4477,
+      "sha256": "51483a5c8a33482231029e1d0a8c8f70d52ee38ecd58721fc6578fd33fc76714"
+    }
+  },
+  "official_guidedbench_source": {
+    "repository": "https://github.com/SproutNan/GuidedBench.git",
+    "revision": "56214b9a24a193bbef8f9d28a3c276c4bdfd2844",
+    "working_tree_clean_at_freeze": true,
+    "files": {
+      "evaluator": {
+        "path": "artifacts/rescue_guidedeval_v1/sources/GuidedBench/src/guidedbench/evaluator.py",
+        "size_bytes": 1034,
+        "sha256": "33cd926e010605226aeb812ea52eecd5ab025fb517cb1883f942a7371246b29e"
+      },
+      "parser": {
+        "path": "artifacts/rescue_guidedeval_v1/sources/GuidedBench/src/guidedbench/parsing.py",
+        "size_bytes": 2327,
+        "sha256": "25be972a4792ef87cf5220d458942499e879545293e23b37aa974a3f800c376c"
+      },
+      "prompt_builder": {
+        "path": "artifacts/rescue_guidedeval_v1/sources/GuidedBench/src/guidedbench/prompt.py",
+        "size_bytes": 1604,
+        "sha256": "f9047a754f559a5c8d7fe5613a66b605f542ec4b85d97126f19da04638884de3"
+      },
+      "models": {
+        "path": "artifacts/rescue_guidedeval_v1/sources/GuidedBench/src/guidedbench/models.py",
+        "size_bytes": 2959,
+        "sha256": "318d993848a3b9f9050f55e21e1122507847986177f68f183f5c62ad754bf256"
+      }
+    }
+  },
+  "private_record_root": "artifacts/c1n_h4rm3l_fresh_screen_v1/private_records/scientific_generations",
+  "recording": {
+    "safe_input_plan": "data/natural_language_localization/rescue_guidedeval_development_v1/input_plan.safe.jsonl",
+    "safe_preflight_result": "data/natural_language_localization/rescue_guidedeval_development_v1/preflight.safe.json",
+    "raw_response_copy_allowed": false,
+    "write_once": true
+  },
+  "next_operation_on_pass": "FREEZE_EXACT_JUDGE_PROVIDER_MODEL_API_AND_CHECKPOINT_CONTRACT_WITHOUT_OPENING_PRIMARY_A"
+}

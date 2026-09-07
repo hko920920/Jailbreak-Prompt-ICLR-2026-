@@ -1,0 +1,177 @@
+\documentclass{article}
+
+\usepackage{iclr2027_conference,times}
+\input{math_commands.tex}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{url}
+
+\title{Minimal Recovery-Set Topology of Jailbreak Prompts}
+
+% Keep the submission anonymous. Do not insert author identities here.
+\author{Anonymous authors}
+
+% Uncomment only for the camera-ready version.
+% \iclrfinalcopy
+
+\newcommand{\resultpending}{\textbf{[RESULT PENDING]}}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Jailbreak prompts are often treated as indivisible strings or ranked by
+single-token importance, even when their effects may depend on interactions
+among multiple human-editable components. We define a behavioral intervention
+problem that recovers every minimal set of attack-added input units whose
+neutralization restores safe behavior while preserving the underlying request.
+Our protocol requires strict-subset minimality, stability across neutralizers
+and decoding seeds, payload invariance, capability controls, and blinded human
+audit. \resultpending{} This draft does not claim an empirical finding until the
+fresh confirmatory experiment and audit are complete.
+\end{abstract}
+
+\section{Introduction}
+
+Understanding which parts of a successful jailbreak are behaviorally necessary
+is useful for evaluation, diagnosis, and defense. Existing token scores and
+leave-one-out analyses can miss interactions: two units may be jointly
+necessary, or several distinct minimal pathways may independently sustain an
+attack. We therefore study the topology of robust minimal recovery sets under
+direct prompt interventions.
+
+The intended contributions are:
+\begin{itemize}
+  \item a precise, intent-preserving definition of robust minimal recovery;
+  \item an exact coarse-unit enumeration protocol with neutralizer, seed, and
+        capability controls; and
+  \item \resultpending{} a repeated empirical finding on a fresh, multi-model
+        confirmation split.
+\end{itemize}
+
+\section{Problem Formulation}
+
+Let $p$ be a harmful payload, $a(p)$ an attacked prompt that contains $p$
+exactly once, and $U=\{u_1,\ldots,u_m\}$ the frozen attack-added units. For a
+subset $S\subseteq U$ and neutralizer $n$, let $I_{S,n}(a(p))$ replace only the
+units in $S$ while leaving $p$ byte-identical. A recovery set must restore the
+predeclared safe-behavior predicate across required seeds and neutralizers,
+without truncation, malformed input, or general capability collapse. It is
+minimal if none of its strict subsets is a recovery set.
+
+The collection of all minimal recovery sets forms a hypergraph over $U$. This
+representation exposes non-singleton dependencies and multiple alternative
+pathways that a single importance ranking cannot express.
+
+\section{Experimental Design}
+
+\subsection{Eligibility and stable pairs}
+
+Direct and attacked prompts share payload, decoding configuration, and seeds.
+A pair is eligible only when the direct request remains non-harmful, the attack
+produces substantive harmful assistance, the payload occurs once and is
+byte-identical, and neither truncation nor capability failure determines the
+label.
+
+\subsection{Interventions}
+
+We freeze at most six coarse attack-added units per eligible pair and enumerate
+all $2^m$ subsets. Each subset is evaluated under two independently meaningful
+neutralizers and three decoding seeds. Decision-critical outputs enter blinded
+human audit by two independent annotators, with a third adjudicator for
+disagreement.
+
+\subsection{Baselines and controls}
+
+We compare exact topology with singleton leave-one-out attribution, random
+cost-matched subsets, and greedy backward elimination. Payload invariance,
+grammar/token validity, matched irrelevant edits, and benign capability probes
+separate genuine safety recovery from destructive editing.
+
+\subsection{Models, attacks, and data}
+
+\resultpending{} Model revisions, quantization status, attack families, fresh
+payload counts, exclusions, and all artifact hashes will be inserted from the
+frozen confirmatory contract. Development examples are excluded from primary
+paper-valid estimates.
+
+\section{Results}
+
+\resultpending{} This section will report stable-pair yield, minimal-set size,
+multiple-pathway frequency, singleton miss rate, neutralizer agreement, seed
+stability, capability-confounded recovery, abstention, and paired uncertainty.
+No value will be inserted without a config-linked result artifact and completed
+human audit.
+
+\begin{table}[t]
+  \caption{Primary confirmatory outcomes. All cells are intentionally pending.}
+  \label{tab:primary-results}
+  \centering
+  \begin{tabular}{lc}
+    \toprule
+    Outcome & Estimate \\
+    \midrule
+    Eligible stable attack instances & \resultpending \\
+    Instances with robust minimal recovery & \resultpending \\
+    Non-singleton or multiple-pathway instances & \resultpending \\
+    Singleton attribution miss rate & \resultpending \\
+    Cross-neutralizer agreement & \resultpending \\
+    Capability-confounded recovery rate & \resultpending \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Related Work}
+
+\resultpending{} Add verified citations on jailbreak evaluation, prompt-level
+causal localization, adversarial suffix optimization, and safety classifiers.
+The final text will distinguish behavioral recovery topology from internal
+representation localization and ordinary token saliency.
+
+\section{Limitations and Ethics}
+
+The intervention lattice is defined over a frozen human-editable partition and
+does not establish a unique natural-language causal decomposition. Results may
+depend on model revision, quantization, chat template, neutralizer, and decoding
+distribution. Behavioral recovery is not evidence that the model has forgotten
+the harmful capability. The study minimizes dissemination risk by keeping raw
+harmful payloads and operational outputs out of the public repository and by
+releasing only hashes, aggregates, and appropriately redacted examples.
+
+\section{Reproducibility Statement}
+
+Every reported result will be linked to a frozen configuration, git commit,
+model and tokenizer revision, generation parameters, seeds, hardware record,
+and exclusion ledger. The repository includes CPU-only tests and harmless smoke
+paths; restricted artifacts remain private and are identified by digest.
+
+\section{AI Use Statement}
+
+Generative AI tools assisted with repository inspection, planning, code and
+test maintenance, and drafting of protocol and manuscript text. The human
+authors are responsible for the research design, execution, verification,
+interpretation, citations, and final submitted content. This statement will be
+updated to enumerate material AI use in the final paper.
+
+\section{Conclusion}
+
+We introduced a protocol for measuring robust minimal recovery-set topology in
+jailbreak prompts. \resultpending{} A conclusion about empirical topology will
+be written only after the fresh confirmatory split and blinded audit satisfy the
+predeclared decision rule.
+
+% Enable the bibliography after verified references have been added.
+% \bibliographystyle{iclr2027_conference}
+% \bibliography{references}
+
+\appendix
+
+\section{Registered Decision Rules}
+
+The appendix will reproduce the final eligibility, GO/NARROW/STOP, exclusion,
+and audit rules and provide artifact identifiers. Appendix material will not be
+used to hide evidence required for the main claims.
+
+\end{document}
+

@@ -68,3 +68,17 @@ class LengthAwareNeutralizer:
             word_count = max(1, len(original.split()))
             replacements.append(" " + " ".join([self.token] * word_count) + " ")
         return replace_spans(text, spans, tuple(replacements))
+
+
+@dataclass(frozen=True)
+class LayoutPreservingBlankNeutralizer:
+    """Blank non-whitespace characters while preserving every character offset."""
+
+    name: str = "layout_preserving_blank"
+
+    def apply(self, text: str, spans: tuple[TextSpan, ...]) -> str:
+        replacements = tuple(
+            "".join(character if character.isspace() else " " for character in span.text(text))
+            for span in spans
+        )
+        return replace_spans(text, spans, replacements)

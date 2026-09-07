@@ -1,0 +1,56 @@
+{
+  "schema_version": "jbspan-e0g1b-jailmeter-runtime-qualification-v1-1",
+  "status": "FROZEN_PREFLIGHT_HISTORICAL_CONTRACT_SHAPE_REPAIR_ONLY",
+  "frozen": true,
+  "frozen_at": "2026-09-03",
+  "paper_validity": false,
+  "panel_qualification": false,
+  "parent_contract": {
+    "path": "configs/evaluator_panel/jailmeter_runtime_e0g1b_v1.json",
+    "bytes": 7963,
+    "sha256": "59ad4191aa89a5f2633302bd91f9b9f7574df5b69372a16794b40c1f8f15fe18"
+  },
+  "operational_failure": {
+    "path": "data/evaluator_panel_v2/e0g1b_v1_preflight_contract_shape_failure.safe.json",
+    "bytes": 1653,
+    "sha256": "88b2d315f8df441944bc74a1464b61da5ad583544f9213880b90b2e1ec838f6c",
+    "required_status": "E0G1B_V1_PREFLIGHT_HISTORICAL_STATUS_ASSUMPTION_FAILURE"
+  },
+  "historical_contract_override": {
+    "path": "configs/gate1/gate1_step3b_evaluator_diagnostic.json",
+    "bytes": 3158,
+    "sha256": "c79f31ce9b067281629d149db5a58cf4912ec63febfed2c43782da69a7072b22",
+    "required_schema_version": "gate1-step3b-evaluator-diagnostic-contract-v1",
+    "required_frozen": true,
+    "required_paper_validity": false
+  },
+  "operational_repair": {
+    "changed": "Validate the historical contract by its exact schema_version, frozen flag, and paper_validity flag instead of a nonexistent top-level status field.",
+    "historical_file_changed": false,
+    "jailmeter_source_changed": false,
+    "base_model_changed": false,
+    "target_model_changed": false,
+    "conversion_changed": false,
+    "runtime_changed": false,
+    "harmless_cases_changed": false,
+    "expected_labels_changed": false,
+    "parser_changed": false,
+    "gates_changed": false,
+    "model_loaded_before_repair": false,
+    "model_outputs_observed_before_repair": false
+  },
+  "recording_overrides": {
+    "preflight_path": "data/evaluator_panel_v2/e0g1b_v1_1_jailmeter_runtime_preflight.safe.json",
+    "base_metadata_manifest_path": "data/evaluator_panel_v2/e0g1b_v1_1_jailmeter_base_metadata.safe.json",
+    "conversion_manifest_path": "data/evaluator_panel_v2/e0g1b_v1_1_jailmeter_lora_conversion.safe.json",
+    "result_path": "data/evaluator_panel_v2/e0g1b_v1_1_jailmeter_runtime_result.safe.json"
+  },
+  "protected_boundaries": {
+    "human_labeled_calibration_read": false,
+    "heldout_opened": false,
+    "p3_outcomes_opened": false,
+    "topology_outcomes_opened": false,
+    "harmful_prompt_used": false,
+    "scientific_metric_computed": false
+  }
+}

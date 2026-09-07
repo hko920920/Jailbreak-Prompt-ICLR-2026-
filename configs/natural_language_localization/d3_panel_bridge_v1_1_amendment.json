@@ -1,0 +1,112 @@
+{
+  "schema_version": "jbspan-d3-panel-bridge-amendment-v1-1",
+  "status": "FROZEN_AFTER_SEED_11_EVALUATOR_AXES_BEFORE_ANY_D3_PANEL_OUTPUT",
+  "frozen": true,
+  "frozen_at_utc": "2026-09-04T13:13:01.123Z",
+  "purpose": "Bind the already frozen fresh-screen panel decision function into the D3 runner namespace after a missing re-export raised AttributeError, without changing target or evaluator data, the panel rule, adaptive routing, denominator, threshold, or any scientific gate.",
+  "evidence_class": "POST_EVALUATOR_PRE_PANEL_OPERATIONAL_NAMESPACE_BRIDGE",
+  "scientific_rule_changed": false,
+  "base_contract_path": "configs/natural_language_localization/d3_exact_topology_v1.json",
+  "dependencies": {
+    "base_contract": {
+      "path": "configs/natural_language_localization/d3_exact_topology_v1.json",
+      "sha256": "d2824dee65ca65683154795ce52e4bd462a13bb052d19937514dd40a8bbf1ed7"
+    },
+    "base_preflight": {
+      "path": "data/natural_language_localization/d3_exact_topology_v1/preflight.safe.json",
+      "sha256": "09fc74157b4d473514f8d2534f9891791f1a6f009695a64db5c86a6e98594459"
+    },
+    "frozen_d3_runner": {
+      "path": "scripts/run_d3_exact_topology.py",
+      "sha256": "f435c9371c0ec79fcd54f76f6838508b41ef96626d379e36f37180852a15ecd0"
+    },
+    "frozen_base_engine": {
+      "path": "scripts/run_fresh_screen_2r.py",
+      "sha256": "8356138996f67cfb4536a8b08bcfce6ee827ec9fef6c41b4f2de8b571f4d4530"
+    },
+    "frozen_panel_source": {
+      "path": "src/jbspan/fresh_screen_funnel.py",
+      "sha256": "c5d59582f7a6d2c1a135371cb3cf592aeddf06e0fe4f2c3d0a81af6306518a24"
+    },
+    "independent_verifier": {
+      "path": "scripts/verify_d3_exact_topology.py",
+      "sha256": "a6fd0f7dbab6fa6c4bf68438c267bbd879ec0fd411ee4d0bf3ce072b7130e9dc"
+    },
+    "resilient_atomic_writer": {
+      "path": "scripts/resume_d3_generation_operational_v1.py",
+      "sha256": "529dc54ed644c090887bdb6a4a854f9ad0d74b19432bbc7efe21b3a66a2926dd"
+    },
+    "panel_bridge_runner": {
+      "path": "scripts/finalize_d3_phase_operational_v1_1.py",
+      "sha256": "95092268f46e744b436c4603649bb43138d6e68ae1890edbc2ef037765a3812b"
+    },
+    "panel_bridge_tests": {
+      "path": "tests/test_d3_panel_bridge_v1_1.py",
+      "sha256": "558de84b4b03ba6946039df3e1a41fb0a09f8b61c2811083b42d7c0179e51cd8"
+    }
+  },
+  "observed_failure": {
+    "command": "finalize-phase --seed 11",
+    "exception": "AttributeError",
+    "missing_attribute": "run_fresh_screen_2r.panel_decision",
+    "cause": "The frozen D3 runner referenced panel_decision through the run_fresh_screen_2r script module, whose import list did not re-export that canonical function.",
+    "function_already_frozen_elsewhere": "jbspan.fresh_screen_funnel.panel_decision",
+    "same_repair_pattern_previously_independently_verified_in_d2": true,
+    "model_or_evaluator_failure": false,
+    "partial_panel_output_written": false,
+    "panel_decision_computed_before_failure": false
+  },
+  "pre_panel_snapshot": {
+    "plan": {
+      "path": "data/natural_language_localization/d3_exact_topology_v1/phase_11_plan.safe.jsonl",
+      "record_count": 888,
+      "sha256": "ef68de81b0f96454f1554ae8f00f95841f4256166134fa20b6394ceae5b5a7d6"
+    },
+    "generation": {
+      "path": "data/natural_language_localization/d3_exact_topology_v1/phase_11_generation.safe.jsonl",
+      "record_count": 888,
+      "sha256": "ff31380d1765f54a6bc5e5d9580cf42938edd7eb9df1e214f1a64dc78e6f2a11"
+    },
+    "qwen_axis": {
+      "path": "data/natural_language_localization/d3_exact_topology_v1/phase_11_qwen_axis.safe.jsonl",
+      "record_count": 888,
+      "sha256": "f304fd81441a64c80395ffe92201943a2c18d5f8df5723d2b2f523e837fe29c4"
+    },
+    "qwen_summary": {
+      "path": "data/natural_language_localization/d3_exact_topology_v1/phase_11_qwen_summary.safe.json",
+      "sha256": "20ce1cec034aadeb2f89dde7c0e2c4c03544d33718bb3930c9dd893e1fc9b72a"
+    },
+    "jailmeter_axis": {
+      "path": "data/natural_language_localization/d3_exact_topology_v1/phase_11_jailmeter_axis.safe.jsonl",
+      "record_count": 888,
+      "sha256": "c3e2af412c7b6643fb630023b90a60da8e7c63c20d8304949c1324a4b1e34446"
+    },
+    "jailmeter_summary": {
+      "path": "data/natural_language_localization/d3_exact_topology_v1/phase_11_jailmeter_summary.safe.json",
+      "sha256": "9b1e1bfb2a671ec58568c41b12d0e40c2c0db63ce679b85067ab8c01c8e27c68"
+    },
+    "qwen_parse_count": 888,
+    "jailmeter_parse_count": 886,
+    "jailmeter_output_limit_abstain_count": 2,
+    "non_limit_parse_failure_count": 0,
+    "panel_decision_file_exists": false,
+    "phase_result_file_exists": false,
+    "raw_response_semantics_inspected": false
+  },
+  "bridge": {
+    "operation": "Assign jbspan.fresh_screen_funnel.panel_decision to the missing run_fresh_screen_2r.panel_decision namespace immediately before the unchanged frozen D3 phase finalizer runs.",
+    "decision_algorithm_changed": false,
+    "panel_threshold_changed": false,
+    "axis_output_changed": false,
+    "target_generation_rerun": false,
+    "evaluator_inference_rerun": false,
+    "record_dropped": false,
+    "output_limit_handling_changed": false,
+    "adaptive_rule_changed": false
+  },
+  "recording": {
+    "bridge_audit_pattern": "data/natural_language_localization/d3_exact_topology_v1/phase_{seed}_panel_bridge_v1_1.safe.json",
+    "safe_artifact_contains_raw_text": false
+  },
+  "next_operation": "APPLY_NAMESPACE_BRIDGE_THEN_RUN_UNCHANGED_SEED_11_PHASE_FINALIZATION_OVER_ALL_888_RECORDS"
+}

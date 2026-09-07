@@ -1,0 +1,83 @@
+{
+  "schema_version": "guidedbench-source-freeze-v1",
+  "status": "pass",
+  "validated_at": "2026-09-01",
+  "dataset": {
+    "repo_id": "HRXUST/GuidedBench",
+    "revision": "10cc683c8df8c07139d3f900e381fb52738123c3",
+    "version": "1.0",
+    "language": "en",
+    "license": "CC-BY-4.0",
+    "gating_mode": "auto"
+  },
+  "official_implementation": {
+    "url": "https://github.com/SproutNan/GuidedBench",
+    "main_revision_observed": "56214b9a24a193bbef8f9d28a3c276c4bdfd2844",
+    "software_license": "Apache-2.0"
+  },
+  "admitted_files": {
+    "core.jsonl": {
+      "bytes": 310197,
+      "sha256": "c9ee3d8b5e8e23b884f2e3a6ae7c276f21a2e4e94d2fb98b48a424418fa73fc9",
+      "hub_blob_id": "41d5feaca9b7b98c46362f5f737f52bebde41c26"
+    },
+    "README.md": {
+      "bytes": 3171,
+      "sha256": "163e7d45fcb724ebe7f4082a2701c0493bdfb84c367f29df1062b5b691c0f99e",
+      "hub_blob_id": "b0892808b223f71a6f6e4fdcb4e973d8a233df99"
+    },
+    "LICENSE": {
+      "bytes": 881,
+      "sha256": "5d0acf072aa60ad9313ae6dcf189f14d1f00839cbd3fd262442dccee5f90f9c4",
+      "hub_blob_id": "b99e525ac961913bdba6b5ab4e4375ecf5271224"
+    }
+  },
+  "excluded_files": {
+    "additional.jsonl": {
+      "reason": "The five additional topics are vendor-policy-dependent and outside the primary core estimand."
+    }
+  },
+  "core_integrity": {
+    "rows": 180,
+    "unique_ids": 180,
+    "unique_indices": 180,
+    "unique_questions": 180,
+    "unique_targets": 180,
+    "index_min": 0,
+    "index_max": 179,
+    "index_contiguous": true,
+    "topics": 15,
+    "sorted_topic_sizes": [4, 4, 5, 6, 6, 6, 9, 10, 10, 14, 16, 18, 20, 25, 27],
+    "top_level_keys": [
+      "benchmark_version",
+      "guidelines",
+      "id",
+      "index",
+      "question",
+      "subset",
+      "target",
+      "topic"
+    ],
+    "guidelines_total": 802,
+    "guideline_type_counts": {
+      "action": 439,
+      "entity": 363
+    },
+    "guidelines_per_case_count_frequency": {
+      "2": 4,
+      "3": 28,
+      "4": 60,
+      "5": 58,
+      "6": 30
+    },
+    "required_guideline_keys": ["description", "examples", "id", "type"],
+    "missing_or_null_required_top_level_fields": 0,
+    "empty_required_guideline_fields": 0,
+    "guideline_ids_unique_within_case": true
+  },
+  "content_handling": {
+    "raw_records_in_repository": false,
+    "storage": "standard Hugging Face cache only",
+    "raw_content_in_gate_logs": false
+  }
+}

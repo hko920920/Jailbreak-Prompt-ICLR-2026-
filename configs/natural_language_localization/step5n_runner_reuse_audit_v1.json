@@ -1,0 +1,182 @@
+{
+  "schema_version": "jbspan-step5n-runner-reuse-audit-v1",
+  "status": "FROZEN_STATIC_CODE_REUSE_AUDIT",
+  "frozen": true,
+  "created_at": "2026-09-05T05:52:00+09:00",
+  "evidence_class": "NONSCIENTIFIC_STATIC_IMPLEMENTATION_AUDIT",
+  "purpose": "Determine which frozen D3 implementation layers may be reused for the proposed two-target h4rm3l-only C1N-C3N route and which require new versioned target-scoped runners.",
+  "authorization_boundary": {
+    "may_modify_frozen_d3_files": false,
+    "may_download_models": false,
+    "may_run_target_or_evaluator_inference": false,
+    "may_open_confirmatory_output": false,
+    "allowed_operation": "HASH_AND_STATIC_SOURCE_AUDIT_ONLY"
+  },
+  "sources": {
+    "d3_screen_runner": {
+      "path": "scripts/run_d3_fresh_development_screen.py",
+      "sha256": "9af9af6024d09dfaac2a9ca3c6bc856d143029977b3ed25931047b890196971d",
+      "required_functions": [
+        "reconstruct_payloads",
+        "rematerialize",
+        "preflight",
+        "finalize_phase",
+        "finalize"
+      ],
+      "required_fragments": [
+        "FAMILIES = (\"h4rm3l\", \"DeepInception\")",
+        "funnel.get(\"initial_payloads\") != 15",
+        "model_id=str(parent[\"target_model\"][\"model_id\"])"
+      ]
+    },
+    "d3_topology_runner": {
+      "path": "scripts/run_d3_exact_topology.py",
+      "sha256": "f435c9371c0ec79fcd54f76f6838508b41ef96626d379e36f37180852a15ecd0",
+      "required_functions": [
+        "build_bundles",
+        "plan_rows",
+        "baseline_rows",
+        "build_control_universe",
+        "preflight",
+        "run_controls",
+        "finalize"
+      ],
+      "required_fragments": [
+        "FAMILIES = (\"h4rm3l\", \"DeepInception\")",
+        "Counter({\"h4rm3l\": 9, \"DeepInception\": 3})",
+        "expected_groups = 9 * 7 * 2 + 3 * 127 * 2",
+        "model_id\": parent[\"target_model\"][\"model_id\"]"
+      ]
+    },
+    "shared_screen_runtime": {
+      "path": "scripts/run_fresh_screen_2r.py",
+      "sha256": "8356138996f67cfb4536a8b08bcfce6ee827ec9fef6c41b4f2de8b571f4d4530",
+      "required_functions": [
+        "phase_paths",
+        "generate",
+        "run_qwen",
+        "run_jailmeter",
+        "finalize_rows",
+        "validate_progress_rows"
+      ],
+      "required_fragments": [
+        "prefix = f\"phase_{seed}\"",
+        "runtime = p3.validate_runtime("
+      ]
+    },
+    "p3_target_runtime": {
+      "path": "scripts/run_local_signal_screen_p3.py",
+      "sha256": "eecff38f21c5f7d92465f5a009f590a545a839216f48b6b44d162f06da9d9a43",
+      "required_functions": [
+        "validate_runtime",
+        "count_tokens",
+        "run_private_invocation",
+        "safe_invocation",
+        "run_harmless_smoke"
+      ],
+      "required_fragments": [
+        "target = as_object(contract[\"target_model\"], where=\"target_model\")",
+        "model_dir = p2_artifact_root / str(target[\"local_subdirectory\"])"
+      ]
+    },
+    "legacy_funnel": {
+      "path": "src/jbspan/fresh_screen_funnel.py",
+      "sha256": "c5d59582f7a6d2c1a135371cb3cf592aeddf06e0fe4f2c3d0a81af6306518a24",
+      "required_functions": [
+        "initial_pairs",
+        "plan_rows",
+        "panel_decision",
+        "decide_active_pairs"
+      ],
+      "required_fragments": [
+        "\"h4rm3l\": \"ATTACKED_H4RM3L\"",
+        "\"DeepInception\": \"ATTACKED_DEEPINCEPTION\""
+      ]
+    },
+    "exact_topology_core": {
+      "path": "src/jbspan/topology.py",
+      "sha256": "a2b1cfaaead73d2efba61f7eb2e3141e327d69bb4f25889ab7813dcf27363672",
+      "required_functions": [
+        "all_unit_subsets",
+        "minimal_recovery_sets",
+        "evaluate_exact_topology"
+      ],
+      "required_fragments": []
+    },
+    "adaptive_topology_core": {
+      "path": "src/jbspan/topology_adaptive.py",
+      "sha256": "be6764a7c9e97ce69fd81472fa8c188348821fd094a56bf1797104e00abf44cf",
+      "required_functions": [
+        "evaluate_exact_topology_adaptive"
+      ],
+      "required_fragments": []
+    },
+    "h4rm3l_typed_materializer": {
+      "path": "scripts/run_topology_d2_micro_pilot.py",
+      "sha256": "c5646aa16928bd5f643a305f38d576f560a0b639650e61566f2c71f08394b513",
+      "required_functions": [
+        "build_one_h4_materialization_family"
+      ],
+      "required_fragments": []
+    }
+  },
+  "gemma_static_support_dependency": {
+    "path": "data/natural_language_localization/step5n_h4rm3l_confirmation_draft_v1/draft_preflight.safe.json",
+    "sha256": "7075a0b10c8d6cec1a9eb7d6cf013c8dba42bf2c6e42479e0c293613c97a8443",
+    "required_status": "STEP5N_DRAFT_PREFLIGHT_PASS_NO_AUTHORITY",
+    "required_runtime_static_support_pass": true,
+    "actual_gemma_qualification_required_later": true
+  },
+  "reuse_classification": {
+    "reuse_unchanged_by_import": [
+      "src/jbspan/topology.py exact finite-lattice and minimality logic",
+      "src/jbspan/topology_adaptive.py valid-harmful-witness stopping logic",
+      "run_topology_d2_micro_pilot.build_one_h4_materialization_family source-native typed renderer"
+    ],
+    "reuse_only_through_new_target_scoped_wrapper": [
+      "atomic JSON and JSONL persistence semantics",
+      "private-record hashing and safe-row projection",
+      "llama.cpp invocation primitives",
+      "Qwen3Guard and JailMeter prompt, parsing, and fixed panel decision primitives",
+      "capability-control rendering pattern"
+    ],
+    "must_not_be_used_as_drop_in_runner": [
+      "run_d3_fresh_development_screen.py",
+      "run_d3_exact_topology.py",
+      "src/jbspan/fresh_screen_funnel.py",
+      "run_local_signal_screen_p3.validate_runtime with the old single-target parent contract"
+    ]
+  },
+  "reasons_drop_in_reuse_is_invalid": [
+    "D3 screen and funnel freeze both h4rm3l and DeepInception and fixed 15-payload counts.",
+    "D3 topology freezes 9 h4rm3l plus 3 DeepInception instances and the resulting 888-group denominator.",
+    "The inherited P3 runtime resolves one parent target_model and cannot select two target-specific GGUFs.",
+    "Existing phase paths are keyed by seed but not target model, so two-target execution would collide.",
+    "D3 empty-baseline reuse is bound to the D3 screen records and cannot stand in for fresh target-specific C1N baselines.",
+    "Frozen D3 files and artifacts are evidence and may not be edited into a new population after outcomes are known."
+  ],
+  "required_new_versioned_layers_after_authorization": [
+    "target registry and harmless-admission runner binding each final model and runtime by revision, size, and SHA-256",
+    "C1N h4rm3l-only two-target funnel with target_id in pair, plan, record, phase path, and result identities",
+    "C2N exact topology runner consuming every eligible C1N target-payload pair and reusing only its own target-specific empty baseline",
+    "C3N edge/downward-closure replication runner using the seven frozen replication seeds",
+    "target-scoped atomic checkpoints and exact resume audits that never restart completed calls",
+    "independent reconstruction scripts that do not call the scientific finalizers",
+    "separate frozen configs and private roots; no modification of D3 evidence"
+  ],
+  "required_invariants": {
+    "target_id_present_in_every_scientific_record_identity": true,
+    "target_scoped_phase_paths": true,
+    "direct_response_shared_across_attack_families": false,
+    "direct_response_shared_across_target_models": false,
+    "empty_baseline_reused_only_within_same_target_payload_seed": true,
+    "all_eligible_c1n_pairs_enter_c2n": true,
+    "no_topology_outcome_cap": true,
+    "frozen_d3_sources_modified": false
+  },
+  "recording": {
+    "output_path": "data/natural_language_localization/step5n_runner_reuse_audit_v1/runner_reuse_audit.safe.json",
+    "raw_prompt_payload_or_response_allowed": false
+  },
+  "expected_conclusion": "CORE_REUSE_PASS_NEW_TARGET_SCOPED_RUNNERS_REQUIRED"
+}

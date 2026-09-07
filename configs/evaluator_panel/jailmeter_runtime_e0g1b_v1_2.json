@@ -1,0 +1,65 @@
+{
+  "schema_version": "jbspan-e0g1b-jailmeter-runtime-qualification-v1-2",
+  "status": "FROZEN_PROSPECTIVE_INSTRUMENTATION_REPAIR_ONLY",
+  "frozen": true,
+  "frozen_at": "2026-09-03",
+  "paper_validity": false,
+  "panel_qualification": false,
+  "parent_contract": {
+    "path": "configs/evaluator_panel/jailmeter_runtime_e0g1b_v1_1.json",
+    "bytes": 2427,
+    "sha256": "7afb546a970075c060a028e6df40e4b311bce326b6b7b9e2ae74f97ca9fc8ba0"
+  },
+  "instrumentation_diagnosis": {
+    "path": "data/evaluator_panel_v2/e0g1b_v1_1_instrumentation_diagnosis.safe.json",
+    "bytes": 2650,
+    "sha256": "58d5b9f5fe122806a566d01ba3a220ccfd63436173e52d646584429ef8d4520d",
+    "required_status": "E0G1B_V1_1_SUBSTANTIVE_RUNTIME_PASS_INSTRUMENTATION_FAIL_DIAGNOSED"
+  },
+  "artifact_adoption": [
+    {
+      "path": "data/evaluator_panel_v2/e0g1b_v1_1_jailmeter_base_metadata.safe.json",
+      "bytes": 1593,
+      "sha256": "0cf383844c176feb94e5330ee5626182be6e33d2fecccd5271397c7ecaae3b08",
+      "required_status": "E0G1B_JAILMETER_BASE_METADATA_DOWNLOAD_PASS",
+      "required_identity": "7bc6dd1cf4dfe5132c31d775b7350a431aae6444af3d9ed65b8cd3aaedea99e5"
+    },
+    {
+      "path": "data/evaluator_panel_v2/e0g1b_v1_1_jailmeter_lora_conversion.safe.json",
+      "bytes": 1195,
+      "sha256": "e5cbf9b1de3e74238203747cf7ed7d4af16c6d37983641bdf464a251e2b7f967",
+      "required_status": "E0G1B_JAILMETER_LORA_CONVERSION_PASS",
+      "required_identity": "35286dce47477781b7698f72a49da9bd246368dacb709bf70a6f796271f5adf8"
+    }
+  ],
+  "runtime_overrides": {
+    "log_verbosity": 4,
+    "maximum_prelaunch_gpu_memory_mib": 1000
+  },
+  "operational_repair": {
+    "changed": "Require a controlled idle-GPU baseline before launch and raise llama.cpp log verbosity from 3 to 4 so the unchanged GPU-offload check has direct load_tensors evidence.",
+    "absolute_peak_gpu_memory_ceiling_mib_unchanged": 7600,
+    "model_changed": false,
+    "lora_changed": false,
+    "conversion_changed": false,
+    "harmless_cases_changed": false,
+    "expected_labels_changed": false,
+    "parser_changed": false,
+    "generation_changed": false,
+    "accuracy_gate_changed": false,
+    "repeatability_gate_changed": false,
+    "time_gate_changed": false
+  },
+  "recording_overrides": {
+    "preflight_path": "data/evaluator_panel_v2/e0g1b_v1_2_jailmeter_runtime_preflight.safe.json",
+    "result_path": "data/evaluator_panel_v2/e0g1b_v1_2_jailmeter_runtime_result.safe.json"
+  },
+  "protected_boundaries": {
+    "human_labeled_calibration_read": false,
+    "heldout_opened": false,
+    "p3_outcomes_opened": false,
+    "topology_outcomes_opened": false,
+    "harmful_prompt_used": false,
+    "scientific_metric_computed": false
+  }
+}

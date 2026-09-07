@@ -1,0 +1,421 @@
+{
+  "schema_version": "jbspan-pa-llama-target-admission-v2",
+  "frozen": true,
+  "status": "FROZEN_ZERO_OUTPUT_TECHNICAL_AMENDMENT_BEFORE_ANY_GENERATION",
+  "evidence_class": "HARMLESS_OPERATIONAL_TARGET_ADMISSION_NOT_PAPER_EVIDENCE",
+  "gate_name": "NEW_DEVELOPMENT_TARGET_BASIC_ADMISSION",
+  "purpose": "Basic harmless capability and one fresh-process replay for an additional original P/A development target; not old Step5N fallback activation or Gemma C1N replacement.",
+  "paper_validity": false,
+  "scope_boundary": {
+    "harmless_only": true,
+    "attack_inputs_allowed": false,
+    "evaluator_calls_allowed": false,
+    "historical_private_access_allowed": false,
+    "sealed_A60_B60_access_allowed": false,
+    "model_downloads_allowed": false,
+    "manuscript_work_allowed": false,
+    "failed_D3_C1N_GuidedEval_gates_unchanged": true
+  },
+  "sources": [
+    {
+      "path": "docs/PA_ORIGINAL_TOPIC_REENTRY_LIVE_RECORD_2026-09-05_V1.md",
+      "size_bytes": 18755,
+      "sha256": "e94be5eaf78d98c4a7765c4cdf1a67f2ce0a8f0ad88dd052375ef67f2892ea54"
+    },
+    {
+      "path": "configs/natural_language_localization/rescue_local_guidedeval_smoke_llama_v4.json",
+      "size_bytes": 14831,
+      "sha256": "1d7dc212290eabf23dd11fe8ab53ae08ebe7230822e19cf6b1267250120e30ef"
+    },
+    {
+      "path": "configs/natural_language_localization/pa_llama_target_admission_v1.json",
+      "size_bytes": 14542,
+      "sha256": "f18847551904811a620ce8a3cad4263cc902f22ebb12feffe142f2db2948012f"
+    }
+  ],
+  "required_code": {
+    "runner": {
+      "path": "scripts/run_pa_llama_target_admission_v2.py",
+      "size_bytes": 36044,
+      "sha256": "d7ff787cafd5e992989f6fed0ef940b6bfdcd226bf456d60ded5de5c95d69f1b"
+    },
+    "synthetic_tests": {
+      "path": "tests/test_pa_llama_target_admission_v2.py",
+      "size_bytes": 21778,
+      "sha256": "16a0778a0910a55bf927f243c5d8bcea7862b143627746e32ec190b4e92efbf3"
+    },
+    "independent_synthetic_tests": {
+      "path": "tests/test_pa_llama_target_admission_independent_v2.py",
+      "size_bytes": 8319,
+      "sha256": "e5f01b1b0cf4962a6c32ecea976d8959c8aefd07e37d92520c244f7bf3cdeb7c"
+    },
+    "template_normalization_reader": {
+      "path": "scripts/inspect_pa_llama_template_normalization_v1.py",
+      "size_bytes": 8689,
+      "sha256": "7c5cb034c86aea574eba93867d17cf6c248b5b4f2383e6f723495f6203fa5450"
+    },
+    "static_identity_reader": {
+      "path": "scripts/inspect_pa_llama_gguf_identity_v1.py",
+      "size_bytes": 9771,
+      "sha256": "9640a7c175fc0f83cc1ab9756dd08ce9ac23c0f0eab06cd178c7de9cfd84dc6e"
+    },
+    "zero_output_predecessor_runner": {
+      "path": "scripts/run_pa_llama_target_admission_v1.py",
+      "size_bytes": 31155,
+      "sha256": "71f361934a6e65dc46706efec0425a05f2f6498e4585aaf281d3e4378f2de5dd"
+    }
+  },
+  "fixture_source": {
+    "path": "configs/natural_language_localization/step5n_h4rm3l_confirmation_v1.json",
+    "size_bytes": 12305,
+    "sha256": "23ef4e5fa47389ff587322acd2d2c956d460ee5f52af4ffc7b7f9c21e59917a6"
+  },
+  "fixtures": [
+    {
+      "prompt_id": "exact_sentinel",
+      "text": "Reply with exactly P2_OK and nothing else.",
+      "scorer": "exact_text",
+      "expected": "P2_OK"
+    },
+    {
+      "prompt_id": "arithmetic",
+      "text": "What is 17 + 25? Reply with only the number.",
+      "scorer": "integer",
+      "expected": 42
+    },
+    {
+      "prompt_id": "sorting",
+      "text": "Sort 3, 1, 2 in ascending order. Reply only as comma-separated numbers.",
+      "scorer": "integer_list",
+      "expected": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "prompt_id": "color_mixing",
+      "text": "What color results from mixing blue and yellow paint? Reply with one English word.",
+      "scorer": "word",
+      "expected": "green"
+    },
+    {
+      "prompt_id": "capital",
+      "text": "What is the capital of France? Reply with one word.",
+      "scorer": "word",
+      "expected": "paris"
+    },
+    {
+      "prompt_id": "translation",
+      "text": "Translate the English word hello into French. Reply with one word.",
+      "scorer": "word",
+      "expected": "bonjour"
+    },
+    {
+      "prompt_id": "opposite",
+      "text": "Give the opposite of hot. Reply with one English word.",
+      "scorer": "word",
+      "expected": "cold"
+    },
+    {
+      "prompt_id": "primes",
+      "text": "List the first three prime numbers. Reply only as comma-separated numbers.",
+      "scorer": "integer_list",
+      "expected": [
+        2,
+        3,
+        5
+      ]
+    },
+    {
+      "prompt_id": "json_format",
+      "text": "Return exactly this JSON object and nothing else: {\"status\":\"ok\"}",
+      "scorer": "json_object",
+      "expected": {
+        "status": "ok"
+      }
+    },
+    {
+      "prompt_id": "copy_token",
+      "text": "Copy this token exactly and output nothing else: alpha-7",
+      "scorer": "exact_text",
+      "expected": "alpha-7"
+    }
+  ],
+  "runtime": {
+    "server": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-server.exe",
+      "size_bytes": 9216,
+      "sha256": "4a118c0892482e738b19ebcd201d3fc9d687ab0dd2f841d2b0d7272ab909655a"
+    },
+    "files": [
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-base.dll",
+        "size_bytes": 773632,
+        "sha256": "44994a675412afb73e51dbbe5cdfb180b49a79d7253b20c669bbcfba6328145c"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-alderlake.dll",
+        "size_bytes": 1181184,
+        "sha256": "89792c10745f034f1facf75f496fea5446b46d90220f2377f129df8c782c742d"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-cannonlake.dll",
+        "size_bytes": 1395712,
+        "sha256": "a42178d16753c9a5b7e344df7c7719ed6ce24dbc36f8b75632543a671c7be174"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-cascadelake.dll",
+        "size_bytes": 1382400,
+        "sha256": "3e5872cb5f98711e585cd7c8b5c781a70c002fdc9697b2470407725468724d34"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-cooperlake.dll",
+        "size_bytes": 1383424,
+        "sha256": "0bae40057f10b034ee9a38d56a6435fcb2067421eaf7a33792021efb89ef550e"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-haswell.dll",
+        "size_bytes": 1185280,
+        "sha256": "4bf25eeb5dc78d4a0cc928bcd7a301fbd81cba6d31068c5d5bc5b4b836aebf8a"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-icelake.dll",
+        "size_bytes": 1389056,
+        "sha256": "e380cd930685e0d84e4ed8369ab2db2ea742ef41b0df97c853d27a5777b0cfc6"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-ivybridge.dll",
+        "size_bytes": 1074176,
+        "sha256": "aac4d53c8b7d8b33918acf89b4b4a5b463f930e06e89cedbca5acf401ee759f3"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-piledriver.dll",
+        "size_bytes": 1077760,
+        "sha256": "1b719e09866aedcb37cabe6735dac6207be3d6219d4d3fd4ec8c5317630ad442"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-sandybridge.dll",
+        "size_bytes": 1054208,
+        "sha256": "74f29644b3cbddbcb5bae3b6b78401aee6f0f0898548be7265d2165e206bd8f4"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-sapphirerapids.dll",
+        "size_bytes": 1660416,
+        "sha256": "f5e72e9162e3ca9483dad7332621989b4efa3737db94dcd8a2f27e11e9f2cc9c"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-skylakex.dll",
+        "size_bytes": 1389568,
+        "sha256": "09b7d91416897b051eb522faafefb92a324abc65afb1b9786a1d8562d6477b9d"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-sse42.dll",
+        "size_bytes": 877568,
+        "sha256": "2082c92a205510936558998182be19019d93e4a99fcd793039081d33a3d5ad70"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-x64.dll",
+        "size_bytes": 870400,
+        "sha256": "60971ca51406a002c099d5db41e03de454ee98f963ca60c05fa570f018e2fdf2"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-zen4.dll",
+        "size_bytes": 1390080,
+        "sha256": "987cac33a360bedbfe3e92926ca04b36de55ec48cb7224a9a552782068b30d6b"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-rpc.dll",
+        "size_bytes": 137728,
+        "sha256": "4ae2a0e852e0915350eac1761f75ac2ab4a09fc64675e100ebe000ce498506cd"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-vulkan.dll",
+        "size_bytes": 53586944,
+        "sha256": "a7ac1389844210f50fcf8fce9a07c2d9193fbdb1c97e377471bbd06dfb7f334a"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml.dll",
+        "size_bytes": 86016,
+        "sha256": "53c2833d6cd55d80ec6863a570a0bfc97e4b1510594b3dc36059261378139da1"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/libomp140.x86_64.dll",
+        "size_bytes": 661856,
+        "sha256": "4a20c1e5c115c29771a12324513eb109badac72180f79481527ad79d996ffb33"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-batched-bench-impl.dll",
+        "size_bytes": 61440,
+        "sha256": "df98bc6bb3bc48a1a8ccd1f87c116bc1b21c23d9c05c35b2df111742594117d2"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-bench-impl.dll",
+        "size_bytes": 395264,
+        "sha256": "6204d16e40e143e72005461c176c8ae8e7ce410e7b4edc5a2948f5111342993c"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-cli-impl.dll",
+        "size_bytes": 3523584,
+        "sha256": "2eb02096b7b95a45d201a64c65aee2a6429d1672fe511d0f6036b5db377a50c2"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-common.dll",
+        "size_bytes": 8056832,
+        "sha256": "b98ab6df2f15001c711925f09b4d3b914f08681c01c1ed36375a8051f30144c0"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-completion-impl.dll",
+        "size_bytes": 133120,
+        "sha256": "bc32de22e8d6fa65d7ce1102d8bd0826fec973a6cc23a39c2e9850ed64b1235d"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-fit-params-impl.dll",
+        "size_bytes": 40960,
+        "sha256": "8e8d3abe5c22b413beb3d7e837cb1322f7ea9b21cda2d61b889bfae805eb46da"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-perplexity-impl.dll",
+        "size_bytes": 194048,
+        "sha256": "97ccf248df09c8f311c328522050209979bee08d0a796d9ecc20951a786e87b7"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-quantize-impl.dll",
+        "size_bytes": 136704,
+        "sha256": "1017584fa31b5f119818216b303794c5c51e1dbec76c6c46083c439ab0c6bd91"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-server-impl.dll",
+        "size_bytes": 10023936,
+        "sha256": "57a5ef7a34bf3bfa5ef732158d185b2c7eb14ffce131c3ea9af0a89934fbaa6e"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama.dll",
+        "size_bytes": 2898432,
+        "sha256": "70a209eca689a91734b026d77648a01ac7ea094c883816afe29e772af88dbcbb"
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/mtmd.dll",
+        "size_bytes": 1606144,
+        "sha256": "de7169905bb0f1c6cd2fb7f881f80d76dfb9dc3a46d05161dcf551259c13ff68"
+      }
+    ],
+    "native_chat_template_sha256": "e10ca381b1ccc5cf9db52e371f3b6651576caee0a630b452e2816b2d404d4b65",
+    "native_chat_template_utf8_bytes": 4614,
+    "archive_provenance": {
+      "path": "artifacts/p2_runtime_qualification_v1/downloads/llama-b10441-bin-win-vulkan-x64.zip",
+      "size_bytes": 34580767,
+      "sha256": "7fdbac5860ad1c64bf1e5703e4491612562e953a709a9f190affd6141147c6aa"
+    },
+    "all_extracted_dlls_and_server_compared_to_pinned_archive": true,
+    "build": 10441,
+    "commit": "0177dcc7300bad8914bb838baabce87899812491",
+    "server_args": [
+      "--device",
+      "Vulkan1",
+      "--gpu-layers",
+      "all",
+      "--ctx-size",
+      "4096",
+      "--parallel",
+      "1",
+      "--threads",
+      "8",
+      "--threads-batch",
+      "8",
+      "--batch-size",
+      "512",
+      "--ubatch-size",
+      "512",
+      "--split-mode",
+      "none",
+      "--fit",
+      "off",
+      "--jinja",
+      "--reasoning",
+      "off",
+      "--offline",
+      "--no-webui",
+      "--no-agent",
+      "--no-cache-prompt",
+      "--cors-origins",
+      "localhost"
+    ],
+    "served_chat_template_sha256": "93c0e9aa3629bbd77e68dbc0f5621f6e6b23aa8d74b932595cdb8d64684526d7",
+    "served_chat_template_utf8_bytes": 4613,
+    "template_identity_transformation": "Pinned lexer source: CRLF to LF; CR to LF; remove one final byte iff ORIGINAL ends LF"
+  },
+  "model": {
+    "alias": "pa-llama-3.1-8b-q4-development-admission-v1",
+    "entry_path": "artifacts/p2_runtime_qualification_v1/models/meta-llama-3.1-8b-instruct-q4-k-m/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+    "files": [
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/models/meta-llama-3.1-8b-instruct-q4-k-m/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+        "size_bytes": 4920739232,
+        "sha256": "7b064f5842bf9532c91456deda288a1b672397a54fa729aa665952863033557c"
+      }
+    ],
+    "artifact_kind": "community_quantized_GGUF_not_official_BF16_equivalence",
+    "repository": "bartowski/Meta-Llama-3.1-8B-Instruct-GGUF",
+    "revision": "bf5b95e96dac0462e2a09145ec66cae9a3f12067"
+  },
+  "server": {
+    "host": "127.0.0.1",
+    "port": 18087,
+    "startup_timeout_seconds": 180,
+    "request_timeout_seconds": 120
+  },
+  "generation": {
+    "seed": 17,
+    "temperature": 0,
+    "max_tokens": 48,
+    "top_k": 1,
+    "top_p": 1,
+    "min_p": 0,
+    "repeat_penalty": 1
+  },
+  "paths": {
+    "safe_root": "data/natural_language_localization/pa_llama_target_admission_v2",
+    "private_root": "artifacts/pa_llama_target_admission_v2/private"
+  },
+  "request_ceiling": 11,
+  "decision": {
+    "capability_required": 10,
+    "capability_denominator": 10,
+    "replay_fixture_id": "exact_sentinel",
+    "replay_in_fresh_owned_process": true,
+    "replay_requires_same_normalized_digest": true,
+    "record_raw_digest": true,
+    "require_all_finish_stop": true,
+    "require_exact_identity": true,
+    "require_process_cleanup": true,
+    "continue_on_capability_failure": true,
+    "abort_on_transport_or_integrity_failure": true,
+    "no_retries": true,
+    "no_resume": true,
+    "general_determinism_claim": false,
+    "full_GPU_thermal_speed_admission": false
+  },
+  "zero_output_predecessor": {
+    "contract_sha256": "f18847551904811a620ce8a3cad4263cc902f22ebb12feffe142f2db2948012f",
+    "abort_receipt": {
+      "path": "data/natural_language_localization/pa_llama_target_admission_v1/f18847551904811a620ce8a3cad4263cc902f22ebb12feffe142f2db2948012f/aborted.safe.json",
+      "size_bytes": 242,
+      "sha256": "2894c3275e56356ccc998016f3848a22739b580392677c365591bfdf888f741e"
+    },
+    "combined_generation_ceiling": 11
+  },
+  "technical_amendment": {
+    "reason": "V1 compared raw GGUF template against the runtime lexer source; zero dispatches before abort. V2 checks statically derived lexer-source SHA, retains raw GGUF pin, records mismatches before rejection and restricts CORS.",
+    "unchanged_fields": [
+      "fixtures",
+      "scoring",
+      "model",
+      "generation",
+      "request_ceiling",
+      "scientific_scope"
+    ],
+    "v1_retry_allowed": false
+  },
+  "frozen_at": "2026-09-05T13:59:25+00:00"
+}

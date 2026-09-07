@@ -1,0 +1,156 @@
+{
+  "schema_version": "jbspan-e0f1b-wildguard-cumulative-sentinel-contract-v1-1",
+  "status": "FROZEN_AFTER_DEFENDER_INTERRUPTION_BEFORE_V1_1_OUTPUT",
+  "frozen": true,
+  "date": "2026-09-02",
+  "timezone": "Asia/Seoul",
+  "contract_path": "configs/evaluator_panel/calibration_redesign_e0f1b_cumulative_sentinel_v1_1.json",
+  "purpose": "Repair only the E0F-1B private-cache storage representation after Windows Defender quarantined a raw-text cache, while preserving the exact 72-record plan, model, prompt, inference, candidate family, gates, and cumulative analysis.",
+  "evidence_class": "OPERATIONAL_STORAGE_ONLY_REPAIR_WITH_FROZEN_SCIENTIFIC_DESIGN",
+  "adopted_e0f1a_records": 72,
+  "addition_scientific_records": 72,
+  "migrated_predecessor_records": 5,
+  "new_completion_call_ceiling": 67,
+  "discarded_quarantined_predecessor_completions": 1,
+  "cumulative_scientific_records": 144,
+  "operational_ceiling_seconds": 2100,
+  "automatic_execution_after_preflight": false,
+  "execution_requires_post_preflight_user_authorization": true,
+  "automatic_expansion_beyond_cumulative_sentinel": false,
+  "implementation": {
+    "runner": {
+      "path": "scripts/run_evaluator_panel_wildguard_cumulative_sentinel_e0f1b_v1_1.py",
+      "bytes": 43946,
+      "sha256": "8b374e31d6294638f9d4b0ed213549e6bc325cc34144e600834b4ee1d45a4520"
+    },
+    "predecessor_runner": {
+      "path": "scripts/run_evaluator_panel_wildguard_cumulative_sentinel_e0f1b.py",
+      "bytes": 50102,
+      "sha256": "94757f5b647539a94d0705cb6d905a277b5d32a6e661b49aa89284da428bcd69"
+    },
+    "parser_module": {
+      "path": "src/jbspan/evaluator_panel.py",
+      "bytes": 11740,
+      "sha256": "5761023334b4b35b2e619e4b6d211f7a4105782d568bb8f98323a3180db2a7c8"
+    },
+    "sentinel_module": {
+      "path": "src/jbspan/evaluator_panel_wildguard_sentinel.py",
+      "bytes": 15744,
+      "sha256": "a6c0e0aba37a50714fbe9d3f6fb4c4d1e45080e4029c294b9c3d10625ef21bb5"
+    }
+  },
+  "dependencies": {
+    "predecessor_contract": {
+      "path": "configs/evaluator_panel/calibration_redesign_e0f1b_cumulative_sentinel_v1.json",
+      "bytes": 10845,
+      "sha256": "7c3061f8a8a6f1766958c2f445c43e8a62521f7b65b7a83a3d5e0495cd967ed7"
+    },
+    "predecessor_preflight": {
+      "path": "data/evaluator_panel_v2/e0f1b_cumulative_preflight.safe.json",
+      "bytes": 5359,
+      "sha256": "594042a38f2cfaf9aca10fb85f9170686430094bd77a7414d5779d1773b7808a",
+      "result_identity_sha256": "acdebf5ede5a693c7a71aca2f7b504fbe8051e2ab56d6e723c79d2905d767a8a"
+    },
+    "defender_interruption": {
+      "path": "data/evaluator_panel_v2/e0f1b_v1_raw_private_cache_defender_interruption.safe.json",
+      "bytes": 3266,
+      "sha256": "8aae154374638e2a567bbc344bfdc3213c874c117e2381f7d15d88a72bae6f33",
+      "result_identity_sha256": "5e3941a8b8d0243d00e76a952f0638a7df8770edb5732aaefa022fbfe645aeed"
+    },
+    "e0f1a_result": {
+      "path": "data/evaluator_panel_v2/e0f1a_micro_sentinel_result.safe.json",
+      "bytes": 63889,
+      "sha256": "334b2fc97b0c84e7e71617eb3ac53dbe087d2728c0be70124bebdad396eb723d",
+      "result_identity_sha256": "bd301ad9d150cd71362f89ee67dfdaec1007233c0f08af2ddd3361d5ebcf7c40"
+    },
+    "e0f1a_axis": {
+      "path": "data/evaluator_panel_v2/e0f1a_micro_sentinel_axis.safe.jsonl",
+      "records": 72,
+      "bytes": 150329,
+      "sha256": "0f61bccba302e31a32ee9f5432723ccb013c6c999ef94dd9d20ff9fedf7c1d32"
+    }
+  },
+  "scientific_design_adoption": {
+    "predecessor_plan_changed": false,
+    "selection_changed": false,
+    "execution_order_changed": false,
+    "model_or_prompt_changed": false,
+    "inference_or_parser_semantics_changed": false,
+    "candidate_family_changed": false,
+    "futility_gates_changed": false,
+    "predecessor_candidate_specs_sha256": "0bdca925e21c8fd23948f837eae63e9836e97cbb75f36fd99b036eb74c863e6e",
+    "predecessor_futility_gates_sha256": "2b4913c69a204585e42c0d8d4a046c81e86356b8b3d1427444f4894f0a2785f9"
+  },
+  "storage_repair": {
+    "private_schema": "jbspan-e0f1b-v1-1-minimal-private-wildguard-record-v1",
+    "raw_fields_stored": [],
+    "stored_fields": "execution identity, record and input hashes, token counts, parsed axes, output hash and length, truncation/integrity flags, timings, and provenance",
+    "migrate_complete_predecessor_records": 5,
+    "migration_rule": "Programmatically validate the five exact predecessor file hashes and frozen input hashes, parse their already-completed classifier outputs, and write only the minimal V1.1 representation without exposing raw content to safe artifacts.",
+    "quarantined_record_restored": false,
+    "quarantined_record_rerun_under_minimal_cache": true,
+    "defender_exclusion_added": false,
+    "defender_realtime_protection_disabled": false,
+    "old_raw_cache_cleanup": "Delete the five predecessor raw caches only after all five minimal migrations have been hash-validated."
+  },
+  "runtime": {
+    "repository": "ggml-org/llama.cpp",
+    "release_tag": "b10441",
+    "revision": "0177dcc7300bad8914bb838baabce87899812491",
+    "required_build": "10441",
+    "required_revision_prefix": "0177dcc73",
+    "server": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-server.exe",
+      "bytes": 9216,
+      "sha256": "4a118c0892482e738b19ebcd201d3fc9d687ab0dd2f841d2b0d7272ab909655a"
+    },
+    "model": {
+      "repository": "allenai/wildguard",
+      "revision": "cbba4823f3e8020e5a74a5e29bf85072def6f2ff",
+      "path": "artifacts/p3_signal_screen_v1/wildguard_runtime/wildguard-q8_0.gguf",
+      "bytes": 7702573664,
+      "sha256": "0c11d34ecd7e0034621c956c65f7372f0dc159eca9112bd2b20011239fdc0247"
+    },
+    "conversion": "Q8_0_DIRECT",
+    "port": 18134,
+    "cpu_only_required": true,
+    "gpu_layer_count": 0,
+    "localhost_only": true,
+    "offline": true
+  },
+  "inference": {
+    "context_tokens": 4096,
+    "maximum_new_tokens": 128,
+    "threads": 16,
+    "threads_batch": 16,
+    "batch_size": 512,
+    "ubatch_size": 512,
+    "seed": 17,
+    "temperature": 0.0,
+    "top_p": 1.0,
+    "cache_prompt": false,
+    "nonce": "JBSPAN_E1B_CANARY_4C91",
+    "max_untrusted_characters": 12000,
+    "strict_three_line_parser": true,
+    "canary_leak_forces_ineligible": true,
+    "input_or_context_truncation_forces_ineligible": true
+  },
+  "outputs": {
+    "preflight_path": "data/evaluator_panel_v2/e0f1b_v1_1_minimal_cache_preflight.safe.json",
+    "addition_axis_path": "data/evaluator_panel_v2/e0f1b_v1_1_cumulative_addition_axis.safe.jsonl",
+    "cumulative_axis_path": "data/evaluator_panel_v2/e0f1b_v1_1_cumulative_axis.safe.jsonl",
+    "execution_path": "data/evaluator_panel_v2/e0f1b_v1_1_cumulative_execution.safe.json",
+    "result_path": "data/evaluator_panel_v2/e0f1b_v1_1_cumulative_result.safe.json",
+    "private_artifact_root": "artifacts/evaluator_panel_v2/e0f1b_wildguard_cumulative_sentinel_v1_1_minimal"
+  },
+  "protected_boundary": {
+    "predecessor_raw_cache_contents_human_opened": false,
+    "predecessor_outputs_used_for_candidate_or_gate_redesign": false,
+    "heldout_opened": false,
+    "p3_responses_opened": false,
+    "topology_outcomes_opened": false,
+    "panel_qualified_by_storage_repair": false,
+    "paper_validity": false,
+    "automatic_300_or_889_expansion": false
+  }
+}

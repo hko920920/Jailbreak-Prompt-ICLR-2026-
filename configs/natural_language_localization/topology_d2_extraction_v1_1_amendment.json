@@ -1,0 +1,107 @@
+{
+  "schema_version": "jbspan-topology-d2-extraction-amendment-v1-1",
+  "status": "FROZEN_AFTER_9_TARGET_RECORDS_BEFORE_ANY_D2_PANEL_OUTPUT",
+  "frozen": true,
+  "frozen_at": "2026-09-04T13:22:57+09:00",
+  "purpose": "Repair one structural simple-IO extraction boundary for prompts of at most 500 characters that already end in a normalized line feed, without rerunning the target or observing response content or panel labels.",
+  "evidence_class": "POST_TARGET_PRE_EVALUATION_OPERATIONAL_EXTRACTION_AMENDMENT",
+  "scientific_rule_changed": false,
+  "dependencies": {
+    "base_contract": {
+      "path": "configs/natural_language_localization/topology_d2_micro_pilot_v1.json",
+      "sha256": "d4e6326affb33e0cb1a3c9f25d24b5bd64d68616f8d4d8cbc59d445dbf23074b"
+    },
+    "base_preflight": {
+      "path": "data/natural_language_localization/topology_d2_micro_pilot_v1/preflight.safe.json",
+      "sha256": "4d14d5303027d892cbcdec9dffe2a01a31d3d7df15f0ccbaa3621f7e43f72cac"
+    },
+    "repair_runner": {
+      "path": "scripts/run_topology_d2_micro_pilot_v1_1.py",
+      "sha256": "68b6d09c6c225f2655889b9dd654d1b8a9fa9b5ffb48cddabd052250c7a06f6a"
+    },
+    "repair_tests": {
+      "path": "tests/test_topology_d2_extraction_v1_1.py",
+      "sha256": "119c51612e9d66213b25bebb052e9659a482dec52780a1430cb542f512e01365"
+    }
+  },
+  "failure_snapshot": {
+    "progress_path": "data/natural_language_localization/topology_d2_micro_pilot_v1/generation_progress.safe.jsonl",
+    "progress_sha256": "caeb7adb1fd30249a066c0297191b70ab628f457530dcf06cac99c63a555ef03",
+    "record_count": 9,
+    "operational_pass_count": 6,
+    "repair_target_count": 3,
+    "repair_targets": [
+      {
+        "record_id": "9dedb3d535dd3588c9d8376cac294fe15d76c41c06f6673d40f04822532df566",
+        "execution_order": 0,
+        "execution_identity_sha256": "06287714f661709023df53f6de603c74aee2d62d7fd1f8a91c5d9f5598792dd9",
+        "prompt_sha256": "e0fb596ec4ad4805a61c80182e8f18d1b67e135f40975479526e4491d6a10e0a",
+        "private_record_sha256": "6654178b14238c6f6126f16da364943a195954fc0716def23753929a59176234"
+      },
+      {
+        "record_id": "c3492709dbb69d52ba897ac9f150302d4ba45be3773e5318889647111afac8df",
+        "execution_order": 1,
+        "execution_identity_sha256": "5f4f6e5746d31680a02158359356647d8338ae51e20aa528b38935eefb19828d",
+        "prompt_sha256": "e0fb596ec4ad4805a61c80182e8f18d1b67e135f40975479526e4491d6a10e0a",
+        "private_record_sha256": "2d9ef914b507295beca53588b9bfa93e73070ad9858765380204971f8d068248"
+      },
+      {
+        "record_id": "54a96fc931f53f9587f5514ac869be0ca16a143aa1b6b60c097a6c865c33c1db",
+        "execution_order": 2,
+        "execution_identity_sha256": "28c57702a0556124a4f5b4214e35e77802bb5a4835e59ec8ae5f4f2816c34a06",
+        "prompt_sha256": "e0fb596ec4ad4805a61c80182e8f18d1b67e135f40975479526e4491d6a10e0a",
+        "private_record_sha256": "3c09133969f7d390ef198190c0815a796f51a713f9fc7c82db04c7605407967d"
+      }
+    ]
+  },
+  "observed_failure_signature": {
+    "return_code": 0,
+    "runtime_error": null,
+    "legacy_response_extraction_error": "ValueError",
+    "legacy_response_character_length": 0,
+    "chat_template_active": true,
+    "gpu_offload_logged": true,
+    "prompt_character_length": 449,
+    "prompt_ends_normalized_line_feed": true,
+    "prompt_occurrences_in_preserved_stdout": 1,
+    "timing_boundaries_in_preserved_stdout": 1,
+    "same_signature_across_seeds": [11, 23, 47]
+  },
+  "repair_algorithm": {
+    "line_endings": "NORMALIZE_CRLF_AND_CR_TO_LF",
+    "displayed_prompt": "FULL_PROMPT_WHEN_AT_MOST_500_CHARACTERS_OTHERWISE_FIRST_500_PLUS_FROZEN_TRUNCATION_SUFFIX",
+    "separator_after_displayed_prompt": "EMPTY_IF_DISPLAYED_PROMPT_ALREADY_ENDS_LF_OTHERWISE_ONE_LF",
+    "prompt_marker_count_required": 1,
+    "timing_boundary_count_required": 1,
+    "response": "EXACT_TEXT_BETWEEN_PROMPT_MARKER_END_AND_TIMING_BOUNDARY_WITH_OUTER_WHITESPACE_STRIPPED",
+    "nonempty_response_required": true,
+    "original_private_record_backup_required": true,
+    "model_rerun": false,
+    "apply_to_future_records": "ONLY_THROUGH_THE_SAME_FROZEN_V3_EXTRACTOR_DURING_THIS_D2_EXECUTION"
+  },
+  "access_boundary_at_freeze": {
+    "raw_response_semantics_inspected": false,
+    "response_text_reported": false,
+    "qwen3guard_output_observed": false,
+    "jailmeter_output_observed": false,
+    "panel_label_observed": false,
+    "topology_outcome_observed": false,
+    "only_delimiter_counts_lengths_statuses_and_boundary_codepoints_inspected": true
+  },
+  "prohibited_changes": {
+    "target_rerun": true,
+    "prompt_change": true,
+    "payload_change": true,
+    "sampling_change": true,
+    "evaluator_change": true,
+    "unit_or_neutralizer_change": true,
+    "manual_response_edit": true,
+    "drop_failed_records": true
+  },
+  "recording": {
+    "repair_audit_path": "data/natural_language_localization/topology_d2_micro_pilot_v1/extraction_repair_v1_1.safe.json",
+    "original_private_backup_root": "artifacts/topology_d2_micro_pilot_v1/private_records/extraction_repair_v1_1/original_records",
+    "safe_artifact_contains_raw_text": false
+  },
+  "next_operation": "APPLY_EXACT_THREE_RECORD_STORAGE_ONLY_REPAIR_THEN_RESUME_WITH_V3_EXTRACTOR_BEFORE_ANY_PANEL_EVALUATION"
+}

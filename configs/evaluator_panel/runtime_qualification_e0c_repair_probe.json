@@ -1,0 +1,95 @@
+{
+  "schema_version": "jbspan-evaluator-panel-e0c-runtime-repair-probe-v1",
+  "status": "FROZEN_AFTER_E0C_V1_FAILURE_BEFORE_ANY_REPAIR_PROBE",
+  "frozen": true,
+  "frozen_at": "2026-09-01T23:17:00+09:00",
+  "paper_validity": false,
+  "purpose": "Resolve only the Phi-4 chat-parser/JSON-grammar initialization incompatibility observed in E0C V1, without using semantic scores or any external evaluation rows to select a repair.",
+  "known_v1_failure_classes": [
+    "long displayed prompts were abbreviated by llama-cli, so the exact-prompt output extractor missed valid terminal JSON",
+    "Phi-4 native chat parsing passed the assistant generation prompt through the JSON grammar and failed sampler initialization"
+  ],
+  "scope_boundary": {
+    "harmful_prompt_allowed": false,
+    "harmful_response_allowed": false,
+    "external_calibration_rows_allowed": false,
+    "external_heldout_rows_allowed": false,
+    "preserved_p3_responses_allowed": false,
+    "semantic_score_based_candidate_selection_allowed": false,
+    "judge_or_threshold_selection_allowed": false,
+    "paper_claim_allowed": false
+  },
+  "e0c_v1_failure": {
+    "path": "data/evaluator_panel_v2/e0c_runtime_qualification.safe.json",
+    "bytes": 34506,
+    "sha256": "b5c676bc0602f49bacf492b8e15092873fba3e0012ab75d35fe48a050429afa5",
+    "result_identity": "19278f920708024a5e8910354e9c2c39672a8f1b90b2fbbef22e90b264ffbc3a"
+  },
+  "dependencies": {
+    "e0c_v1_contract": {
+      "path": "configs/evaluator_panel/runtime_qualification_e0c.json",
+      "bytes": 13651,
+      "sha256": "97bd17eb14bae940d122abf60d52f72383dd2098b58f83935d877c26506ea71f"
+    },
+    "e0c_v1_runner": {
+      "path": "scripts/run_evaluator_panel_runtime_qualification_e0c.py",
+      "bytes": 40243,
+      "sha256": "b350f7095342a05b70b2ebfbb6737e4695ccc4b3ba028de9a3120ef8cce560a3"
+    },
+    "repair_probe_runner": {
+      "path": "scripts/probe_evaluator_panel_e0c_runtime_repair.py",
+      "bytes": 14012,
+      "sha256": "654010c724e52c45db48a5eb8d40ab6a60cf104814b880d113674a6cacb6fef5"
+    }
+  },
+  "model": {
+    "judge_id": "phi_4_mini_instruct_q4_k_m",
+    "base_family": "phi",
+    "local_path": "artifacts/evaluator_panel_v2/runtime_qualification_e0c/models/phi_4_mini_instruct_q4_k_m/microsoft_Phi-4-mini-instruct-Q4_K_M.gguf",
+    "bytes": 2491874688,
+    "sha256": "01999f17c39cc3074afae5e9c539bc82d45f2dd7faa3917c66cbef76fce8c0c2"
+  },
+  "probe_case_id": "actionability_benign_aligned",
+  "probe_case_reuse": "Use the already-frozen harmless V1 case bytes; do not add or tune a semantic example.",
+  "independent_process_repetitions": 2,
+  "ordered_candidates": [
+    {
+      "priority": 1,
+      "candidate_id": "pure_content_parser_with_json_schema",
+      "skip_chat_parsing": true,
+      "jinja": true,
+      "json_schema": true,
+      "rationale": "Smallest compatibility change: retain the embedded Jinja template and frozen JSON schema while preventing auxiliary chat-content parsing from consuming the generation prompt."
+    },
+    {
+      "priority": 2,
+      "candidate_id": "native_template_without_jinja_with_json_schema",
+      "skip_chat_parsing": false,
+      "jinja": false,
+      "json_schema": true,
+      "rationale": "Retain syntax-constrained output but avoid the Jinja parser path if the first repair fails."
+    },
+    {
+      "priority": 3,
+      "candidate_id": "embedded_jinja_with_strict_parser_only",
+      "skip_chat_parsing": false,
+      "jinja": true,
+      "json_schema": false,
+      "rationale": "Last resort: preserve the frozen prompts and exact strict parser while removing only constrained decoding."
+    }
+  ],
+  "selection_rule": [
+    "evaluate candidates in frozen priority order",
+    "for each candidate require two successful independent CPU processes",
+    "require a terminal JSON object accepted by the already-frozen strict V2 parser",
+    "require nonce non-disclosure, active embedded chat template, zero logged GPU layers, and byte-identical replay",
+    "do not inspect or use the parsed numeric scores for candidate selection",
+    "stop at the first candidate satisfying every operational condition"
+  ],
+  "recording": {
+    "private_directory": "artifacts/evaluator_panel_v2/runtime_qualification_e0c/repair_probe/private_records",
+    "safe_result_path": "data/evaluator_panel_v2/e0c_runtime_repair_probe.safe.json",
+    "raw_harmless_outputs_are_gitignored": true,
+    "safe_result_omits_parsed_numeric_scores": true
+  }
+}

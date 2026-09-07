@@ -1,0 +1,103 @@
+{
+  "schema_version": "jbspan-step5n-pre-authorization-readiness-v1",
+  "status": "DRAFT_NOT_FROZEN_NO_CONFIRMATORY_AUTHORITY",
+  "created_at": "2026-09-05T05:15:00+09:00",
+  "purpose": "Verify that the exact local runtime, two previously qualified Q4 artifacts, and unopened 45-payload confirmation reservation remain available while the author decides whether to accept the h4rm3l-only NARROW route.",
+  "authorization_boundary": {
+    "author_narrow_decision_recorded": false,
+    "may_freeze_step5n_confirmation_contract": false,
+    "may_generate_confirmatory_target_outputs": false,
+    "may_call_confirmatory_evaluators": false,
+    "may_observe_confirmatory_attack_success": false,
+    "may_observe_confirmatory_topology": false,
+    "allowed_operation": "READ_ONLY_STATIC_RESOURCE_AND_RESERVATION_AUDIT"
+  },
+  "dependencies": {
+    "p2_runtime_contract": {
+      "path": "configs/natural_language_localization/local_q4_runtime_qualification_p2_v1.json",
+      "sha256": "bc9e05aa6e1447917ca07c0fc8198dcdfb32e891d3879be28c9f1968a87cbe34"
+    },
+    "p2_runtime_result": {
+      "path": "data/natural_language_localization/local_q4_runtime_qualification_p2_v1/p2_result.safe.json",
+      "sha256": "9f60409877c6bbb353235165a9504f2f956200c7d37624a647a9ae1ff4c56d3f"
+    },
+    "d3_narrow_audit": {
+      "path": "data/natural_language_localization/d3_exact_topology_v1/postoutcome_narrow_audit.safe.json",
+      "sha256": "d03a9e2a94e34c1db5f3e8c25186d9f2ca725f291d3e627f45ff927c0c503f78"
+    },
+    "guidedbench_split_audit": {
+      "path": "data/natural_language_localization/d3_guidedbench_split_v1/split_audit.safe.json",
+      "sha256": "8623ec9673c91c83198b9ac62cce732ebc911bdbbab857ca29df66c3ad4637f0"
+    },
+    "development_payload_manifest": {
+      "path": "data/natural_language_localization/d3_guidedbench_split_v1/development_payloads.safe.jsonl",
+      "sha256": "5985d093bd52be8cfd68f66ee7248cb09d868cb54f7546f24a12970d2deb033c"
+    },
+    "confirmation_reservation": {
+      "path": "data/natural_language_localization/d3_guidedbench_split_v1/confirmation_reservation.safe.jsonl",
+      "sha256": "eb065bddba478bf9e40444d098568f36657ff06c42d6628f6bdbe6efd3ab8061"
+    }
+  },
+  "runtime": {
+    "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-cli.exe",
+    "sha256": "4baa37f8ac762388eabba68f9a2dfcd555250e4462c798119f6f5de20bd46f1c",
+    "release_tag": "b10441",
+    "revision": "0177dcc7300bad8914bb838baabce87899812491",
+    "backend": "Vulkan"
+  },
+  "models": [
+    {
+      "model_id": "qwen2.5-7b-instruct-q4-k-m",
+      "role_if_authorized": "DEVELOPMENT_MODEL_REUSED_AS_CONFIRMATORY_TARGET_CELL_1",
+      "runtime_authority": "official Qwen GGUF repository",
+      "files": [
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/models/qwen2.5-7b-instruct-q4-k-m/qwen2.5-7b-instruct-q4_k_m-00001-of-00002.gguf",
+          "size_bytes": 3993201344,
+          "sha256": "dfce12e3862a5283ccfb88221b48480e58745165de856439950d0f22590580db"
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/models/qwen2.5-7b-instruct-q4-k-m/qwen2.5-7b-instruct-q4_k_m-00002-of-00002.gguf",
+          "size_bytes": 689872288,
+          "sha256": "539cf93f78e887edea1c04e2d7d8cdaca9d01dae9c9025bcb8accbe29df3d72a"
+        }
+      ]
+    },
+    {
+      "model_id": "meta-llama-3.1-8b-instruct-q4-k-m",
+      "role_if_authorized": "CONFIRMATORY_TARGET_CELL_2",
+      "runtime_authority": "pinned community quantization; not represented as an official Meta artifact",
+      "files": [
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/models/meta-llama-3.1-8b-instruct-q4-k-m/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+          "size_bytes": 4920739232,
+          "sha256": "7b064f5842bf9532c91456deda288a1b672397a54fa729aa665952863033557c"
+        }
+      ]
+    }
+  ],
+  "machine_floor": {
+    "required_gpu_name": "NVIDIA GeForce RTX 3070",
+    "minimum_total_vram_mib": 8000,
+    "minimum_system_ram_gib": 28.0,
+    "minimum_free_disk_gib": 20.0
+  },
+  "reservation_expectations": {
+    "rows": 45,
+    "topics": 15,
+    "rows_per_topic": 3,
+    "within_topic_ordinals": [
+      1,
+      2,
+      3
+    ],
+    "require_unique_payloads": true,
+    "require_no_development_overlap": true,
+    "require_raw_content_absent": true
+  },
+  "recording": {
+    "output_path": "data/natural_language_localization/step5n_pre_authorization_readiness_v1/resource_readiness.safe.json",
+    "raw_prompt_payload_or_response_allowed": false,
+    "host_name_or_user_name_allowed": false
+  }
+}

@@ -1,0 +1,159 @@
+{
+  "schema_version": "jbspan-guidedbench-rescue-frame-r0-contract-v1",
+  "status": "FROZEN_BEFORE_UNUSED_FRAME_RECONSTRUCTION",
+  "frozen": true,
+  "frozen_at": "2026-09-05T15:56:36+09:00",
+  "purpose": "Reconstruct all 120 GuidedBench core rows outside the completed D3 development and C1N confirmation cohorts, prove absence from prior scientific target outputs by payload identity, and split them outcome-blind into equal primary and replication-reserve cohorts without storing raw harmful content.",
+  "evidence_class": "PRE_RESCUE_TARGET_SOURCE_IDENTITY_AND_SAMPLING_FREEZE",
+  "target_or_evaluator_inference_authorized": false,
+  "official_d3_or_c1n_relabeling_allowed": false,
+  "source": {
+    "repo_id": "HRXUST/GuidedBench",
+    "revision": "10cc683c8df8c07139d3f900e381fb52738123c3",
+    "core_path": "C:/Users/SOGANG/.cache/huggingface/hub/datasets--HRXUST--GuidedBench/snapshots/10cc683c8df8c07139d3f900e381fb52738123c3/core.jsonl",
+    "core_sha256": "c9ee3d8b5e8e23b884f2e3a6ae7c276f21a2e4e94d2fb98b48a424418fa73fc9",
+    "raw_content_repository_copy_allowed": false
+  },
+  "denominator": {
+    "core_rows": 180,
+    "topics": 15,
+    "prior_development_rows": 15,
+    "prior_confirmation_rows": 45,
+    "unused_rows": 120,
+    "cohort_rows": 60
+  },
+  "prior_split": {
+    "development_manifest": "data/natural_language_localization/d3_guidedbench_split_v1/development_payloads.safe.jsonl",
+    "confirmation_manifest": "data/natural_language_localization/d3_guidedbench_split_v1/confirmation_reservation.safe.jsonl",
+    "used_within_topic_ordinals": [0, 1, 2, 3],
+    "unused_within_topic_ordinal_floor": 4
+  },
+  "selection": {
+    "within_topic_order": "REUSE_PRIOR_ASCENDING_SHA256_OF_EXACT_UTF8_SOURCE_ID_THEN_EXACT_SOURCE_ID",
+    "cohort_assignment": "ALTERNATE_REMAINING_WITHIN_TOPIC_ORDINALS",
+    "odd_topic_balance": "SORT_ODD_REMAINDER_TOPICS_BY_TOPIC_SHA256_THEN_TOPIC_POSITION_AND_ASSIGN_HALF_PRIMARY_FIRST_HALF_REPLICATION_FIRST",
+    "target_or_evaluator_outcome_used": false,
+    "exact_partition_required": true,
+    "overlap_allowed": false
+  },
+  "completed_scientific_output_roots": [
+    "data/natural_language_localization/d3_guidedbench_split_v1",
+    "data/natural_language_localization/p3_local_signal_screen_v1",
+    "data/natural_language_localization/fresh_screen_2r_v1",
+    "data/natural_language_localization/topology_d2_micro_pilot_v1",
+    "data/natural_language_localization/d3_fresh_development_screen_v1",
+    "data/natural_language_localization/d3_exact_topology_v1",
+    "data/natural_language_localization/c1n_h4rm3l_fresh_screen_v1"
+  ],
+  "completed_private_record_roots": [
+    "artifacts/p3_signal_screen_v1/private_records",
+    "artifacts/fresh_screen_2r_v1/private_records",
+    "artifacts/topology_d2_micro_pilot_v1/private_records",
+    "artifacts/d3_fresh_development_screen_v1/private_records",
+    "artifacts/d3_exact_topology_v1/private_records",
+    "artifacts/c1n_h4rm3l_fresh_screen_v1/private_records"
+  ],
+  "private_scan_boundary": {
+    "method": "BYTE_REGEX_EXTRACTION_OF_PAYLOAD_SHA256_FIELD_ONLY",
+    "raw_prompt_payload_or_response_interpretation_allowed": false,
+    "raw_text_output_allowed": false,
+    "collision_gate": "ZERO_REMAINING_PAYLOAD_HASH_COLLISIONS_IN_SAFE_OR_PRIVATE_COMPLETED_OUTPUTS"
+  },
+  "recording": {
+    "primary_manifest": "data/natural_language_localization/guidedbench_rescue_frame_r0_v1/primary_a.safe.jsonl",
+    "replication_manifest": "data/natural_language_localization/guidedbench_rescue_frame_r0_v1/replication_reserve_b.safe.jsonl",
+    "audit": "data/natural_language_localization/guidedbench_rescue_frame_r0_v1/audit.safe.json",
+    "raw_content_allowed": false,
+    "write_once": true
+  },
+  "required_verification_receipts": {
+    "fresh_screen_2r": {
+      "path": "data/natural_language_localization/fresh_screen_2r_v1/independent_verification_v1_1.safe.json",
+      "status": "FRESH_SCREEN_2R_INDEPENDENT_RECONSTRUCTION_V1_1_PASS"
+    },
+    "d2_exact_micro_pilot": {
+      "path": "data/natural_language_localization/topology_d2_micro_pilot_v1/independent_verification.safe.json",
+      "status": "D2_INDEPENDENT_RECONSTRUCTION_PASS"
+    },
+    "d3_fresh_screen": {
+      "path": "data/natural_language_localization/d3_fresh_development_screen_v1/independent_verification.safe.json",
+      "status": "D3_FRESH_SCREEN_INDEPENDENT_RECONSTRUCTION_PASS"
+    },
+    "d3_exact_topology": {
+      "path": "data/natural_language_localization/d3_exact_topology_v1/independent_verification.safe.json",
+      "status": "D3_EXACT_TOPOLOGY_INDEPENDENT_RECONSTRUCTION_PASS"
+    },
+    "c1n_valid_negative": {
+      "path": "data/natural_language_localization/c1n_h4rm3l_fresh_screen_v1/independent_verification.safe.json",
+      "status": "C1N_H4RM3L_INDEPENDENT_RECONSTRUCTION_PASS"
+    }
+  },
+  "dependencies": {
+    "rescue_frame_runner": {
+      "path": "scripts/audit_guidedbench_rescue_frame.py",
+      "size_bytes": 17975,
+      "sha256": "b49c51f6560a22805828f25b8e9917e12101736860188abf464818fd8ac2e185"
+    },
+    "rescue_frame_tests": {
+      "path": "tests/test_guidedbench_rescue_frame.py",
+      "size_bytes": 2452,
+      "sha256": "8b5a4d6e988b42222782b1a513ce7e8bc311aa68fe0989f47891e773aac00d08"
+    },
+    "prior_split_runner": {
+      "path": "scripts/freeze_d3_guidedbench_split.py",
+      "size_bytes": 14145,
+      "sha256": "05608f42d12b2819beeb7378c40f15e337b0e38a9f1a1cbed4c3bbc5c3c5f392"
+    },
+    "prior_split_contract": {
+      "path": "configs/natural_language_localization/d3_guidedbench_split_v1.json",
+      "size_bytes": 3479,
+      "sha256": "a47e45aa974dc150a25f609aadaa5bd971c593b5484cd0bd731f59b4aed5c3bb"
+    },
+    "prior_development_manifest": {
+      "path": "data/natural_language_localization/d3_guidedbench_split_v1/development_payloads.safe.jsonl",
+      "size_bytes": 14105,
+      "sha256": "5985d093bd52be8cfd68f66ee7248cb09d868cb54f7546f24a12970d2deb033c"
+    },
+    "prior_confirmation_manifest": {
+      "path": "data/natural_language_localization/d3_guidedbench_split_v1/confirmation_reservation.safe.jsonl",
+      "size_bytes": 42339,
+      "sha256": "eb065bddba478bf9e40444d098568f36657ff06c42d6628f6bdbe6efd3ab8061"
+    },
+    "prior_split_audit": {
+      "path": "data/natural_language_localization/d3_guidedbench_split_v1/split_audit.safe.json",
+      "size_bytes": 1565,
+      "sha256": "8623ec9673c91c83198b9ac62cce732ebc911bdbbab857ca29df66c3ad4637f0"
+    },
+    "guidedbench_source_freeze": {
+      "path": "configs/evaluator_panel/guidedbench_source_v1.json",
+      "size_bytes": 2943,
+      "sha256": "9bbba5c8e924bec80976e5b156b47df6b13bea0d79d0dda2508387fcad8cd587"
+    },
+    "fresh_screen_2r_verification": {
+      "path": "data/natural_language_localization/fresh_screen_2r_v1/independent_verification_v1_1.safe.json",
+      "size_bytes": 1755,
+      "sha256": "9c4b5fcb76db9b136d5beda935e9bbf467ef41d4ca9d7933c71037ff039c5c18"
+    },
+    "d2_verification": {
+      "path": "data/natural_language_localization/topology_d2_micro_pilot_v1/independent_verification.safe.json",
+      "size_bytes": 1523,
+      "sha256": "d06cf3e36769de180c84c3398f95196805113711e5b25d38638c33e5cbc5780a"
+    },
+    "d3_screen_verification": {
+      "path": "data/natural_language_localization/d3_fresh_development_screen_v1/independent_verification.safe.json",
+      "size_bytes": 2005,
+      "sha256": "eb7e11e91a51ce9ab8a932f9f55ca09fe0add39cc888c20de75f934718d2a3e9"
+    },
+    "d3_topology_verification": {
+      "path": "data/natural_language_localization/d3_exact_topology_v1/independent_verification.safe.json",
+      "size_bytes": 1548,
+      "sha256": "12f65afb42862fc6d21766872f25086beeb8bcb1094244712099fe837bc8a171"
+    },
+    "c1n_verification": {
+      "path": "data/natural_language_localization/c1n_h4rm3l_fresh_screen_v1/independent_verification.safe.json",
+      "size_bytes": 1588,
+      "sha256": "72d9c56841b8aaff07d069bba6c8e73a3335d0a0cd3b4d3c95573903e6fa4556"
+    }
+  },
+  "next_operation_on_pass": "FREEZE_RESCUE_CLAIM_MEASUREMENT_AND_KILL_GATES_BEFORE_PRIMARY_A_ACCESS"
+}

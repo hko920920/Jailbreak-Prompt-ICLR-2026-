@@ -1,0 +1,75 @@
+{
+  "schema_version": "jbspan-reviewer-calibration-pre-d1-amendment-v1",
+  "status": "FROZEN_BEFORE_D1_PANEL_AND_TOPOLOGY_OUTCOMES",
+  "frozen": true,
+  "frozen_at": "2026-09-04T01:39:55+09:00",
+  "purpose": "Apply lessons from actual human reviews of PP-Mark and The Noise Paradox by moving simplest-explanation and contribution-killer checks before expensive confirmation without changing the T0 outcome ontology or topology definitions.",
+  "parent": {
+    "path": "configs/natural_language_localization/topology_transition_t0_v1.json",
+    "sha256": "d395d5cf971e65030bca1fc6646460744951375db34cba78e1ab773633b30ce3",
+    "required_status": "FROZEN_LABEL_BLIND_TO_P3_PANEL_AND_TOPOLOGY_OUTCOMES"
+  },
+  "outcome_boundary_at_freeze": {
+    "p3_e0g5_outputs_observed": false,
+    "p3_panel_labels_observed": false,
+    "stable_pair_states_observed": false,
+    "topology_outcomes_observed": false,
+    "new_human_labels_collected": false
+  },
+  "unchanged_scientific_contract": [
+    "E0G5_PANEL_AND_ABSTENTION_MAPPING",
+    "STABLE_PAIR_PREDICATE",
+    "IMMUTABLE_PAYLOAD_RULE",
+    "SOURCE_DERIVED_UNIT_VOCABULARIES",
+    "TWO_NEUTRALIZERS",
+    "PRIMARY_AND_REPLICATION_SEEDS",
+    "CAPABILITY_CONTROLS",
+    "STRICT_SUBSET_MINIMALITY_WITHOUT_MONOTONICITY",
+    "FRESH_DEVELOPMENT_CONFIRMATION_SEPARATION",
+    "FINAL_C3_THRESHOLDS"
+  ],
+  "review_calibration_policy": {
+    "acceptance_score_forecast_allowed": false,
+    "multiple_llm_personas_count_as_independent_reviewers": false,
+    "limitation_is_nonfatal_merely_because_disclosed": false,
+    "required_review_outputs": [
+      "STRONGEST_PLAUSIBLE_REJECTION",
+      "SIMPLEST_COMPETING_EXPLANATION",
+      "CLAIM_EVIDENCE_MAP",
+      "STOP_NARROW_OR_CONTINUE_DECISION"
+    ]
+  },
+  "d2_early_contribution_killer": {
+    "derive_from_complete_truth_table": [
+      "ALL_SINGLETONS",
+      "LEAVE_ONE_OUT",
+      "DDMIN_ONE_PATH",
+      "GREEDY_ONE_PATH",
+      "SAME_NAMED_SINGLETON_EXPLAINS_ALL",
+      "WHOLE_WRAPPER_ONLY",
+      "ORDER_GE_2_WITHOUT_RECOVERED_SINGLETON",
+      "MULTIPLE_PATHWAY_ONE_PATH_MISS"
+    ],
+    "additional_target_generation_for_baseline_selection_allowed": false,
+    "continue_signal": "ORIGINAL_D2_GO_AND_AT_LEAST_ONE_OF_ORDER_GE_2_WITHOUT_RECOVERED_SINGLETON_OR_MULTIPLE_PATHWAY_ONE_PATH_MISS",
+    "no_contribution_signal": "EVERY_RESULT_IS_THE_SAME_OBVIOUS_SINGLETON_OR_WHOLE_WRAPPER_OR_NEUTRALIZER_SPECIFIC_ARTIFACT_OR_CAPABILITY_CONFOUND"
+  },
+  "d3_preconfirmation_kill_gate": {
+    "retain_parent_d3_gate": true,
+    "additional_requirements": [
+      "NONTRIVIAL_SIGNAL_IN_AT_LEAST_TWO_FRESH_PAYLOADS",
+      "NO_SINGLE_NAMED_UNIT_OR_WHOLE_WRAPPER_EXPLAINS_ALL_REPORTABLE_RECOVERY",
+      "AT_LEAST_ONE_EXACT_MINIMAL_EDGE_MISSED_BY_A_ONE_UNIT_OR_ONE_PATH_BASELINE_OR_PROSPECTIVE_CLAIM_NARROWING",
+      "EVALUATOR_AXIS_AND_REASONABLE_FROZEN_RULE_SENSITIVITY_COMPLETE",
+      "VOCABULARY_RELATIVE_COARSENING_AND_UNRESOLVED_DENOMINATORS_REPORTED"
+    ],
+    "failure_action": "DO_NOT_OPEN_FULL_CONFIRMATORY_TOPOLOGY_ROUTE_UNLESS_A_NEW_PRE_OUTCOME_NARROWED_CLAIM_CONTRACT_IS_FROZEN"
+  },
+  "human_evidence_boundary": {
+    "new_annotation_study_required_for_d1_d3": false,
+    "automatic_panel_may_be_called_human_equivalent": false,
+    "paper_claim": "AUTOMATIC_PANEL_DEFINED_RECOVERY_UNDER_REPORTED_EXTERNAL_ERROR_COVERAGE_AND_ABSTENTION",
+    "independent_human_cold_read_before_submission": "PREFERRED_BUT_NOT_A_FORMAL_ANNOTATION_STUDY"
+  },
+  "next_operation": "IMPLEMENT_AND_PREFLIGHT_D1_WITHOUT_OPENING_OUTCOMES_UNTIL_THIS_AMENDMENT_IS_IDENTITY_VERIFIED"
+}

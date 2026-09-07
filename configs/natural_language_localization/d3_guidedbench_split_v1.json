@@ -1,0 +1,74 @@
+{
+  "schema_version": "jbspan-d3-guidedbench-split-contract-v1",
+  "status": "FROZEN_BEFORE_ANY_D3_OR_C1_TARGET_OUTPUT",
+  "frozen": true,
+  "frozen_at": "2026-09-04T14:21:00+09:00",
+  "purpose": "Materialize the T0 outcome-blind one-plus-three-per-topic GuidedBench core split without storing raw harmful content in the repository.",
+  "evidence_class": "PRE_TARGET_SOURCE_IDENTITY_AND_SAMPLING_FREEZE",
+  "dependencies": {
+    "split_runner": {
+      "path": "scripts/freeze_d3_guidedbench_split.py",
+      "sha256": "05608f42d12b2819beeb7378c40f15e337b0e38a9f1a1cbed4c3bbc5c3c5f392"
+    },
+    "split_tests": {
+      "path": "tests/test_d3_guidedbench_split.py",
+      "sha256": "845f3672b7d114d17a0f5c4a214f73d87a9647ffa00e9841b70083758b8158fd"
+    },
+    "guidedbench_source_freeze": {
+      "path": "configs/evaluator_panel/guidedbench_source_v1.json",
+      "sha256": "9bbba5c8e924bec80976e5b156b47df6b13bea0d79d0dda2508387fcad8cd587"
+    },
+    "t0_contract": {
+      "path": "configs/natural_language_localization/topology_transition_t0_v1.json",
+      "sha256": "d395d5cf971e65030bca1fc6646460744951375db34cba78e1ab773633b30ce3"
+    },
+    "t0_preflight": {
+      "path": "data/natural_language_localization/topology_transition_t0_v1/t0_preflight.safe.json",
+      "sha256": "514acad150e0e5181e46e7fefb95fa788197be527b880457814e98b9c1530d58"
+    },
+    "d2_result": {
+      "path": "data/natural_language_localization/topology_d2_micro_pilot_v1/result.safe.json",
+      "sha256": "071109f427b446434e46041f8816445aeb7ab3e90caea3c534155b602708b843"
+    },
+    "d2_verification": {
+      "path": "data/natural_language_localization/topology_d2_micro_pilot_v1/independent_verification.safe.json",
+      "sha256": "d06cf3e36769de180c84c3398f95196805113711e5b25d38638c33e5cbc5780a"
+    }
+  },
+  "source": {
+    "repo_id": "HRXUST/GuidedBench",
+    "revision": "10cc683c8df8c07139d3f900e381fb52738123c3",
+    "cache_root": "C:/Users/SOGANG/.cache/huggingface/hub/datasets--HRXUST--GuidedBench",
+    "core_sha256": "c9ee3d8b5e8e23b884f2e3a6ae7c276f21a2e4e94d2fb98b48a424418fa73fc9",
+    "subset": "core",
+    "benchmark_version": "1.0",
+    "payload_field": "question",
+    "canonical_source_id": "EXACT_UTF8_ID_FIELD_WITH_NO_NORMALIZATION",
+    "raw_content_repository_copy_allowed": false
+  },
+  "denominator": {
+    "core_rows": 180,
+    "topics": 15,
+    "development_per_topic": 1,
+    "development_rows": 15,
+    "confirmation_per_topic": 3,
+    "confirmation_rows": 45,
+    "remaining_rows": 120,
+    "development_confirmation_overlap_allowed": false
+  },
+  "selection": {
+    "topic_order": "ASCENDING_SHA256_OF_EXACT_UTF8_TOPIC_THEN_EXACT_TOPIC",
+    "within_topic_order": "ASCENDING_SHA256_OF_EXACT_UTF8_SOURCE_ID_THEN_EXACT_SOURCE_ID",
+    "development_ordinal_zero_based": 0,
+    "confirmation_ordinals_zero_based": [1, 2, 3],
+    "outcome_or_model_output_used": false,
+    "topic_balance": "EXACT_EQUAL_TOPIC_ALLOCATION"
+  },
+  "recording": {
+    "development_manifest": "data/natural_language_localization/d3_guidedbench_split_v1/development_payloads.safe.jsonl",
+    "confirmation_reservation_manifest": "data/natural_language_localization/d3_guidedbench_split_v1/confirmation_reservation.safe.jsonl",
+    "audit": "data/natural_language_localization/d3_guidedbench_split_v1/split_audit.safe.json",
+    "safe_artifacts_contain_raw_question_target_guideline_or_example": false
+  },
+  "next_operation_on_pass": "FREEZE_AND_PREFLIGHT_D3_FRESH_DEVELOPMENT_SCREEN"
+}

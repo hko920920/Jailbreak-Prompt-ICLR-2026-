@@ -1,0 +1,61 @@
+{
+  "schema_version": "jbspan-d3-controls-operational-v1",
+  "status": "FROZEN_OPERATIONAL_AMENDMENT",
+  "recorded_at": "2026-09-05T04:20:17+09:00",
+  "scope": "D3 exact-topology capability-control safe-artifact persistence only",
+  "motivation": "Long-running prior phases observed transient Windows destination locks during repeated progress replacement.",
+  "correction": {
+    "method": "Invoke the frozen run_d3_exact_topology.run_controls implementation while replacing only safe JSON and JSONL writers in memory with byte-identical atomic writers that retry transient Windows destination locks.",
+    "scientific_rule_changed": false,
+    "candidate_selection_changed": false,
+    "control_denominator_changed": false,
+    "prompt_changed": false,
+    "model_or_decoding_changed": false,
+    "capability_predicate_changed": false,
+    "final_gate_changed": false
+  },
+  "pre_execution_denominator_audit": {
+    "provisional_candidate_subset_count": 81,
+    "controls_per_candidate_subset": 4,
+    "selected_control_record_count": 324,
+    "control_outcome_observed": false
+  },
+  "verification": {
+    "focused_pytest_passed": 10,
+    "ruff_passed": true
+  },
+  "dependencies": {
+    "scientific_runner": {
+      "path": "scripts/run_d3_exact_topology.py",
+      "sha256": "f435c9371c0ec79fcd54f76f6838508b41ef96626d379e36f37180852a15ecd0"
+    },
+    "scientific_contract": {
+      "path": "configs/natural_language_localization/d3_exact_topology_v1.json",
+      "sha256": "d2824dee65ca65683154795ce52e4bd462a13bb052d19937514dd40a8bbf1ed7"
+    },
+    "operational_wrapper": {
+      "path": "scripts/run_d3_controls_operational_v1.py",
+      "sha256": "f72502fbe8d90e8d146667999016f5b01ecbe48a18da9304a3465ef6268bf289"
+    },
+    "operational_test": {
+      "path": "tests/test_d3_controls_operational_v1.py",
+      "sha256": "13d488314338050b6a3f269c149ea9a6c8b1e0570dc76493b944e3b4af7b2e82"
+    },
+    "control_universe": {
+      "path": "data/natural_language_localization/d3_exact_topology_v1/control_universe.safe.jsonl",
+      "sha256": "aaafe16b1548e3792fab34be068b5a0859776fb066b5f79bae4fce0cfd0d8d25"
+    },
+    "seed_11_decisions": {
+      "path": "data/natural_language_localization/d3_exact_topology_v1/phase_11_record_decisions.safe.jsonl",
+      "sha256": "c63e86ee0319afa935d57ae4b96df75ff0c3f4b448c0c4988188a881bc87a9a4"
+    },
+    "seed_23_decisions": {
+      "path": "data/natural_language_localization/d3_exact_topology_v1/phase_23_record_decisions.safe.jsonl",
+      "sha256": "07adf5268eed1f4349fed0f5d8d2bf0da6de331abd644752440330a33c7e6a35"
+    },
+    "seed_47_decisions": {
+      "path": "data/natural_language_localization/d3_exact_topology_v1/phase_47_record_decisions.safe.jsonl",
+      "sha256": "1a1046740bc04b5a5a78552a7a784a779e060cd49efb7da6e06aac7efd43f9ee"
+    }
+  }
+}

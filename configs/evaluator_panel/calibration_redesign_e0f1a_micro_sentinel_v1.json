@@ -1,0 +1,160 @@
+{
+  "schema_version": "jbspan-e0f1a-wildguard-micro-sentinel-contract-v1",
+  "status": "FROZEN_BEFORE_ANY_E0F1A_MICRO_SENTINEL_OUTPUT",
+  "frozen": true,
+  "date": "2026-09-02",
+  "timezone": "Asia/Seoul",
+  "contract_path": "configs/evaluator_panel/calibration_redesign_e0f1a_micro_sentinel_v1.json",
+  "purpose": "Detect gross WildGuard-path scientific failure within the observed local CPU budget before spending on the original 144-record sentinel.",
+  "evidence_class": "CALIBRATION_ONLY_SCIENTIFIC_FUTILITY_MICRO_SENTINEL_NOT_PANEL_QUALIFICATION",
+  "scientific_completion_call_ceiling": 72,
+  "operational_ceiling_seconds": 2100,
+  "automatic_expansion_after_micro_sentinel": false,
+  "implementation": {
+    "module": {
+      "path": "src/jbspan/evaluator_panel_wildguard_sentinel.py",
+      "bytes": 15744,
+      "sha256": "a6c0e0aba37a50714fbe9d3f6fb4c4d1e45080e4029c294b9c3d10625ef21bb5"
+    },
+    "runner": {
+      "path": "scripts/run_evaluator_panel_wildguard_micro_sentinel_e0f1a.py",
+      "bytes": 22725,
+      "sha256": "dbb55b3a10111c283a40e15f929d5017cd933c7b0996b8e8737cc493029f004e"
+    },
+    "base_runner": {
+      "path": "scripts/run_evaluator_panel_wildguard_sentinel_e0f1.py",
+      "bytes": 42953,
+      "sha256": "f5f4067b237dae5bfc548c6cb5152916e035c3e871adc487d7100f82a89fdfbf"
+    }
+  },
+  "dependencies": {
+    "base_e0f1_contract": {
+      "path": "configs/evaluator_panel/calibration_redesign_e0f1_sentinel_v1.json",
+      "bytes": 13838,
+      "sha256": "548b10c2e8b95c824bbc76c9782111124a5e262a7272bb845527f43affb1e7ce"
+    },
+    "e0f1_v1_interruption": {
+      "path": "data/evaluator_panel_v2/e0f1_v1_operational_interruption.safe.json",
+      "bytes": 1452,
+      "sha256": "e33738b7eeeaf04170f7f44907cfdb581955ee2e48677dfebfd020e798bc3a44",
+      "result_identity_sha256": "79ddd4d45f6ac0f4eb2a82ed6595123b5188a8d337e703751b56188f56d0acea"
+    },
+    "cpu_thread_probe": {
+      "path": "data/evaluator_panel_v2/e0f1_cpu_thread_probe.safe.json",
+      "bytes": 1691,
+      "sha256": "c6b3c3624bee5c3684da3bfbedc8f10bf8c8fcaf5da2532e6655efcacbc61071",
+      "result_identity_sha256": "6a2ee55783be001c6f8311067e1ae723f7bddd81d558b64422aef0bcc4d9bacf"
+    }
+  },
+  "required_interruption_status": "E0F1_V1_OPERATIONAL_STOP_PRESERVE_14_PRIVATE_CHECKPOINTS_NO_METRICS",
+  "required_thread_probe_status": "E0F1_CPU_THREAD_PROBE_PASS_BYTE_IDENTICAL_4_8_16",
+  "inherited_candidate_specs_sha256": "0bdca925e21c8fd23948f837eae63e9836e97cbb75f36fd99b036eb74c863e6e",
+  "inherited_calibration_population_sha256": "de10c434aa17a448c19a876a7bb0d42b1765484633713d65f6df434a99dca377",
+  "inherited_futility_gates_sha256": "2b4913c69a204585e42c0d8d4a046c81e86356b8b3d1427444f4894f0a2785f9",
+  "micro_identity_manifest": {
+    "path": "data/evaluator_panel_v2/e0f1a_micro_sentinel_identity.safe.jsonl",
+    "records": 72,
+    "bytes": 28776,
+    "sha256": "9640b350789a5262b1f67a1264e340627dc34ddaa1f93d0d9f41292e5b021652"
+  },
+  "selection": {
+    "parent_pool": "Only records whose original frozen stage is E0F_2_INTERMEDIATE; none were called by interrupted E0F-1 V1.",
+    "seed": "jbspan-e0f1a-micro-sentinel-v1",
+    "rule": "Within each source and human-label cell, rank by SHA256(seed|record_id), take the first 12, then write no per-record label.",
+    "records": 72,
+    "human_harmful": 36,
+    "human_safe": 36,
+    "prior_E0F1_V1_outputs_used_for_selection_or_metrics": false
+  },
+  "expected_source_label_counts": {
+    "harmbench:HARMFUL": 12,
+    "harmbench:SAFE": 12,
+    "jailbreakbench:HARMFUL": 12,
+    "jailbreakbench:SAFE": 12,
+    "strongreject:HARMFUL": 12,
+    "strongreject:SAFE": 12
+  },
+  "runtime": {
+    "repository": "ggml-org/llama.cpp",
+    "release_tag": "b10441",
+    "revision": "0177dcc7300bad8914bb838baabce87899812491",
+    "required_build": "10441",
+    "required_revision_prefix": "0177dcc73",
+    "server": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-server.exe",
+      "bytes": 9216,
+      "sha256": "4a118c0892482e738b19ebcd201d3fc9d687ab0dd2f841d2b0d7272ab909655a"
+    },
+    "model": {
+      "repository": "allenai/wildguard",
+      "revision": "cbba4823f3e8020e5a74a5e29bf85072def6f2ff",
+      "path": "artifacts/p3_signal_screen_v1/wildguard_runtime/wildguard-q8_0.gguf",
+      "bytes": 7702573664,
+      "sha256": "0c11d34ecd7e0034621c956c65f7372f0dc159eca9112bd2b20011239fdc0247"
+    },
+    "conversion": "Q8_0_DIRECT",
+    "port": 18134,
+    "cpu_only_required": true,
+    "gpu_layer_count": 0,
+    "localhost_only": true,
+    "offline": true
+  },
+  "inference": {
+    "context_tokens": 4096,
+    "maximum_new_tokens": 128,
+    "threads": 16,
+    "threads_batch": 16,
+    "batch_size": 512,
+    "ubatch_size": 512,
+    "seed": 17,
+    "temperature": 0.0,
+    "top_p": 1.0,
+    "cache_prompt": false,
+    "nonce": "JBSPAN_E1B_CANARY_4C91",
+    "max_untrusted_characters": 12000,
+    "strict_three_line_parser": true,
+    "canary_leak_forces_ineligible": true,
+    "input_or_context_truncation_forces_ineligible": true
+  },
+  "thread_amendment": {
+    "changed_fields": [
+      "threads: 4 -> 16",
+      "threads_batch: 4 -> 16"
+    ],
+    "unchanged_fields": "model, server, prompt bytes, parser, sample construction, context, token limit, batch and ubatch, seed, temperature, top_p, cache policy, and all scientific gates",
+    "harmless_long_prompt_output_byte_identical_at_threads": [
+      4,
+      8,
+      16
+    ],
+    "observed_prompt_tokens_per_second": {
+      "4": 16.795717054259896,
+      "8": 24.55334704146257,
+      "16": 28.145473364485042
+    },
+    "scientific_output_seen_before_amendment": false
+  },
+  "outputs": {
+    "plan_path": "data/evaluator_panel_v2/e0f1a_micro_sentinel_plan.safe.jsonl",
+    "preflight_path": "data/evaluator_panel_v2/e0f1a_micro_sentinel_preflight.safe.json",
+    "axis_path": "data/evaluator_panel_v2/e0f1a_micro_sentinel_axis.safe.jsonl",
+    "execution_path": "data/evaluator_panel_v2/e0f1a_micro_sentinel_execution.safe.json",
+    "result_path": "data/evaluator_panel_v2/e0f1a_micro_sentinel_result.safe.json",
+    "private_artifact_root": "artifacts/evaluator_panel_v2/e0f1a_wildguard_micro_sentinel_v1"
+  },
+  "privacy_and_resume": {
+    "raw_text_and_classifier_output": "ignored private per-record cache only",
+    "safe_outputs": "hashes, lengths, WildGuard axes, integrity flags, and aggregate human-label metrics only",
+    "completed_private_record_reuse": true,
+    "safe_terminal_artifacts_are_frozen": true
+  },
+  "protected_boundary": {
+    "original_E0F1_V1_private_outputs_opened_for_scientific_redesign": false,
+    "heldout_opened": false,
+    "p3_responses_opened": false,
+    "topology_outcomes_opened": false,
+    "panel_qualified_by_micro_sentinel": false,
+    "paper_validity": false,
+    "automatic_144_or_300_expansion": false
+  }
+}

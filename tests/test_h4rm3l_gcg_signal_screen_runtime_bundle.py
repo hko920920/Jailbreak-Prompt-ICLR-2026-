@@ -13,7 +13,7 @@ SPEC.loader.exec_module(MODULE)
 
 def test_git_blob_sha_matches_git_object_framing(tmp_path: Path) -> None:
     path = tmp_path / "sample.txt"
-    path.write_text("abc\n", encoding="utf-8")
+    path.write_text("abc\n", encoding="utf-8", newline="\n")
     assert MODULE.git_blob_sha(path) == "8baef1b4abc478178b004d62031cf7fe6db6f903"
 
 

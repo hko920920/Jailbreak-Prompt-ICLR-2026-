@@ -1,0 +1,58 @@
+{
+  "schema_version": "jbspan-topology-engine-p1-v1",
+  "status": "FROZEN_SYNTHETIC_ONLY_IMPLEMENTATION_GATE",
+  "frozen": true,
+  "date_asia_seoul": "2026-08-31",
+  "paper_validity": false,
+  "target_model_called": false,
+  "harmful_payload_used": false,
+  "parent_scope": "docs/CURRENT_RESEARCH_SCOPE_AND_CONTRIBUTION_FREEZE_V3.md",
+  "primary_object": "ALL_STRICT_SUBSET_MINIMAL_RECOVERY_SETS_IN_FROZEN_UNIT_VOCABULARY",
+  "requirements": {
+    "include_empty_baseline_subset": true,
+    "enumerate_all_subsets": true,
+    "monotonicity_assumed": false,
+    "verify_all_strict_subsets": true,
+    "require_complete_neutralizer_seed_matrix": true,
+    "payload_exactly_once": true,
+    "payload_byte_identity": true,
+    "invalid_input_cannot_recover": true,
+    "truncation_cannot_recover": true,
+    "capability_confound_cannot_recover": true,
+    "abstention_cannot_be_silently_overridden": true,
+    "private_and_safe_records_separated": true,
+    "execution_key_deduplication": true,
+    "resumable_atomic_records": true
+  },
+  "outcome_vocabulary": [
+    "REFUSAL_OR_SAFE_REDIRECTION",
+    "NON_ACTIONABLE_OR_IRRELEVANT",
+    "SUBSTANTIVE_HARMFUL_ASSISTANCE",
+    "CAPABILITY_CONFOUNDED",
+    "ABSTAIN"
+  ],
+  "required_synthetic_cases": [
+    "SINGLETON_RECOVERY",
+    "PURE_PAIR_INTERACTION",
+    "MULTIPLE_MINIMAL_PATHWAYS",
+    "NON_MONOTONE_RECOVERY",
+    "ALL_STRICT_SUBSET_MINIMALITY",
+    "NEUTRALIZER_DISAGREEMENT",
+    "INCOMPLETE_MATRIX",
+    "INVALID_PAYLOAD",
+    "DECISION_RELEVANT_TRUNCATION",
+    "CAPABILITY_CONFOUND",
+    "ABSTENTION",
+    "RECOVERED_EMPTY_BASELINE_REJECTION",
+    "PRIVATE_SAFE_SEPARATION",
+    "RESUME_DEDUPLICATION"
+  ],
+  "gate": {
+    "new_tests_pass": true,
+    "full_cpu_regression_pass": true,
+    "ruff_pass": true,
+    "mypy_pass": true,
+    "no_target_outputs_opened": true,
+    "next_operation_on_pass": "FREEZE_LOCAL_Q4_HARMLESS_RUNTIME_QUALIFICATION"
+  }
+}

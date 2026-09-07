@@ -1,0 +1,198 @@
+{
+  "audit_policy_denials": {
+    "AUDIT_PROCESS_OR_NETWORK_FORBIDDEN": 4,
+    "AUDIT_WRITE_OUTSIDE_NEW_REPORTS": 702
+  },
+  "audit_script_sha256": "df0ff69881ba835578b0d49a0ada4d3f54d943fc0f1351dfd2a1e7572e697fda",
+  "completed_at": "2026-09-07T03:29:34.128334+00:00",
+  "elapsed_seconds": 23.032,
+  "error_code": "FileNotFoundError",
+  "error_type": "FileNotFoundError",
+  "new_model_calls": 0,
+  "policy_self_tests_passed": 10,
+  "read_path_count": 581,
+  "read_path_inventory_sha256": "4d701e47a7e882e0b1d7a13133a243c23a46fd8e8147fd82570515527438d30c",
+  "schema_version": "pa-stage1-reentry-audit-v1",
+  "scientific_gate_evaluated": false,
+  "stage": 1,
+  "stage2_started": false,
+  "started_at": "2026-09-07T03:29:11.103471+00:00",
+  "status": "AUDIT_INCOMPLETE",
+  "trace_locations": [
+    {
+      "file": "audit_pa_stage1_reentry_v1.py",
+      "function": "main",
+      "line": 291
+    },
+    {
+      "file": "audit_pa_stage1_reentry_v1.py",
+      "function": "audit",
+      "line": 135
+    },
+    {
+      "file": "pa_llama_topology_target_continuation_v1.py",
+      "function": "load_amendment",
+      "line": 323
+    },
+    {
+      "file": "pa_llama_topology_target_continuation_v1.py",
+      "function": "load_parent",
+      "line": 287
+    },
+    {
+      "file": "pa_llama_topology_execution_v1.py",
+      "function": "validate_execution",
+      "line": 540
+    },
+    {
+      "file": "pa_llama_topology_execution_v1.py",
+      "function": "load_preparation",
+      "line": 411
+    },
+    {
+      "file": "pa_llama_topology_execution_v1.py",
+      "function": "load_sources",
+      "line": 240
+    },
+    {
+      "file": "pa_llama_topology_execution_v1.py",
+      "function": "verify_parent_evidence",
+      "line": 170
+    },
+    {
+      "file": "pa_llama_development_panel_v1.py",
+      "function": "verify_axis",
+      "line": 1241
+    },
+    {
+      "file": "pa_llama_development_panel_v1.py",
+      "function": "load_axis_values",
+      "line": 665
+    },
+    {
+      "file": "__init__.py",
+      "function": "<module>",
+      "line": 27
+    },
+    {
+      "file": "dependency_versions_check.py",
+      "function": "<module>",
+      "line": 16
+    },
+    {
+      "file": "__init__.py",
+      "function": "<module>",
+      "line": 24
+    },
+    {
+      "file": "auto_docstring.py",
+      "function": "<module>",
+      "line": 30
+    },
+    {
+      "file": "generic.py",
+      "function": "<module>",
+      "line": 51
+    },
+    {
+      "file": "__init__.py",
+      "function": "<module>",
+      "line": 2108
+    },
+    {
+      "file": "functional.py",
+      "function": "<module>",
+      "line": 7
+    },
+    {
+      "file": "__init__.py",
+      "function": "<module>",
+      "line": 8
+    },
+    {
+      "file": "__init__.py",
+      "function": "<module>",
+      "line": 1
+    },
+    {
+      "file": "module.py",
+      "function": "<module>",
+      "line": 29
+    },
+    {
+      "file": "__init__.py",
+      "function": "<module>",
+      "line": 8
+    },
+    {
+      "file": "__init__.py",
+      "function": "<module>",
+      "line": 1
+    },
+    {
+      "file": "dataloader.py",
+      "function": "<module>",
+      "line": 21
+    },
+    {
+      "file": "graph_settings.py",
+      "function": "<module>",
+      "line": 8
+    },
+    {
+      "file": "__init__.py",
+      "function": "<module>",
+      "line": 1
+    },
+    {
+      "file": "__init__.py",
+      "function": "<module>",
+      "line": 1
+    },
+    {
+      "file": "dataframes.py",
+      "function": "<module>",
+      "line": 4
+    },
+    {
+      "file": "_decorator.py",
+      "function": "<module>",
+      "line": 7
+    },
+    {
+      "file": "datapipe.py",
+      "function": "<module>",
+      "line": 16
+    },
+    {
+      "file": "_import_utils.py",
+      "function": "import_dill",
+      "line": 36
+    },
+    {
+      "file": "__init__.py",
+      "function": "<module>",
+      "line": 33
+    },
+    {
+      "file": "session.py",
+      "function": "<module>",
+      "line": 35
+    },
+    {
+      "file": "tempfile.py",
+      "function": "gettempdir",
+      "line": 299
+    },
+    {
+      "file": "tempfile.py",
+      "function": "_gettempdir",
+      "line": 292
+    },
+    {
+      "file": "tempfile.py",
+      "function": "_get_default_tempdir",
+      "line": 223
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "schema_version": "jbspan-d3-generation-plan-bootstrap-operational-v2",
+  "status": "FROZEN_OPERATIONAL_AMENDMENT",
+  "recorded_at": "2026-09-04T22:24:53+09:00",
+  "scope": "D3 seed-23-and-later bounded target-generation launcher only",
+  "trigger": {
+    "exception": "FileNotFoundError",
+    "missing_path": "data/natural_language_localization/d3_exact_topology_v1/phase_23_plan.safe.jsonl",
+    "cause": "The v1 operational launcher loaded a later-seed plan before the frozen adaptive planner had created it.",
+    "model_invoked": false,
+    "scientific_outputs_committed": 0
+  },
+  "correction": {
+    "method": "Call the frozen run_d3_exact_topology.ensure_phase_plan implementation, verify its persisted rows byte-for-row, then delegate generation unchanged to the v1 bounded launcher.",
+    "scientific_rule_changed": false,
+    "adaptive_skip_rule_changed": false,
+    "prompt_changed": false,
+    "model_or_decoding_changed": false,
+    "panel_rule_changed": false
+  },
+  "seed_23_plan_audit": {
+    "seed_11_plan_count": 888,
+    "valid_nontruncated_harmful_groups": 367,
+    "expected_seed_23_count": 521,
+    "actual_seed_23_count": 521,
+    "missing_groups": 0,
+    "unexpected_groups": 0,
+    "order_mismatches": 0,
+    "unique_record_ids": 521,
+    "plan_sha256": "969dfd98fbae1af55afcea9f86e2732af90e1c511005387b9956a448c6834de9"
+  },
+  "verification": {
+    "focused_pytest_passed": 3,
+    "ruff_passed": true
+  },
+  "dependencies": {
+    "scientific_runner": {
+      "path": "scripts/run_d3_exact_topology.py",
+      "sha256": "f435c9371c0ec79fcd54f76f6838508b41ef96626d379e36f37180852a15ecd0"
+    },
+    "scientific_contract": {
+      "path": "configs/natural_language_localization/d3_exact_topology_v1.json",
+      "sha256": "d2824dee65ca65683154795ce52e4bd462a13bb052d19937514dd40a8bbf1ed7"
+    },
+    "v1_launcher": {
+      "path": "scripts/resume_d3_generation_operational_v1.py",
+      "sha256": "529dc54ed644c090887bdb6a4a854f9ad0d74b19432bbc7efe21b3a66a2926dd"
+    },
+    "v2_launcher": {
+      "path": "scripts/resume_d3_generation_operational_v2.py",
+      "sha256": "968a59d81b46bb1690b74a118d0b6c90245899197e2fd91138812973e81ba246"
+    },
+    "v2_test": {
+      "path": "tests/test_d3_generation_operational_v2.py",
+      "sha256": "9b17771024f8fa45a2dd977a404c2f3ec449d2bc779a18df6a2e217204e2771e"
+    },
+    "seed_11_decisions": {
+      "path": "data/natural_language_localization/d3_exact_topology_v1/phase_11_record_decisions.safe.jsonl",
+      "sha256": "c63e86ee0319afa935d57ae4b96df75ff0c3f4b448c0c4988188a881bc87a9a4"
+    },
+    "seed_11_result": {
+      "path": "data/natural_language_localization/d3_exact_topology_v1/phase_11_result.safe.json",
+      "sha256": "7287cafe71d0390410a729bc5d62340b2225efaa2b4ee39cc7836de013857c5f"
+    }
+  }
+}

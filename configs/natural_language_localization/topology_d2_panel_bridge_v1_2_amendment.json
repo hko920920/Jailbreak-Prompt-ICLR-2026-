@@ -1,0 +1,85 @@
+{
+  "schema_version": "jbspan-topology-d2-panel-bridge-amendment-v1-2",
+  "status": "FROZEN_AFTER_BOTH_EVALUATOR_AXES_BEFORE_ANY_D2_PANEL_OUTPUT",
+  "frozen": true,
+  "frozen_at": "2026-09-04T14:06:32+09:00",
+  "purpose": "Bind the already frozen fresh-screen panel decision function into the D2 runner namespace after a missing re-export raised AttributeError, without changing any evaluator output or scientific decision rule.",
+  "evidence_class": "POST_EVALUATOR_PRE_PANEL_OPERATIONAL_NAMESPACE_BRIDGE",
+  "scientific_rule_changed": false,
+  "base_contract_path": "configs/natural_language_localization/topology_d2_micro_pilot_v1.json",
+  "dependencies": {
+    "base_contract": {
+      "path": "configs/natural_language_localization/topology_d2_micro_pilot_v1.json",
+      "sha256": "d4e6326affb33e0cb1a3c9f25d24b5bd64d68616f8d4d8cbc59d445dbf23074b"
+    },
+    "base_preflight": {
+      "path": "data/natural_language_localization/topology_d2_micro_pilot_v1/preflight.safe.json",
+      "sha256": "4d14d5303027d892cbcdec9dffe2a01a31d3d7df15f0ccbaa3621f7e43f72cac"
+    },
+    "extraction_runner_v1_1": {
+      "path": "scripts/run_topology_d2_micro_pilot_v1_1.py",
+      "sha256": "68b6d09c6c225f2655889b9dd654d1b8a9fa9b5ffb48cddabd052250c7a06f6a"
+    },
+    "extraction_amendment_v1_1": {
+      "path": "configs/natural_language_localization/topology_d2_extraction_v1_1_amendment.json",
+      "sha256": "718283ab6fad48bd22724387239c7e5c4f6549b0b2830e3cf2b9b9727d3079be"
+    },
+    "frozen_panel_source": {
+      "path": "src/jbspan/fresh_screen_funnel.py",
+      "sha256": "c5d59582f7a6d2c1a135371cb3cf592aeddf06e0fe4f2c3d0a81af6306518a24"
+    },
+    "panel_bridge_runner": {
+      "path": "scripts/run_topology_d2_micro_pilot_v1_2.py",
+      "sha256": "ba91e82c7f7e13f0566276137586eabeae8d910f6803c417548dc86688bc0e53"
+    },
+    "panel_bridge_tests": {
+      "path": "tests/test_topology_d2_panel_bridge_v1_2.py",
+      "sha256": "610b51b3881c221cf969c13829729ae2730e811e4ebdef3565557184e07ec083"
+    }
+  },
+  "observed_failure": {
+    "command": "finalize-panel",
+    "exception": "AttributeError",
+    "missing_attribute": "run_fresh_screen_2r.panel_decision",
+    "cause": "The D2 runner referenced panel_decision through the run_fresh_screen_2r script module, whose import list did not re-export that function.",
+    "function_already_frozen_elsewhere": "jbspan.fresh_screen_funnel.panel_decision",
+    "model_or_evaluator_failure": false,
+    "partial_panel_output_written": false
+  },
+  "pre_panel_snapshot": {
+    "generation": {
+      "path": "data/natural_language_localization/topology_d2_micro_pilot_v1/generation.safe.jsonl",
+      "record_count": 126,
+      "sha256": "679f57f947441d7ee5454ed4fa667ee436ef95b2225210e597e24c162f48e6a8"
+    },
+    "qwen_axis": {
+      "path": "data/natural_language_localization/topology_d2_micro_pilot_v1/qwen_axis.safe.jsonl",
+      "record_count": 126,
+      "sha256": "1cf9dd55221d2e05a1e63d2f98e7f06a36d5680f8bd5bfdf49bc817e37e85261"
+    },
+    "jailmeter_axis": {
+      "path": "data/natural_language_localization/topology_d2_micro_pilot_v1/jailmeter_axis.safe.jsonl",
+      "record_count": 126,
+      "sha256": "437910c7a6205b103891a9a5cb9c36b49e1153afeecdd32ba264c4bb6843a996"
+    },
+    "all_axis_records_strictly_parsed": true,
+    "output_limit_hits": 0,
+    "panel_decision_file_exists": false,
+    "panel_summary_file_exists": false,
+    "raw_response_semantics_inspected": false
+  },
+  "bridge": {
+    "operation": "Assign jbspan.fresh_screen_funnel.panel_decision to the missing run_fresh_screen_2r.panel_decision namespace immediately before the frozen D2 finalization code runs.",
+    "decision_algorithm_changed": false,
+    "panel_threshold_changed": false,
+    "axis_output_changed": false,
+    "target_generation_rerun": false,
+    "evaluator_inference_rerun": false,
+    "record_dropped": false
+  },
+  "recording": {
+    "bridge_audit_path": "data/natural_language_localization/topology_d2_micro_pilot_v1/panel_bridge_v1_2.safe.json",
+    "safe_artifact_contains_raw_text": false
+  },
+  "next_operation": "APPLY_NAMESPACE_BRIDGE_THEN_RUN_THE_UNCHANGED_FROZEN_PANEL_DECISION_OVER_ALL_126_RECORDS"
+}

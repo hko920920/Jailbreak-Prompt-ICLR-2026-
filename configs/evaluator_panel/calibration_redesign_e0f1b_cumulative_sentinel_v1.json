@@ -1,0 +1,208 @@
+{
+  "schema_version": "jbspan-e0f1b-wildguard-cumulative-sentinel-contract-v1",
+  "status": "FROZEN_BEFORE_ANY_E0F1B_ADDITION_OUTPUT",
+  "frozen": true,
+  "date": "2026-09-02",
+  "timezone": "Asia/Seoul",
+  "contract_path": "configs/evaluator_panel/calibration_redesign_e0f1b_cumulative_sentinel_v1.json",
+  "purpose": "Extend the completed E0F-1A 72-record micro-sentinel to a cumulative 144-record calibration-only futility sentinel using exactly 72 previously uncalled records, while excluding all interrupted V1 calls without reading their private contents.",
+  "evidence_class": "CALIBRATION_ONLY_CUMULATIVE_SCIENTIFIC_FUTILITY_SENTINEL_NOT_PANEL_QUALIFICATION",
+  "adopted_scientific_records": 72,
+  "new_scientific_completion_call_ceiling": 72,
+  "cumulative_scientific_records": 144,
+  "operational_ceiling_seconds": 2100,
+  "automatic_execution_after_preflight": false,
+  "execution_requires_post_preflight_user_authorization": true,
+  "automatic_expansion_beyond_cumulative_sentinel": false,
+  "implementation": {
+    "module": {
+      "path": "src/jbspan/evaluator_panel_wildguard_sentinel.py",
+      "bytes": 15744,
+      "sha256": "a6c0e0aba37a50714fbe9d3f6fb4c4d1e45080e4029c294b9c3d10625ef21bb5"
+    },
+    "runner": {
+      "path": "scripts/run_evaluator_panel_wildguard_cumulative_sentinel_e0f1b.py",
+      "bytes": 50102,
+      "sha256": "94757f5b647539a94d0705cb6d905a277b5d32a6e661b49aa89284da428bcd69"
+    },
+    "base_runner": {
+      "path": "scripts/run_evaluator_panel_wildguard_sentinel_e0f1.py",
+      "bytes": 42953,
+      "sha256": "f5f4067b237dae5bfc548c6cb5152916e035c3e871adc487d7100f82a89fdfbf"
+    },
+    "micro_runner": {
+      "path": "scripts/run_evaluator_panel_wildguard_micro_sentinel_e0f1a.py",
+      "bytes": 22725,
+      "sha256": "dbb55b3a10111c283a40e15f929d5017cd933c7b0996b8e8737cc493029f004e"
+    }
+  },
+  "dependencies": {
+    "base_e0f1_contract": {
+      "path": "configs/evaluator_panel/calibration_redesign_e0f1_sentinel_v1.json",
+      "bytes": 13838,
+      "sha256": "548b10c2e8b95c824bbc76c9782111124a5e262a7272bb845527f43affb1e7ce"
+    },
+    "e0f1a_contract": {
+      "path": "configs/evaluator_panel/calibration_redesign_e0f1a_micro_sentinel_v1.json",
+      "bytes": 6831,
+      "sha256": "5b4aa4863bec4d346ccdd084288b0ec0260c9976788abdd2eeb1644ca61e7a50"
+    },
+    "e0f1a_result": {
+      "path": "data/evaluator_panel_v2/e0f1a_micro_sentinel_result.safe.json",
+      "bytes": 63889,
+      "sha256": "334b2fc97b0c84e7e71617eb3ac53dbe087d2728c0be70124bebdad396eb723d",
+      "result_identity_sha256": "bd301ad9d150cd71362f89ee67dfdaec1007233c0f08af2ddd3361d5ebcf7c40"
+    },
+    "e0f1a_axis": {
+      "path": "data/evaluator_panel_v2/e0f1a_micro_sentinel_axis.safe.jsonl",
+      "records": 72,
+      "bytes": 150329,
+      "sha256": "0f61bccba302e31a32ee9f5432723ccb013c6c999ef94dd9d20ff9fedf7c1d32"
+    },
+    "e0f1a_execution": {
+      "path": "data/evaluator_panel_v2/e0f1a_micro_sentinel_execution.safe.json",
+      "bytes": 2049,
+      "sha256": "9e42662c715b0703b96ba2472e1a36b120030650d7f26764dd989e56d3afa521",
+      "result_identity_sha256": "cd0568614c329f40a668ca17e61dbfd88ece91bbc1af279ac505ba022c02ae9a"
+    },
+    "e0f1_v1_interruption": {
+      "path": "data/evaluator_panel_v2/e0f1_v1_operational_interruption.safe.json",
+      "bytes": 1452,
+      "sha256": "e33738b7eeeaf04170f7f44907cfdb581955ee2e48677dfebfd020e798bc3a44",
+      "result_identity_sha256": "79ddd4d45f6ac0f4eb2a82ed6595123b5188a8d337e703751b56188f56d0acea"
+    },
+    "e0f1_v1_safe_plan": {
+      "path": "data/evaluator_panel_v2/e0f1_wildguard_sentinel_plan.safe.jsonl",
+      "records": 144,
+      "bytes": 162048,
+      "sha256": "748b043910c2d6a33ef8faa68fa5cd1d67ad095294a83559bca16982d6f16ccb"
+    }
+  },
+  "inherited_candidate_specs_sha256": "0bdca925e21c8fd23948f837eae63e9836e97cbb75f36fd99b036eb74c863e6e",
+  "inherited_calibration_population_sha256": "de10c434aa17a448c19a876a7bb0d42b1765484633713d65f6df434a99dca377",
+  "inherited_futility_gates_sha256": "2b4913c69a204585e42c0d8d4a046c81e86356b8b3d1427444f4894f0a2785f9",
+  "adoption": {
+    "source": "Completed E0F-1A safe WildGuard axis only.",
+    "records": 72,
+    "rule": "Adopt all and only the 72 E0F-1A identities and safe axis rows byte-for-byte; do not rerun them.",
+    "independent_confirmation": false,
+    "reason": "E0F-1B is a cumulative precision-improvement stage, not an independent replication."
+  },
+  "v1_exclusion": {
+    "private_record_directory": "artifacts/evaluator_panel_v2/e0f1_wildguard_sentinel_v1/private_records",
+    "expected_private_filenames": 14,
+    "mapping_rule": "Recompute every V1 execution identity from the frozen V1 contract and safe plan, match only the 14 filename stems, and never read private JSON contents.",
+    "use_in_e0f1b": "Exclude all 14 matched record identities from additions and metrics.",
+    "private_record_contents_may_be_opened": false,
+    "wildguard_labels_or_candidate_metrics_may_be_used": false
+  },
+  "selection": {
+    "parent_pool": "Records whose original frozen first_included_stage is E0F_1_SENTINEL, excluding the 14 filename-mapped interrupted V1 calls and all E0F-1A adopted identities.",
+    "seed_derivation": "SHA256('jbspan-e0f1b-cumulative-additions-v1|' + E0F1A_RESULT_IDENTITY + '|' + V1_INTERRUPTION_IDENTITY)",
+    "derived_seed_sha256": "70fef633c9f6322473f299495d33bbbda99c698ef2e04780b21d66df3da516aa",
+    "stratification": "Select exactly 12 human-harmful and 12 human-safe records from each of HarmBench, JailbreakBench, and StrongREJECT.",
+    "group_coverage_rule": "Within each source-label cell, prioritize behavior groups absent from the adopted 72, then lower adopted multiplicity, then identity-derived group and record hashes; use at most one record per available group before deterministic fill.",
+    "execution_order": "Twelve rounds of six records, exactly one from each source-label cell per round; hide per-record labels in safe artifacts and deterministically hash-order each round.",
+    "wildguard_or_existing_signal_predictions_used": false,
+    "per_record_labels_written": false,
+    "expected_addition_source_label_counts": {
+      "harmbench:HARMFUL": 12,
+      "harmbench:SAFE": 12,
+      "jailbreakbench:HARMFUL": 12,
+      "jailbreakbench:SAFE": 12,
+      "strongreject:HARMFUL": 12,
+      "strongreject:SAFE": 12
+    },
+    "expected_cumulative_source_label_counts": {
+      "harmbench:HARMFUL": 24,
+      "harmbench:SAFE": 24,
+      "jailbreakbench:HARMFUL": 24,
+      "jailbreakbench:SAFE": 24,
+      "strongreject:HARMFUL": 24,
+      "strongreject:SAFE": 24
+    }
+  },
+  "scientific_decision": {
+    "candidate_family": "All 12 candidates frozen before E0F-1A are retained; B5 is not singled out for the gate.",
+    "primary_gate": "Apply the inherited E0F-1 futility gates once to all 144 cumulative records with exact complete integrity.",
+    "pass_rule": "At least one frozen candidate must pass every inherited point, every-source, optimistic-final-target, and integrity check.",
+    "group_reporting": "Report leave-one-behavior-group-out ranges for pooled recall, source-weighted projected precision, and minimum source recall for every candidate; this is descriptive dependence sensitivity, not a new pass gate.",
+    "pass_meaning": "Authorize only review and freezing of an E0F-2 cumulative-300 design.",
+    "fail_meaning": "Stop WildGuard expansion without opening held-out, P3, or topology outcomes.",
+    "multiple_candidate_boundary": "This is a development futility screen and cannot support a qualification or paper claim."
+  },
+  "runtime": {
+    "repository": "ggml-org/llama.cpp",
+    "release_tag": "b10441",
+    "revision": "0177dcc7300bad8914bb838baabce87899812491",
+    "required_build": "10441",
+    "required_revision_prefix": "0177dcc73",
+    "server": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-server.exe",
+      "bytes": 9216,
+      "sha256": "4a118c0892482e738b19ebcd201d3fc9d687ab0dd2f841d2b0d7272ab909655a"
+    },
+    "model": {
+      "repository": "allenai/wildguard",
+      "revision": "cbba4823f3e8020e5a74a5e29bf85072def6f2ff",
+      "path": "artifacts/p3_signal_screen_v1/wildguard_runtime/wildguard-q8_0.gguf",
+      "bytes": 7702573664,
+      "sha256": "0c11d34ecd7e0034621c956c65f7372f0dc159eca9112bd2b20011239fdc0247"
+    },
+    "conversion": "Q8_0_DIRECT",
+    "port": 18134,
+    "cpu_only_required": true,
+    "gpu_layer_count": 0,
+    "localhost_only": true,
+    "offline": true
+  },
+  "inference": {
+    "context_tokens": 4096,
+    "maximum_new_tokens": 128,
+    "threads": 16,
+    "threads_batch": 16,
+    "batch_size": 512,
+    "ubatch_size": 512,
+    "seed": 17,
+    "temperature": 0.0,
+    "top_p": 1.0,
+    "cache_prompt": false,
+    "nonce": "JBSPAN_E1B_CANARY_4C91",
+    "max_untrusted_characters": 12000,
+    "strict_three_line_parser": true,
+    "canary_leak_forces_ineligible": true,
+    "input_or_context_truncation_forces_ineligible": true
+  },
+  "outputs": {
+    "v1_exclusion_identity_path": "data/evaluator_panel_v2/e0f1b_v1_called_exclusion_identity.safe.jsonl",
+    "addition_identity_path": "data/evaluator_panel_v2/e0f1b_cumulative_addition_identity.safe.jsonl",
+    "addition_plan_path": "data/evaluator_panel_v2/e0f1b_cumulative_addition_plan.safe.jsonl",
+    "preflight_path": "data/evaluator_panel_v2/e0f1b_cumulative_preflight.safe.json",
+    "addition_axis_path": "data/evaluator_panel_v2/e0f1b_cumulative_addition_axis.safe.jsonl",
+    "cumulative_axis_path": "data/evaluator_panel_v2/e0f1b_cumulative_axis.safe.jsonl",
+    "execution_path": "data/evaluator_panel_v2/e0f1b_cumulative_execution.safe.json",
+    "result_path": "data/evaluator_panel_v2/e0f1b_cumulative_result.safe.json",
+    "private_artifact_root": "artifacts/evaluator_panel_v2/e0f1b_wildguard_cumulative_sentinel_v1"
+  },
+  "privacy_and_resume": {
+    "raw_text_and_classifier_output": "ignored private per-record cache only for the 72 additions",
+    "safe_outputs": "label-free identities, hashes, lengths, WildGuard axes, integrity flags, aggregate label metrics, and group-sensitivity summaries only",
+    "new_private_cache_identity": "E0F-1B contract, code, model, inference, record, and classifier-input identities",
+    "reuse_interrupted_v1_private_cache": false,
+    "reuse_e0f1a_private_cache": false,
+    "adopt_e0f1a_safe_axis": true,
+    "completed_new_record_resume": true,
+    "safe_terminal_artifacts_are_frozen": true
+  },
+  "protected_boundary": {
+    "e0f1a_is_adopted_not_independent_confirmation": true,
+    "v1_private_contents_opened": false,
+    "v1_predictions_used": false,
+    "heldout_opened": false,
+    "p3_responses_opened": false,
+    "topology_outcomes_opened": false,
+    "panel_qualified_by_e0f1b": false,
+    "paper_validity": false,
+    "automatic_300_or_889_expansion": false
+  }
+}

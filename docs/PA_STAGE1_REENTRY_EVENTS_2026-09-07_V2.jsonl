@@ -1,0 +1,3 @@
+{"at_utc": "2026-09-07T03:29:11.103471+00:00", "event": "STAGE1_OFFLINE_AUDIT_STARTED"}
+{"at_utc": "2026-09-07T03:29:11.189481+00:00", "event": "FROZEN_LOADER_AND_NEW_SCREEN_RAW_VERIFICATION_STARTED"}
+{"at_utc": "2026-09-07T03:29:34.130331+00:00", "elapsed_seconds": 23.032, "error_code": "FileNotFoundError", "event": "STAGE1_OFFLINE_AUDIT_FINISHED", "report": "docs/PA_STAGE1_REENTRY_AUDIT_2026-09-07_V2.safe.json", "status": "AUDIT_INCOMPLETE"}

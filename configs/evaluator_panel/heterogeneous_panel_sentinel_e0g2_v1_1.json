@@ -1,0 +1,53 @@
+{
+  "schema_version": "jbspan-e0g2-heterogeneous-panel-development-sentinel-v1-1",
+  "status": "FROZEN_PREINFERENCE_SELECTION_FEASIBILITY_REPAIR_ONLY",
+  "frozen": true,
+  "frozen_at": "2026-09-03",
+  "paper_validity": false,
+  "panel_qualification": false,
+  "parent_contract": {
+    "path": "configs/evaluator_panel/heterogeneous_panel_sentinel_e0g2_v1.json",
+    "bytes": 7440,
+    "sha256": "7730a617d17105ffbab75010fabcd3ff024001402d0fe279ff809c44ed664da7"
+  },
+  "selection_failure": {
+    "path": "data/evaluator_panel_v2/e0g2_v1_selection_feasibility_failure.safe.json",
+    "bytes": 2011,
+    "sha256": "995c4669b8a96a0a512b13afc4c96b679a0f7ce956ac464f07fd85af1ffc3384",
+    "required_status": "E0G2_V1_DISTINCT_BEHAVIOR_SELECTION_INFEASIBLE"
+  },
+  "selection_overrides": {
+    "distinct_behavior_group_required": false,
+    "maximum_records_per_behavior_group": 2,
+    "dependence_warning": "The 60-record sentinel may contain at most two responses per behavior group; it is a route-feasibility diagnostic, not an independent-sample performance estimate.",
+    "full_calibration_requirement": "All later selection, uncertainty, and held-out inference must remain behavior-group aware."
+  },
+  "operational_repair": {
+    "changed": "Replace an infeasible all-record distinct-group constraint with a frozen maximum of two records per behavior group.",
+    "record_count_changed": false,
+    "source_label_agreement_quotas_changed": false,
+    "ranking_seed_changed": false,
+    "panel_rule_changed": false,
+    "sentinel_gate_changed": false,
+    "models_changed": false,
+    "model_outputs_observed_before_repair": false
+  },
+  "recording_overrides": {
+    "selection_path": "data/evaluator_panel_v2/e0g2_v1_1_panel_sentinel_selection.safe.jsonl",
+    "selection_manifest_path": "data/evaluator_panel_v2/e0g2_v1_1_panel_sentinel_selection_manifest.safe.json",
+    "preflight_path": "data/evaluator_panel_v2/e0g2_v1_1_panel_sentinel_preflight.safe.json",
+    "qwen_axis_path": "data/evaluator_panel_v2/e0g2_v1_1_panel_sentinel_qwen_axis.safe.jsonl",
+    "qwen_summary_path": "data/evaluator_panel_v2/e0g2_v1_1_panel_sentinel_qwen_summary.safe.json",
+    "jailmeter_axis_path": "data/evaluator_panel_v2/e0g2_v1_1_panel_sentinel_jailmeter_axis.safe.jsonl",
+    "jailmeter_summary_path": "data/evaluator_panel_v2/e0g2_v1_1_panel_sentinel_jailmeter_summary.safe.json",
+    "result_path": "data/evaluator_panel_v2/e0g2_v1_1_panel_sentinel_result.safe.json"
+  },
+  "protected_boundaries": {
+    "primary_heldout_803_opened": false,
+    "external_heldout_947_opened": false,
+    "p3_responses_opened": false,
+    "topology_outcomes_opened": false,
+    "new_human_annotation_collected": false,
+    "paper_metric_computed": false
+  }
+}

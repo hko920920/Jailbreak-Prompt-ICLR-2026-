@@ -1,0 +1,82 @@
+{
+  "schema_version": "jbspan-e0g3-jailmeter-parallel-equivalence-probe-v1",
+  "status": "FROZEN_BEFORE_PARALLEL_MODEL_INFERENCE",
+  "frozen": true,
+  "frozen_at": "2026-09-03",
+  "paper_validity": false,
+  "panel_qualification": false,
+  "purpose": "Test whether two-slot continuous batching preserves exact JailMeter outputs while reducing wall time before the 889-record development calibration.",
+  "parent_sentinel": {
+    "contract_path": "configs/evaluator_panel/heterogeneous_panel_sentinel_e0g2_v1_1.json",
+    "contract_bytes": 2737,
+    "contract_sha256": "9141b5011f168f97e5aae3066e668d4d362cdda494035023652bd37798b0abaa",
+    "selection_manifest_path": "data/evaluator_panel_v2/e0g2_v1_1_panel_sentinel_selection_manifest.safe.json",
+    "selection_manifest_bytes": 1886,
+    "selection_manifest_sha256": "974eb332eda07c0ae129d1ccc32ce644a3f9d27d1ae26ec6cb957ddd7c655103",
+    "selection_identity_sha256": "b3d10686268c718f93efb27d03866e11a214299d525edbefbc88caabd7e3525e",
+    "result_path": "data/evaluator_panel_v2/e0g2_v1_1_panel_sentinel_result.safe.json",
+    "result_bytes": 31511,
+    "result_sha256": "b594a5201b496f0e2bf9ac1eb7ec087b588100e5e0e9d9247e400013366667c6",
+    "result_identity_sha256": "9ab75b4452221aaff69570d71e2ce90cceb1fc0d86556f68d7c12d508256c747",
+    "required_status": "E0G2_HETEROGENEOUS_PANEL_SENTINEL_PASS"
+  },
+  "sequential_reference": {
+    "axis_path": "data/evaluator_panel_v2/e0g2_v1_1_panel_sentinel_jailmeter_axis.safe.jsonl",
+    "axis_bytes": 24380,
+    "axis_sha256": "640da89102dee7d3ed5e4cb420594ec3d958dda69e79218861710baf9752d2e0",
+    "summary_path": "data/evaluator_panel_v2/e0g2_v1_1_panel_sentinel_jailmeter_summary.safe.json",
+    "summary_bytes": 1305,
+    "summary_sha256": "59917e1f317830784d567209f7cd0b4daca4255214c511cd33a690e26a37f1f8",
+    "axis_identity_sha256": "bc0b043c58a761fa4c9bb0c1bff70000d9c7b4458be5b729dba8482adce100e9",
+    "records": 60
+  },
+  "selection": {
+    "seed": "jbspan-e0g3-jailmeter-parallel-equivalence-probe-v1",
+    "records": 12,
+    "longest_observed_records": 4,
+    "deterministic_remainder_records": 8,
+    "longest_score": "input_tokens + output_tokens descending, then record_id ascending",
+    "remainder_score": "SHA256(seed|record_id) ascending after excluding longest records",
+    "interpretation": "Operational stress-and-diversity sample selected only from already evaluated E0G2 records; no scientific metric is estimated."
+  },
+  "runtime_overrides": {
+    "parallel_slots": 2,
+    "continuous_batching": true,
+    "context_tokens_total": 8192,
+    "context_tokens_per_slot": 4096,
+    "request_workers": 2,
+    "maximum_total_seconds": 300,
+    "maximum_prelaunch_gpu_memory_mib": 1000,
+    "maximum_peak_gpu_memory_mib": 7600
+  },
+  "gates": {
+    "exact_input_sha256_fraction": 1.0,
+    "exact_input_token_fraction": 1.0,
+    "exact_output_sha256_fraction": 1.0,
+    "exact_output_character_fraction": 1.0,
+    "exact_output_token_fraction": 1.0,
+    "exact_label_fraction": 1.0,
+    "exact_label_match_count_fraction": 1.0,
+    "parse_coverage_min": 1.0,
+    "output_limit_stops_allowed": 0,
+    "minimum_speedup_for_adoption": 1.25,
+    "adoption_rule": "Adopt two-slot execution only if every equivalence/resource gate passes and request-wall speedup is at least 1.25; otherwise retain sequential execution."
+  },
+  "recording": {
+    "selection_path": "data/evaluator_panel_v2/e0g3_v1_parallel_probe_selection.safe.jsonl",
+    "selection_manifest_path": "data/evaluator_panel_v2/e0g3_v1_parallel_probe_selection_manifest.safe.json",
+    "preflight_path": "data/evaluator_panel_v2/e0g3_v1_parallel_probe_preflight.safe.json",
+    "axis_path": "data/evaluator_panel_v2/e0g3_v1_parallel_probe_axis.safe.jsonl",
+    "result_path": "data/evaluator_panel_v2/e0g3_v1_parallel_probe_result.safe.json",
+    "raw_prompt_or_response_allowed": false,
+    "raw_model_output_allowed": false
+  },
+  "protected_boundaries": {
+    "primary_heldout_803_opened": false,
+    "external_heldout_947_opened": false,
+    "p3_responses_opened": false,
+    "topology_outcomes_opened": false,
+    "new_human_annotation_collected": false,
+    "paper_metric_computed": false
+  }
+}

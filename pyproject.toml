@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "jbspan"
 version = "0.1.0"
-description = "Causal localization of jailbreak-enabling prompt spans"
+description = "Payload-preserving minimal-recovery topology for jailbreak prompts"
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [{name = "Anonymous Research Team"}]
@@ -41,6 +41,7 @@ where = ["src"]
 [tool.pytest.ini_options]
 addopts = "-q"
 testpaths = ["tests"]
+pythonpath = ["src"]
 
 [tool.ruff]
 line-length = 100

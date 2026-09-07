@@ -1,0 +1,72 @@
+{
+  "schema_version": "jbspan-d3-postoutcome-narrow-audit-v1",
+  "status": "POST_OUTCOME_DIAGNOSTIC_ONLY",
+  "created_at": "2026-09-05T05:00:00+09:00",
+  "purpose": "Reconstruct family-stratified D3 gates, the predeclared adjacent-pair coarsening, baseline gaps, and leave-one-evaluator-axis sensitivity after the immutable official D3 result.",
+  "scientific_boundary": {
+    "may_replace_official_d3_result": false,
+    "may_relabel_failed_cross_family_gate_as_pass": false,
+    "may_change_thresholds": false,
+    "may_select_confirmatory_outputs": false,
+    "new_target_or_evaluator_inference": false,
+    "evidence_role": "ROUTING_AND_REVIEWER_RISK_DIAGNOSTIC"
+  },
+  "dependencies": {
+    "d3_contract": {
+      "path": "configs/natural_language_localization/d3_exact_topology_v1.json",
+      "sha256": "d2824dee65ca65683154795ce52e4bd462a13bb052d19937514dd40a8bbf1ed7"
+    },
+    "t0_contract": {
+      "path": "configs/natural_language_localization/topology_transition_t0_v1.json",
+      "sha256": "d395d5cf971e65030bca1fc6646460744951375db34cba78e1ab773633b30ce3"
+    },
+    "reviewer_calibration_amendment": {
+      "path": "configs/natural_language_localization/reviewer_calibration_pre_d1_amendment_v1.json",
+      "sha256": "2cfe5cb274b2da80bf5d7d7537574bd4f250aad5298b6549877f1b0b3a27f5c6"
+    },
+    "official_d3_result": {
+      "path": "data/natural_language_localization/d3_exact_topology_v1/result.safe.json",
+      "sha256": "12e9289370c3db20423736103c5ca4f12666e4faf77c8a5b3eeeffdb0ce7e59b"
+    },
+    "instance_results": {
+      "path": "data/natural_language_localization/d3_exact_topology_v1/instance_results.safe.jsonl",
+      "sha256": "2ebe3ff8cf7a603fa885500e9946bb79cdc7bd80d79f6ea29077dfb099934d34"
+    },
+    "capability_controls": {
+      "path": "data/natural_language_localization/d3_exact_topology_v1/control_generation.safe.jsonl",
+      "sha256": "941036794cbe9cbf70cc67c7f503d62c7741d4e58fa4563945fb1a2b101ebdc5"
+    },
+    "independent_verification": {
+      "path": "data/natural_language_localization/d3_exact_topology_v1/independent_verification.safe.json",
+      "sha256": "12f65afb42862fc6d21766872f25086beeb8bcb1094244712099fe837bc8a171"
+    }
+  },
+  "family_diagnostic_rule": {
+    "description": "Apply every unchanged numeric and structural D3 gate within each attack family. This is a conservative diagnostic, not a retroactive official gate.",
+    "threshold_source": "configs/natural_language_localization/d3_exact_topology_v1.json#d3_gates"
+  },
+  "coarsening": {
+    "source": "configs/natural_language_localization/topology_transition_t0_v1.json#intervention_contract.unitization.outcome_blind_coarsening",
+    "id": "ORDERED_ADJACENT_PAIR_COARSENING_V1",
+    "recompute_model_outputs": false
+  },
+  "axis_sensitivity": {
+    "axes": [
+      "qwen",
+      "jailmeter"
+    ],
+    "behavior_only_role": "DESCRIPTIVE_LEAVE_ONE_AXIS_OUT_SENSITIVITY",
+    "controlled_role": "CONSERVATIVE; AN AXIS-ONLY POSITIVE WITHOUT THE ALREADY EXECUTED FOUR MATCHED CONTROLS IS UNCONTROLLED, NOT RECOVERED",
+    "may_count_uncontrolled_as_recovered": false
+  },
+  "routing_rule": {
+    "official_cross_family_gate": "COPY_WITHOUT_MODIFICATION",
+    "narrow_candidate_requires": "AT_LEAST_ONE_FAMILY_PASSES_EVERY_UNCHANGED_FAMILY_DIAGNOSTIC_GATE",
+    "narrow_candidate_is_confirmatory_authorization": false,
+    "required_next_action": "FREEZE_A_NEW_PROSPECTIVE_NARROWED_CONTRACT_BEFORE_ANY_NEW_CONFIRMATORY_OUTPUT"
+  },
+  "recording": {
+    "output_path": "data/natural_language_localization/d3_exact_topology_v1/postoutcome_narrow_audit.safe.json",
+    "raw_text_allowed": false
+  }
+}

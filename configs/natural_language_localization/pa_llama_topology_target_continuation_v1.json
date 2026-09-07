@@ -1,0 +1,103 @@
+{
+  "automatic_retry_allowed": false,
+  "bound_plan_identity_sha256": "8b3b702ab5ea256699b9c3a92b148f05feb0523bd903724dd7ae91dfa9c789f9",
+  "budgets": {
+    "combined_target_calls": 1470,
+    "new_metadata_calls": 0,
+    "new_target_calls": 598
+  },
+  "continuation_target_count": 598,
+  "cooldown": {
+    "before_every_target_dispatch": true,
+    "hardware_settings_changed": false,
+    "inflight_timeout_unchanged": true,
+    "maximum_start_temperature_c": 60,
+    "maximum_wait_seconds": 180,
+    "poll_seconds": 0.5
+  },
+  "epoch_schedule": [
+    {
+      "epoch_index": 3,
+      "first_ordinal": 873,
+      "last_ordinal": 1082
+    },
+    {
+      "epoch_index": 4,
+      "first_ordinal": 1083,
+      "last_ordinal": 1292
+    },
+    {
+      "epoch_index": 5,
+      "first_ordinal": 1293,
+      "last_ordinal": 1470
+    }
+  ],
+  "execution_authorized": true,
+  "execution_limits": {
+    "deadline_utc": "2026-09-05T22:55:47+00:00",
+    "jailmeter_context_tokens": 4096,
+    "jailmeter_phase_seconds": 21600,
+    "maximum_input_tokens_before_chat_margin": 3456,
+    "maximum_peak_cuda_allocated_bytes": 7516192768,
+    "maximum_peak_gpu_mib": 7600,
+    "maximum_prelaunch_gpu_mib": 1000,
+    "minimum_free_disk_bytes": 16106127360,
+    "qwen_context_tokens": 32768,
+    "qwen_phase_seconds": 7200,
+    "reserved_chat_template_margin_tokens": 128
+  },
+  "frozen": true,
+  "frozen_at_utc": "2026-09-05T21:11:35+00:00",
+  "historical_private_reads_allowed": false,
+  "original_contract_sha256": "d05f91c14625217e191837c0abbef0bc2e78eebaa7cecec18c97ce30b0cf19f0",
+  "original_operational_gate_passed": false,
+  "original_prefix_count": 872,
+  "paper_validity": false,
+  "paths": {
+    "private_root": "artifacts/pa_llama_topology_target_continuation_v1/private",
+    "safe_root": "data/natural_language_localization/pa_llama_topology_target_continuation_v1"
+  },
+  "per_dispatch_minimum_disk_free_bytes": 16106127360,
+  "planned_target_count": 1470,
+  "prefix_manifest": {
+    "path": "data/natural_language_localization/pa_llama_topology_target_continuation_v1/d05f91c14625217e191837c0abbef0bc2e78eebaa7cecec18c97ce30b0cf19f0/prefix-manifest.safe.json",
+    "sha256": "958b3493ae957c71b29a0d60a95ee9728018b532f280132037344366d7cfd955",
+    "size_bytes": 3773254
+  },
+  "prelaunch_minimum_disk_free_bytes": 21474836480,
+  "protocol": {
+    "path": "docs/PA_LLAMA_TOPOLOGY_TARGET_CONTINUATION_PROTOCOL_2026-09-06_V1.md",
+    "sha256": "ae3ba1c824133211714b124ec042dde8bfc455ca06ec2f16472170b25ea8d262",
+    "size_bytes": 11224
+  },
+  "required_code": {
+    "scripts/pa_llama_topology_target_continuation_v1.py": {
+      "path": "scripts/pa_llama_topology_target_continuation_v1.py",
+      "sha256": "8a44f902d80d6fe10647220a3f7e5a66359221c6da1eeeab03a9945696a3d9cb",
+      "size_bytes": 41994
+    },
+    "tests/test_pa_llama_topology_target_continuation_v1.py": {
+      "path": "tests/test_pa_llama_topology_target_continuation_v1.py",
+      "sha256": "36f2cead9695409a3ef31da122007b8e4712417ce7b10b2094504a1c6253dc90",
+      "size_bytes": 22469
+    },
+    "scripts/pa_llama_topology_continued_evaluation_v1.py": {
+      "path": "scripts/pa_llama_topology_continued_evaluation_v1.py",
+      "sha256": "2146ce9aad08d6140c68f8c45c1bb919ed9c7c2e6ae6f5bad78c529167781051",
+      "size_bytes": 29592
+    },
+    "tests/test_pa_llama_topology_continued_evaluation_v1.py": {
+      "path": "tests/test_pa_llama_topology_continued_evaluation_v1.py",
+      "sha256": "b59d0274a53324e6d68625f8e1954f23c35c9cd292cc66f37be326a679278a3b",
+      "size_bytes": 30088
+    },
+    "tests/test_pa_llama_topology_continuation_integration_review_v1.py": {
+      "path": "tests/test_pa_llama_topology_continuation_integration_review_v1.py",
+      "sha256": "fe965e26d99b4c6f58f747b07f150f1397bee5a8490b5ec524409031d8c0dd16",
+      "size_bytes": 15559
+    }
+  },
+  "schema_version": "jbspan-pa-llama-topology-target-continuation-v1",
+  "scientific_rules_unchanged": true,
+  "verification_scope": "RAW_ALL_1470_TARGET_RECEIPTS_WITH_EXPLICIT_CONTINUATION_NOT_ORIGINAL_OPERATIONAL_PASS"
+}

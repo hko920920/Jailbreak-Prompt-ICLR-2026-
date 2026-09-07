@@ -1,0 +1,101 @@
+{
+  "schema_version": "jbspan-e0g4-output-limit-integrity-amendment-v1.1",
+  "status": "FROZEN_BEFORE_FULL_AXIS_OUTCOME",
+  "frozen": true,
+  "frozen_at_utc": "2026-09-03T09:40:47.130Z",
+  "purpose": "Conservatively repair an instrumentation-only false-negative in output-limit metadata without changing model outputs, parsed labels, the panel rule, qualification thresholds, selection, or protected outcome boundaries.",
+  "trigger": {
+    "observed_behavior": "llama.cpp reported stopped_limit=false on JailMeter rows whose completion token count exactly equaled n_predict=1536",
+    "instrumentation_failure": "The parent E0G4 runner copied stopped_limit directly instead of also checking the known completion-token boundary.",
+    "scientific_impact_if_unrepaired": "The fixed output-limit quality-control gate would undercount truncated or potentially truncated completions.",
+    "label_impact": "The affected rows already have no parsed JailMeter label and therefore remain ABSTAIN under the unchanged panel rule. No label is recovered or altered."
+  },
+  "preoutcome_observation": {
+    "full_expected_records": 889,
+    "axis_status_at_freeze": "IN_PROGRESS",
+    "jailmeter_progress_records_at_freeze_status_check": 544,
+    "records_present_at_last_detailed_metadata_inspection": 536,
+    "last_detailed_metadata_inspection_utc": "2026-09-03T09:39:48.1345227Z",
+    "initial_detection_progress_records": 487,
+    "initial_derived_only_count": 2,
+    "derived_only_count_at_last_detailed_inspection": 3,
+    "derived_only_fraction_at_last_detailed_inspection": 0.005597014925373134,
+    "raw_limit_flag_count_at_last_detailed_inspection": 0,
+    "parse_count_at_last_detailed_inspection": 533,
+    "duplicate_record_id_count_at_last_detailed_inspection": 0,
+    "derived_only_record_ids_at_freeze": [
+      "5676c8c0c025ea968c986f46003442483078bdf415e1c3c09736a12d2b9cca40",
+      "9dc3aa3aa917ee3a665f8e78c6d61368ea38b734983d3866f1e0e1eb2f712820",
+      "9e20527c757d0741c79e08da95091d8d171bd517c3a434b39691bca79955ce34"
+    ],
+    "source_for_all_observed_rows": "strongreject",
+    "panel_metrics_computed_before_freeze": false,
+    "human_label_comparison_performed": false,
+    "full_axis_outcome_opened": false,
+    "raw_text_inspected": false,
+    "metadata_fields_inspected": [
+      "record_id",
+      "execution_order",
+      "input_tokens",
+      "output_tokens",
+      "output_limit_stop",
+      "label",
+      "label_match_count",
+      "inference_seconds",
+      "source_id via frozen selection"
+    ]
+  },
+  "effective_limit_stop_rule": {
+    "definition": "raw_output_limit_stop OR (output_tokens is a non-boolean integer AND output_tokens >= maximum_output_tokens)",
+    "qwen_maximum_output_tokens": 128,
+    "jailmeter_maximum_output_tokens": 1536,
+    "conservative_boundary_policy": "An exact token-boundary completion is counted as an output-limit stop even if server stopped_limit is false.",
+    "missing_output_token_policy": "Fail authoritative finalization if any completed axis row lacks integer output-token metadata."
+  },
+  "scientific_invariants": {
+    "selection_changed": false,
+    "execution_order_changed": false,
+    "model_or_weights_changed": false,
+    "prompt_changed": false,
+    "generation_parameters_changed": false,
+    "model_rerun": false,
+    "parsed_axis_labels_changed": false,
+    "panel_rule_changed": false,
+    "qualification_threshold_changed": false,
+    "bootstrap_changed": false,
+    "raw_axis_or_summary_files_modified": false,
+    "protected_heldout_or_topology_boundaries_opened": false
+  },
+  "implementation": {
+    "parent_contract": {
+      "path": "configs/evaluator_panel/heterogeneous_panel_full_development_e0g4_v1.json",
+      "sha256": "9c458031ae3196727a8b6e60d5384c24928c52c70bf6318e841f7fa84aeeeed7"
+    },
+    "parent_runner": {
+      "path": "scripts/run_heterogeneous_panel_full_development_e0g4.py",
+      "sha256": "d10e37768021813c9c956c6d0dd56073d9ddcc8e4844429cc766074af823108d"
+    },
+    "integrity_module": {
+      "path": "src/jbspan/evaluator_output_integrity.py",
+      "sha256": "e40afe1869413426a168eb196b9472058165654bda19ff6f3a4b820449e5e5c4"
+    },
+    "finalizer": {
+      "path": "scripts/finalize_heterogeneous_panel_e0g4_integrity_v1_1.py",
+      "sha256": "e4a96bed7ff06a42912d0a9277b20a0ff775a87a34ec8ac1092b26fb1950e599"
+    }
+  },
+  "recording": {
+    "parent_result_path": "data/evaluator_panel_v2/e0g4_v1_full_development_result.safe.json",
+    "integrity_overlay_path": "data/evaluator_panel_v2/e0g4_v1_1_output_limit_integrity_overlay.safe.json",
+    "authoritative_result_path": "data/evaluator_panel_v2/e0g4_v1_1_full_development_result.safe.json"
+  },
+  "authority": {
+    "parent_v1_result_role": "computational precursor only; its direct stopped_limit count is known to be incomplete",
+    "authoritative_result_role": "v1.1 result produced by the hashed integrity finalizer after both parent axes finish",
+    "allowed_change_to_parent_gate_checks": [
+      "qwen_output_limit_stops",
+      "jailmeter_output_limit_stops"
+    ],
+    "all_other_parent_metrics_and_gate_checks": "copied unchanged"
+  }
+}

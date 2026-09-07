@@ -167,7 +167,7 @@ def git(*args: str, cwd: Path) -> str:
 def write_csv(path: Path, fieldnames: list[str], rows: list[dict[str, str]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer = csv.DictWriter(handle, fieldnames=fieldnames, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
 
@@ -189,22 +189,19 @@ def test_synthetic_end_to_end_freezes_hash_manifest(tmp_path: Path) -> None:
         "    'prompt_contextual': 'C={context}; B={behavior}; G={generation}',\n"
         "}\n",
         encoding="utf-8",
+        newline="\n",
     )
     notebook = source / "notebooks" / "run_classifier_val_set.ipynb"
     notebook.parent.mkdir(parents=True)
-    notebook.write_text("{}\n", encoding="utf-8")
+    notebook.write_text("{}\n", encoding="utf-8", newline="\n")
 
     rows_by_behavior = {
-        "behavior-a": [
-            validation_row(test_case="a0", generation="generation-a0", votes=(0, 0, 1))
-        ],
-        "behavior-b": [
-            validation_row(test_case="b1", generation="generation-b1", votes=(1, 1, 0))
-        ],
+        "behavior-a": [validation_row(test_case="a0", generation="generation-a0", votes=(0, 0, 1))],
+        "behavior-b": [validation_row(test_case="b1", generation="generation-b1", votes=(1, 1, 0))],
     }
     validation_path = source / "data" / "classifier_val_sets" / "text.json"
     validation_path.parent.mkdir(parents=True)
-    validation_path.write_text(json.dumps(rows_by_behavior), encoding="utf-8")
+    validation_path.write_text(json.dumps(rows_by_behavior), encoding="utf-8", newline="\n")
     text_csv = source / "data" / "behavior_datasets" / "text.csv"
     multimodal_csv = source / "data" / "behavior_datasets" / "multi.csv"
     write_csv(
@@ -249,9 +246,7 @@ def test_synthetic_end_to_end_freezes_hash_manifest(tmp_path: Path) -> None:
 
     result_dir = root / "data" / "results"
     result_dir.mkdir(parents=True)
-    record_ids_hash = module.canonical_sha256(
-        [str(row["record_id"]) for row in selection_rows]
-    )
+    record_ids_hash = module.canonical_sha256([str(row["record_id"]) for row in selection_rows])
     safe_rows_hash = module.canonical_sha256(selection_rows)
     repair = {
         "status": "E1C_SELECTION_REPAIR_PASS",
@@ -284,8 +279,7 @@ def test_synthetic_end_to_end_freezes_hash_manifest(tmp_path: Path) -> None:
         "operational_pass": False,
         "harmbench_live_predictions_generated": False,
         "next_authorized_operation": (
-            "STOP_E1C_AND_RESOLVE_REMAINING_SOURCE_OR_SELECTION_AMBIGUITY_"
-            "BEFORE_LIVE_OUTPUTS"
+            "STOP_E1C_AND_RESOLVE_REMAINING_SOURCE_OR_SELECTION_AMBIGUITY_BEFORE_LIVE_OUTPUTS"
         ),
         "text_section_execution": {
             "effective_prompt_family": "MISTRAL_CLS_PROMPT",
@@ -348,9 +342,7 @@ def test_synthetic_end_to_end_freezes_hash_manifest(tmp_path: Path) -> None:
                 "required_operational_pass": False,
                 "required_live_predictions": False,
                 "required_next_operation": v2["next_authorized_operation"],
-                "required_false_checks": [
-                    "all_selected_rows_resolve_in_notebook_registry"
-                ],
+                "required_false_checks": ["all_selected_rows_resolve_in_notebook_registry"],
                 "required_selected_missing_registry_row_count": 3,
                 "required_selected_notebook_unusable_row_count": 0,
                 "required_notebook_effective_prompt_family": "MISTRAL_CLS_PROMPT",
@@ -408,9 +400,7 @@ def test_synthetic_end_to_end_freezes_hash_manifest(tmp_path: Path) -> None:
             "decoder_temperature": 0.0,
             "decoder_max_tokens": 1,
             "expected_prompt_summary": {
-                key: value
-                for key, value in prompt_summary.items()
-                if key != "raw_prompt_recorded"
+                key: value for key, value in prompt_summary.items() if key != "raw_prompt_recorded"
             },
         },
         "notebook_diagnostic": {
@@ -438,7 +428,7 @@ def test_synthetic_end_to_end_freezes_hash_manifest(tmp_path: Path) -> None:
                 "generation_length",
                 "rendered_prompt_sha256",
                 "rendered_prompt_length",
-            ]
+            ],
         },
         "decision_gate": {
             "on_pass": "FREEZE_LIVE_CONTRACT",

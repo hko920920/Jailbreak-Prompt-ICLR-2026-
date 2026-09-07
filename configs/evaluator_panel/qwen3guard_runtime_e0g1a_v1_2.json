@@ -1,0 +1,61 @@
+{
+  "schema_version": "jbspan-e0g1a-qwen3guard-runtime-qualification-v1-2",
+  "status": "FROZEN_PREINFERENCE_CUDA_CONTEXT_INITIALIZATION_REPAIR_ONLY",
+  "frozen": true,
+  "frozen_at": "2026-09-03",
+  "paper_validity": false,
+  "panel_qualification": false,
+  "parent_contract": {
+    "path": "configs/evaluator_panel/qwen3guard_runtime_e0g1a_v1.json",
+    "bytes": 5605,
+    "sha256": "5d173c44f94517cbfa929ea5140be338d84a147e4f8df18b28612c5d9b7d54cb"
+  },
+  "operational_failures": [
+    {
+      "path": "data/evaluator_panel_v2/e0g1a_qwen3guard_v1_instrumentation_failure.safe.json",
+      "sha256": "ec40e6276cb2b2349699344556e03db4dd7e0dca695bbd0bf4788ac00b9cb67e",
+      "required_status": "E0G1A_V1_PREINFERENCE_CUDA_INSTRUMENTATION_FAILURE"
+    },
+    {
+      "path": "data/evaluator_panel_v2/e0g1a_qwen3guard_v1_1_instrumentation_failure.safe.json",
+      "sha256": "1cd8b805aa0717b0c5e54f8227d8acb85c31b5f702f8ead5024ec2272fe434c7",
+      "required_status": "E0G1A_V1_1_PREINFERENCE_CUDA_CONTEXT_INSTRUMENTATION_FAILURE"
+    }
+  ],
+  "operational_repair": {
+    "changed": "Explicit CUDA context initialization and device selection before unchanged peak-memory instrumentation",
+    "added_calls": [
+      "torch.cuda.init()",
+      "torch.cuda.set_device(0)"
+    ],
+    "model_changed": false,
+    "model_files_changed": false,
+    "harmless_cases_changed": false,
+    "parser_changed": false,
+    "generation_changed": false,
+    "expected_labels_changed": false,
+    "budgets_changed": false,
+    "gates_changed": false,
+    "model_loaded_before_repair": false,
+    "model_outputs_observed_before_repair": false,
+    "diagnostic_confirmation": "The isolated CUDA diagnostic passed initialization, device selection, memory queries, peak reset, and a tensor operation."
+  },
+  "download_adoption": {
+    "path": "data/evaluator_panel_v2/e0g1a_qwen3guard_download.safe.json",
+    "sha256": "0077f1b83d5e828c65d0af19f556a942f355c67d0f4f37e043709b26e52f8d56",
+    "status": "E0G1A_QWEN3GUARD_EXACT_DOWNLOAD_PASS",
+    "download_identity_sha256": "49207c2b4d6d99a408e5e8e8cc3f6a7c29d4ccb290d63f04e88211da68f9cf4c"
+  },
+  "recording_overrides": {
+    "preflight_path": "data/evaluator_panel_v2/e0g1a_v1_2_qwen3guard_runtime_preflight.safe.json",
+    "result_path": "data/evaluator_panel_v2/e0g1a_v1_2_qwen3guard_runtime_result.safe.json"
+  },
+  "protected_boundaries": {
+    "human_labeled_calibration_read": false,
+    "heldout_opened": false,
+    "p3_opened": false,
+    "topology_opened": false,
+    "harmful_prompt_used": false,
+    "scientific_metric_computed": false
+  }
+}

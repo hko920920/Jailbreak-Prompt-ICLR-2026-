@@ -1,0 +1,804 @@
+{
+  "bound_plan_identity_sha256": "8b3b702ab5ea256699b9c3a92b148f05feb0523bd903724dd7ae91dfa9c789f9",
+  "budgets": {
+    "control_materializations": 588,
+    "control_target_calls": 588,
+    "jailmeter_calls": 882,
+    "metadata_post_calls": 2646,
+    "outcome_based_deduplication_allowed": false,
+    "qwen_calls": 882,
+    "scientific_materializations": 294,
+    "scientific_target_calls": 882,
+    "screen_budget_reused": false,
+    "total_inference_calls": 3234,
+    "total_target_calls": 1470
+  },
+  "context_tokens": 4096,
+  "cooldown": {
+    "before_every_target_dispatch": true,
+    "hardware_settings_changed": false,
+    "inflight_timeout_unchanged": true,
+    "maximum_start_temperature_c": 60,
+    "maximum_wait_seconds": 180,
+    "poll_seconds": 0.5
+  },
+  "evidence_class": "RESULT_INFORMED_EXPOSED_DEVELOPMENT_NOT_CONFIRMATION",
+  "execution_authorized": true,
+  "execution_limits": {
+    "deadline_utc": "2026-09-05T22:55:47+00:00",
+    "jailmeter_context_tokens": 4096,
+    "jailmeter_phase_seconds": 21600,
+    "maximum_input_tokens_before_chat_margin": 3456,
+    "maximum_peak_cuda_allocated_bytes": 7516192768,
+    "maximum_peak_gpu_mib": 7600,
+    "maximum_prelaunch_gpu_mib": 1000,
+    "minimum_free_disk_bytes": 16106127360,
+    "qwen_context_tokens": 32768,
+    "qwen_phase_seconds": 7200,
+    "reserved_chat_template_margin_tokens": 128
+  },
+  "frozen": true,
+  "frozen_at_utc": "2026-09-05T18:59:05+00:00",
+  "generation": {
+    "max_tokens": 512,
+    "min_p": 0,
+    "repeat_penalty": 1,
+    "temperature": 0.7,
+    "top_k": 50,
+    "top_p": 0.9
+  },
+  "model": {
+    "alias": "pa-llama-3.1-8b-q4-development-admission-v1",
+    "artifact_kind": "community_quantized_GGUF_not_official_BF16_equivalence",
+    "entry_path": "artifacts/p2_runtime_qualification_v1/models/meta-llama-3.1-8b-instruct-q4-k-m/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+    "files": [
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/models/meta-llama-3.1-8b-instruct-q4-k-m/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+        "sha256": "7b064f5842bf9532c91456deda288a1b672397a54fa729aa665952863033557c",
+        "size_bytes": 4920739232
+      }
+    ],
+    "repository": "bartowski/Meta-Llama-3.1-8B-Instruct-GGUF",
+    "revision": "bf5b95e96dac0462e2a09145ec66cae9a3f12067"
+  },
+  "panel": {
+    "asset_pins": {
+      "jailmeter": [
+        {
+          "path": "artifacts/evaluator_panel_v3/models/qwen2.5-7b-instruct-base-config-a09a354/config.json",
+          "sha256": "7463bb0ea78315365e6c6b74de4e73bbcc8359dfb0c5a737584e077d42c0b03c",
+          "size_bytes": 663
+        },
+        {
+          "path": "artifacts/evaluator_panel_v3/models/qwen2.5-7b-instruct-base-config-a09a354/generation_config.json",
+          "sha256": "3a8f9087e486054c8a4a08dae2e5a3ba62e23da212b5b8c08bc42cb983c3459f",
+          "size_bytes": 243
+        },
+        {
+          "path": "artifacts/evaluator_panel_v3/models/qwen2.5-7b-instruct-base-config-a09a354/merges.txt",
+          "sha256": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3",
+          "size_bytes": 1671839
+        },
+        {
+          "path": "artifacts/evaluator_panel_v3/models/qwen2.5-7b-instruct-base-config-a09a354/tokenizer.json",
+          "sha256": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+          "size_bytes": 7031645
+        },
+        {
+          "path": "artifacts/evaluator_panel_v3/models/qwen2.5-7b-instruct-base-config-a09a354/tokenizer_config.json",
+          "sha256": "5b5d4f65d0acd3b2d56a35b56d374a36cbc1c8fa5cf3b3febbbfabf22f359583",
+          "size_bytes": 7305
+        },
+        {
+          "path": "artifacts/evaluator_panel_v3/models/qwen2.5-7b-instruct-base-config-a09a354/vocab.json",
+          "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+          "size_bytes": 2776833
+        },
+        {
+          "path": "artifacts/evaluator_panel_v3/models/jailmeter-slm-6a492b5/jailmeter-slm-lora-f16.gguf",
+          "sha256": "335a66a0ce14f1e26ab0bf08ee4dd835f9fa3606ec2956a8192320a2f830fd05",
+          "size_bytes": 40397440
+        },
+        {
+          "path": "artifacts/evaluator_panel_v3/sources/JailMeter-6a492b5/jailmeter_slm/run_jailmeter_slm.py",
+          "sha256": "13f95d445367051ba0ea501037e6504aa2a731966afba325230d7421e2a91dde",
+          "size_bytes": 6888
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/models/qwen2.5-7b-instruct-q4-k-m/qwen2.5-7b-instruct-q4_k_m-00001-of-00002.gguf",
+          "sha256": "dfce12e3862a5283ccfb88221b48480e58745165de856439950d0f22590580db",
+          "size_bytes": 3993201344
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/models/qwen2.5-7b-instruct-q4-k-m/qwen2.5-7b-instruct-q4_k_m-00002-of-00002.gguf",
+          "sha256": "539cf93f78e887edea1c04e2d7d8cdaca9d01dae9c9025bcb8accbe29df3d72a",
+          "size_bytes": 689872288
+        }
+      ],
+      "qwen": [
+        {
+          "path": "artifacts/evaluator_panel_v3/models/qwen3guard-gen-0.6b-fada3b2/LICENSE",
+          "sha256": "832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e",
+          "size_bytes": 11343
+        },
+        {
+          "path": "artifacts/evaluator_panel_v3/models/qwen3guard-gen-0.6b-fada3b2/README.md",
+          "sha256": "3a52042f467261243d949d86a779f08ac8ff9da30ce47fd636db6e1c9c1b7635",
+          "size_bytes": 9841
+        },
+        {
+          "path": "artifacts/evaluator_panel_v3/models/qwen3guard-gen-0.6b-fada3b2/config.json",
+          "sha256": "4674816bdf440c113a9ca87aedfa069b67f7cabbd89e71da7d4e4a68adce4af4",
+          "size_bytes": 727
+        },
+        {
+          "path": "artifacts/evaluator_panel_v3/models/qwen3guard-gen-0.6b-fada3b2/generation_config.json",
+          "sha256": "5f0bc42aae9f779d06bf620ce685a02cb0cde802d0f27f05c7331aaf0e1fd2d7",
+          "size_bytes": 161
+        },
+        {
+          "path": "artifacts/evaluator_panel_v3/models/qwen3guard-gen-0.6b-fada3b2/merges.txt",
+          "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+          "size_bytes": 1671853
+        },
+        {
+          "path": "artifacts/evaluator_panel_v3/models/qwen3guard-gen-0.6b-fada3b2/model.safetensors",
+          "sha256": "4f3ce47ebd968cddb67de08d8764f8ede7c410a7d1fb9e08145a4c7a2f2e5c0f",
+          "size_bytes": 1503300328
+        },
+        {
+          "path": "artifacts/evaluator_panel_v3/models/qwen3guard-gen-0.6b-fada3b2/tokenizer.json",
+          "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+          "size_bytes": 11422654
+        },
+        {
+          "path": "artifacts/evaluator_panel_v3/models/qwen3guard-gen-0.6b-fada3b2/tokenizer_config.json",
+          "sha256": "934e187433b06c5d28519e0347dd293084cf28621f00a86ae7e24e42f8b53e81",
+          "size_bytes": 9601
+        },
+        {
+          "path": "artifacts/evaluator_panel_v3/models/qwen3guard-gen-0.6b-fada3b2/vocab.json",
+          "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+          "size_bytes": 2776833
+        }
+      ],
+      "runtime": [
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-server.exe",
+          "sha256": "4a118c0892482e738b19ebcd201d3fc9d687ab0dd2f841d2b0d7272ab909655a",
+          "size_bytes": 9216
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-base.dll",
+          "sha256": "44994a675412afb73e51dbbe5cdfb180b49a79d7253b20c669bbcfba6328145c",
+          "size_bytes": 773632
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-alderlake.dll",
+          "sha256": "89792c10745f034f1facf75f496fea5446b46d90220f2377f129df8c782c742d",
+          "size_bytes": 1181184
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-cannonlake.dll",
+          "sha256": "a42178d16753c9a5b7e344df7c7719ed6ce24dbc36f8b75632543a671c7be174",
+          "size_bytes": 1395712
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-cascadelake.dll",
+          "sha256": "3e5872cb5f98711e585cd7c8b5c781a70c002fdc9697b2470407725468724d34",
+          "size_bytes": 1382400
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-cooperlake.dll",
+          "sha256": "0bae40057f10b034ee9a38d56a6435fcb2067421eaf7a33792021efb89ef550e",
+          "size_bytes": 1383424
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-haswell.dll",
+          "sha256": "4bf25eeb5dc78d4a0cc928bcd7a301fbd81cba6d31068c5d5bc5b4b836aebf8a",
+          "size_bytes": 1185280
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-icelake.dll",
+          "sha256": "e380cd930685e0d84e4ed8369ab2db2ea742ef41b0df97c853d27a5777b0cfc6",
+          "size_bytes": 1389056
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-ivybridge.dll",
+          "sha256": "aac4d53c8b7d8b33918acf89b4b4a5b463f930e06e89cedbca5acf401ee759f3",
+          "size_bytes": 1074176
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-piledriver.dll",
+          "sha256": "1b719e09866aedcb37cabe6735dac6207be3d6219d4d3fd4ec8c5317630ad442",
+          "size_bytes": 1077760
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-sandybridge.dll",
+          "sha256": "74f29644b3cbddbcb5bae3b6b78401aee6f0f0898548be7265d2165e206bd8f4",
+          "size_bytes": 1054208
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-sapphirerapids.dll",
+          "sha256": "f5e72e9162e3ca9483dad7332621989b4efa3737db94dcd8a2f27e11e9f2cc9c",
+          "size_bytes": 1660416
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-skylakex.dll",
+          "sha256": "09b7d91416897b051eb522faafefb92a324abc65afb1b9786a1d8562d6477b9d",
+          "size_bytes": 1389568
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-sse42.dll",
+          "sha256": "2082c92a205510936558998182be19019d93e4a99fcd793039081d33a3d5ad70",
+          "size_bytes": 877568
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-x64.dll",
+          "sha256": "60971ca51406a002c099d5db41e03de454ee98f963ca60c05fa570f018e2fdf2",
+          "size_bytes": 870400
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-zen4.dll",
+          "sha256": "987cac33a360bedbfe3e92926ca04b36de55ec48cb7224a9a552782068b30d6b",
+          "size_bytes": 1390080
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-rpc.dll",
+          "sha256": "4ae2a0e852e0915350eac1761f75ac2ab4a09fc64675e100ebe000ce498506cd",
+          "size_bytes": 137728
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-vulkan.dll",
+          "sha256": "a7ac1389844210f50fcf8fce9a07c2d9193fbdb1c97e377471bbd06dfb7f334a",
+          "size_bytes": 53586944
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml.dll",
+          "sha256": "53c2833d6cd55d80ec6863a570a0bfc97e4b1510594b3dc36059261378139da1",
+          "size_bytes": 86016
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/libomp140.x86_64.dll",
+          "sha256": "4a20c1e5c115c29771a12324513eb109badac72180f79481527ad79d996ffb33",
+          "size_bytes": 661856
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-batched-bench-impl.dll",
+          "sha256": "df98bc6bb3bc48a1a8ccd1f87c116bc1b21c23d9c05c35b2df111742594117d2",
+          "size_bytes": 61440
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-bench-impl.dll",
+          "sha256": "6204d16e40e143e72005461c176c8ae8e7ce410e7b4edc5a2948f5111342993c",
+          "size_bytes": 395264
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-cli-impl.dll",
+          "sha256": "2eb02096b7b95a45d201a64c65aee2a6429d1672fe511d0f6036b5db377a50c2",
+          "size_bytes": 3523584
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-common.dll",
+          "sha256": "b98ab6df2f15001c711925f09b4d3b914f08681c01c1ed36375a8051f30144c0",
+          "size_bytes": 8056832
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-completion-impl.dll",
+          "sha256": "bc32de22e8d6fa65d7ce1102d8bd0826fec973a6cc23a39c2e9850ed64b1235d",
+          "size_bytes": 133120
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-fit-params-impl.dll",
+          "sha256": "8e8d3abe5c22b413beb3d7e837cb1322f7ea9b21cda2d61b889bfae805eb46da",
+          "size_bytes": 40960
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-perplexity-impl.dll",
+          "sha256": "97ccf248df09c8f311c328522050209979bee08d0a796d9ecc20951a786e87b7",
+          "size_bytes": 194048
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-quantize-impl.dll",
+          "sha256": "1017584fa31b5f119818216b303794c5c51e1dbec76c6c46083c439ab0c6bd91",
+          "size_bytes": 136704
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-server-impl.dll",
+          "sha256": "57a5ef7a34bf3bfa5ef732158d185b2c7eb14ffce131c3ea9af0a89934fbaa6e",
+          "size_bytes": 10023936
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama.dll",
+          "sha256": "70a209eca689a91734b026d77648a01ac7ea094c883816afe29e772af88dbcbb",
+          "size_bytes": 2898432
+        },
+        {
+          "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/mtmd.dll",
+          "sha256": "de7169905bb0f1c6cd2fb7f881f80d76dfb9dc3a46d05161dcf551259c13ff68",
+          "size_bytes": 1606144
+        }
+      ]
+    },
+    "jailmeter": {
+      "base_metadata_local_path": "artifacts/evaluator_panel_v3/models/qwen2.5-7b-instruct-base-config-a09a354",
+      "context_tokens": 4096,
+      "gpu_layers": 99,
+      "health_timeout_seconds": 180,
+      "host": "127.0.0.1",
+      "label_regex": "<label>\\s*(0|1)\\s*</label>",
+      "lora_path": "artifacts/evaluator_panel_v3/models/jailmeter-slm-6a492b5/jailmeter-slm-lora-f16.gguf",
+      "max_new_tokens": 1536,
+      "maximum_peak_gpu_memory_mib": 7600,
+      "maximum_prelaunch_gpu_memory_mib": 1000,
+      "maximum_total_seconds": 900,
+      "port": 18082,
+      "request_timeout_seconds": 240,
+      "require_exactly_one_label_match": true,
+      "runner_path": "artifacts/evaluator_panel_v3/sources/JailMeter-6a492b5/jailmeter_slm/run_jailmeter_slm.py",
+      "runtime_directory": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan",
+      "server_log_retained": false,
+      "server_relative_path": "llama-server.exe",
+      "target_model_path": "artifacts/p2_runtime_qualification_v1/models/qwen2.5-7b-instruct-q4-k-m/qwen2.5-7b-instruct-q4_k_m-00001-of-00002.gguf",
+      "temperature": 0.0,
+      "threads": 4
+    },
+    "jailmeter_system_prompt_sha256": "e0d8d1c9bdd0e6dfe1e80da66ef5ce586d3fbb59b39c1cdde5335d26fec71acf",
+    "pure_function_sources": {
+      "decision": {
+        "path": "src/jbspan/c1n_screen.py",
+        "sha256": "b6d6fee84231cd9746be899f808fe86d9a249902b052be89baf4f7376f7ed11c",
+        "size_bytes": 15171
+      },
+      "e0g5": {
+        "path": "scripts/run_heterogeneous_panel_heldout_e0g5.py",
+        "sha256": "935c53a42ce8895a26960a1f850fb48df657ec7983dfd27932d7f6418bb64473",
+        "size_bytes": 72796
+      },
+      "normalizer": {
+        "path": "scripts/run_local_signal_screen_p3.py",
+        "sha256": "eecff38f21c5f7d92465f5a009f590a545a839216f48b6b44d162f06da9d9a43",
+        "size_bytes": 86315
+      },
+      "sentinel": {
+        "path": "scripts/run_heterogeneous_panel_sentinel_e0g2.py",
+        "sha256": "f5881807728e1f8cc7edcefc3b89c6d22b580c1b3eedd3b1fc3cbbed519a130c",
+        "size_bytes": 43978
+      }
+    },
+    "qwen": {
+      "category_regex": "(Violent|Non-violent Illegal Acts|Sexual Content or Sexual Acts|PII|Suicide & Self-Harm|Unethical Acts|Politically Sensitive Topics|Copyright Violation|None)",
+      "device": "cuda:0",
+      "do_sample": false,
+      "dtype": "float16",
+      "max_new_tokens": 128,
+      "maximum_peak_cuda_allocated_bytes": 7516192768,
+      "maximum_total_seconds": 300,
+      "model_local_path": "artifacts/evaluator_panel_v3/models/qwen3guard-gen-0.6b-fada3b2",
+      "refusal_regex": "Refusal: (Yes|No)",
+      "require_exactly_one_refusal_match": true,
+      "require_exactly_one_safety_match": true,
+      "safety_regex": "Safety: (Safe|Unsafe|Controversial)"
+    },
+    "runtime_contract": {
+      "path": "configs/evaluator_panel/heterogeneous_panel_sentinel_e0g2_v1.json",
+      "sha256": "7730a617d17105ffbab75010fabcd3ff024001402d0fe279ff809c44ed664da7",
+      "size_bytes": 7440
+    }
+  },
+  "panel_cooldown": {
+    "before_every_evaluator_dispatch": true,
+    "hardware_settings_changed": false,
+    "inflight_timeout_unchanged": true,
+    "maximum_start_temperature_c": 60,
+    "maximum_wait_seconds": 180,
+    "poll_seconds": 0.5
+  },
+  "paper_validity": false,
+  "parent_screen_contract_sha256": "49bfa0302681971ed49150a95d3a300d3f8f4bc85e0fe483ec73ebd39e1b7139",
+  "paths": {
+    "private_root": "artifacts/pa_llama_topology_v1/private",
+    "safe_root": "data/natural_language_localization/pa_llama_topology_v1"
+  },
+  "preparation": {
+    "path": "data/natural_language_localization/pa_llama_topology_preparation_v1/fe0af6381817cddc6da856da69fccc2b7a9a282e8a4cce7707c81070f8489a82/preparation.safe.json",
+    "sha256": "1bb479bc74c19136fb79a807d5653603a786a2446c1a3116f6f01d8749a097c3",
+    "size_bytes": 1593
+  },
+  "privacy": {
+    "historical_private_reads_allowed": false,
+    "new_screen_input_files": 1,
+    "private_output_stdout_allowed": false,
+    "sealed_reads_allowed": false
+  },
+  "protocol": {
+    "path": "docs/PA_LLAMA_TOPOLOGY_EXECUTION_PROTOCOL_2026-09-05_V1.md",
+    "sha256": "8beda8ab2e5afba22519f363f242dccd80961f35abf9c542bf33e995835431bf",
+    "size_bytes": 10408
+  },
+  "required_code": {
+    "amendment_continuation_worker": {
+      "path": "scripts/pa_llama_development_jailmeter_continuation_v1.py",
+      "sha256": "0c726ebcbd9f7c5f06f00073af789717059aee8441f8312395198832e7a37d2f",
+      "size_bytes": 42481
+    },
+    "amendment_continuation_worker_tests": {
+      "path": "tests/test_pa_llama_development_jailmeter_continuation_v1.py",
+      "sha256": "51bfd98bdb2c8d42a7e2e901017211f42ca3950ff20ec2c4d87691624929f5c2",
+      "size_bytes": 29933
+    },
+    "amendment_continued_finalizer": {
+      "path": "scripts/pa_llama_development_continued_aggregate_v1.py",
+      "sha256": "0f928d28c87d65950e36768f6a362e56e74ae00b80c4ea47202a4d5cd1f544d4",
+      "size_bytes": 13028
+    },
+    "amendment_continued_finalizer_tests": {
+      "path": "tests/test_pa_llama_development_continued_aggregate_v1.py",
+      "sha256": "2167b4c46704024e036959bf63b61cf792d8a41aa3b16e6d5923d91a8bb9ea96",
+      "size_bytes": 12796
+    },
+    "parent_aggregator": {
+      "path": "scripts/pa_llama_development_aggregate_v1.py",
+      "sha256": "b5722c3b84b083cde52fc8edb859454a137dc881d764a6ff470e47be43bb252c",
+      "size_bytes": 16625
+    },
+    "parent_aggregator_tests": {
+      "path": "tests/test_pa_llama_development_aggregate_v1.py",
+      "sha256": "0b158266aa04231d597cba642c8ab97749ebf10de91077f4bc9ac1b9933a77f4",
+      "size_bytes": 15293
+    },
+    "parent_common_module": {
+      "path": "scripts/pa_llama_development_common_v1.py",
+      "sha256": "9b27b4f5380e913922080d8d26edf265136e9dd4b6b296f4b66dd2aac7ee8ad3",
+      "size_bytes": 28349
+    },
+    "parent_common_tests": {
+      "path": "tests/test_pa_llama_development_common_v1.py",
+      "sha256": "788064ac56244535bcc5ddcf5c200d6d32c25dfd02cfa8b6798cc379e5bb2972",
+      "size_bytes": 20250
+    },
+    "parent_legacy_identity_helper": {
+      "path": "scripts/run_pa_llama_target_admission_v2.py",
+      "sha256": "d7ff787cafd5e992989f6fed0ef940b6bfdcd226bf456d60ded5de5c95d69f1b",
+      "size_bytes": 36044
+    },
+    "parent_panel_runner": {
+      "path": "scripts/pa_llama_development_panel_v1.py",
+      "sha256": "92f02cc26353ea176df4eff478d9d895f893f7f8b9ed589f8e537d51b96b0ff1",
+      "size_bytes": 52825
+    },
+    "parent_panel_tests": {
+      "path": "tests/test_pa_llama_development_panel_v1.py",
+      "sha256": "1cbdcf13dde0402a537d1650865f07c557d4a6799eb4bfe9a0ff6de335544c30",
+      "size_bytes": 31496
+    },
+    "parent_source_inventory_preparer": {
+      "path": "scripts/prepare_pa_llama_development_source_v1.py",
+      "sha256": "94b9173b15935e2dd53f3f8324fb44e304846adefa0bd9bd6b3147a90545fd7e",
+      "size_bytes": 11162
+    },
+    "parent_source_inventory_tests": {
+      "path": "tests/test_pa_llama_development_source_v1.py",
+      "sha256": "cd626f508f8db670b2cdaed8a3c298304ce559ae1a131130de9ad15ce3deef9e",
+      "size_bytes": 8074
+    },
+    "parent_target_runner": {
+      "path": "scripts/pa_llama_development_target_v1.py",
+      "sha256": "a8739861a1bb9dda5927ba1d9d2538c0a9e03d110e4988296fcfbfcc260dea69",
+      "size_bytes": 43581
+    },
+    "parent_target_tests": {
+      "path": "tests/test_pa_llama_development_target_v1.py",
+      "sha256": "9667776f8a56f427c275e251b2c57a19b74cb33dbd9793f543e40741cd26c125",
+      "size_bytes": 29879
+    },
+    "topology_00": {
+      "path": "scripts/pa_llama_topology_analysis_v1.py",
+      "sha256": "9937a11708421c451893ef7aedfcd58f7ba712ceba7674b404b5a8606d67c5a7",
+      "size_bytes": 26767
+    },
+    "topology_01": {
+      "path": "scripts/pa_llama_topology_execution_v1.py",
+      "sha256": "03078c7d4c8f807d44c1bbd177e607dc78262d14b61a6519ad49ae02a60f1ed3",
+      "size_bytes": 26283
+    },
+    "topology_02": {
+      "path": "scripts/pa_llama_topology_finalize_v1.py",
+      "sha256": "f081e253e915f872086625dc09865fe752bf286b5a73a79f9e3f7e7ca5b1f4f5",
+      "size_bytes": 18940
+    },
+    "topology_03": {
+      "path": "scripts/pa_llama_topology_materialize_v1.py",
+      "sha256": "a89185d869a82daa9d6516cb7ade3388620f11dce96af51da8a79f2e7570cce6",
+      "size_bytes": 26419
+    },
+    "topology_04": {
+      "path": "scripts/pa_llama_topology_measurement_v1.py",
+      "sha256": "5c745295409529c291a5193fc06a46fc17337f708fbb38b04f467ed8550d0832",
+      "size_bytes": 14153
+    },
+    "topology_05": {
+      "path": "scripts/pa_llama_topology_panel_v1.py",
+      "sha256": "40866bf42a5dcd55d8c8c449b81c9d0ce3c2f8c29ba65c378a99ac1d6af7ca77",
+      "size_bytes": 37058
+    },
+    "topology_06": {
+      "path": "scripts/pa_llama_topology_plan_v1.py",
+      "sha256": "37750bff8fefca3b84a8ca0684634ad2f9cd810454fc122ba09f254699c592c6",
+      "size_bytes": 32188
+    },
+    "topology_07": {
+      "path": "scripts/pa_llama_topology_target_v1.py",
+      "sha256": "81f884ce834862baa776b4ad425c24c82c12cf0bd7ae2dffbbbe2587c3c95264",
+      "size_bytes": 46146
+    },
+    "topology_08": {
+      "path": "tests/test_pa_llama_topology_analysis_v1.py",
+      "sha256": "1e97c720655e1d37fbc3048282658b20189248effeaf4f15b38c720240a60334",
+      "size_bytes": 22493
+    },
+    "topology_09": {
+      "path": "tests/test_pa_llama_topology_execution_v1.py",
+      "sha256": "7dad3afaa79c41a466c309708247a070f96b7253fdd3e1cfb52653189919a15f",
+      "size_bytes": 18274
+    },
+    "topology_10": {
+      "path": "tests/test_pa_llama_topology_finalize_v1.py",
+      "sha256": "a7735c438c7a9a92d1df45ca9b16b2b04acc8bbf0e97853e2e2a6822359ba1f8",
+      "size_bytes": 33746
+    },
+    "topology_11": {
+      "path": "tests/test_pa_llama_topology_integration_review_v1.py",
+      "sha256": "1c1921b051cb02b46244d297819e5e026ab8c68cfa50e2d99f2a2c98ecf36291",
+      "size_bytes": 9496
+    },
+    "topology_12": {
+      "path": "tests/test_pa_llama_topology_materialize_v1.py",
+      "sha256": "abffa5efa9ac7ffa04401a0bf5beb78973a5b1a5d5acba6cd9d11a314df6fa36",
+      "size_bytes": 12900
+    },
+    "topology_13": {
+      "path": "tests/test_pa_llama_topology_measurement_v1.py",
+      "sha256": "d4f17ba09592123d5792bc8d402df2145ca59331d950d2526ea852cb57159b94",
+      "size_bytes": 7932
+    },
+    "topology_14": {
+      "path": "tests/test_pa_llama_topology_panel_v1.py",
+      "sha256": "44227349d2aad44795ef7b4b23b982624b018afdb17f1eff4648d41c86759c2e",
+      "size_bytes": 25343
+    },
+    "topology_15": {
+      "path": "tests/test_pa_llama_topology_plan_v1.py",
+      "sha256": "afe7777cfdccaaea2dd552dd00f2c403117fe85b29388f6f622924b6e7d1b5c8",
+      "size_bytes": 26932
+    },
+    "topology_16": {
+      "path": "tests/test_pa_llama_topology_target_v1.py",
+      "sha256": "7d826700ac1fa39e57783304a7b911e0e01a7768b1094ee119d4739ce8772dc9",
+      "size_bytes": 35703
+    }
+  },
+  "runtime": {
+    "all_extracted_dlls_and_server_compared_to_pinned_archive": true,
+    "archive_provenance": {
+      "path": "artifacts/p2_runtime_qualification_v1/downloads/llama-b10441-bin-win-vulkan-x64.zip",
+      "sha256": "7fdbac5860ad1c64bf1e5703e4491612562e953a709a9f190affd6141147c6aa",
+      "size_bytes": 34580767
+    },
+    "build": 10441,
+    "commit": "0177dcc7300bad8914bb838baabce87899812491",
+    "files": [
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-base.dll",
+        "sha256": "44994a675412afb73e51dbbe5cdfb180b49a79d7253b20c669bbcfba6328145c",
+        "size_bytes": 773632
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-alderlake.dll",
+        "sha256": "89792c10745f034f1facf75f496fea5446b46d90220f2377f129df8c782c742d",
+        "size_bytes": 1181184
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-cannonlake.dll",
+        "sha256": "a42178d16753c9a5b7e344df7c7719ed6ce24dbc36f8b75632543a671c7be174",
+        "size_bytes": 1395712
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-cascadelake.dll",
+        "sha256": "3e5872cb5f98711e585cd7c8b5c781a70c002fdc9697b2470407725468724d34",
+        "size_bytes": 1382400
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-cooperlake.dll",
+        "sha256": "0bae40057f10b034ee9a38d56a6435fcb2067421eaf7a33792021efb89ef550e",
+        "size_bytes": 1383424
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-haswell.dll",
+        "sha256": "4bf25eeb5dc78d4a0cc928bcd7a301fbd81cba6d31068c5d5bc5b4b836aebf8a",
+        "size_bytes": 1185280
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-icelake.dll",
+        "sha256": "e380cd930685e0d84e4ed8369ab2db2ea742ef41b0df97c853d27a5777b0cfc6",
+        "size_bytes": 1389056
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-ivybridge.dll",
+        "sha256": "aac4d53c8b7d8b33918acf89b4b4a5b463f930e06e89cedbca5acf401ee759f3",
+        "size_bytes": 1074176
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-piledriver.dll",
+        "sha256": "1b719e09866aedcb37cabe6735dac6207be3d6219d4d3fd4ec8c5317630ad442",
+        "size_bytes": 1077760
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-sandybridge.dll",
+        "sha256": "74f29644b3cbddbcb5bae3b6b78401aee6f0f0898548be7265d2165e206bd8f4",
+        "size_bytes": 1054208
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-sapphirerapids.dll",
+        "sha256": "f5e72e9162e3ca9483dad7332621989b4efa3737db94dcd8a2f27e11e9f2cc9c",
+        "size_bytes": 1660416
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-skylakex.dll",
+        "sha256": "09b7d91416897b051eb522faafefb92a324abc65afb1b9786a1d8562d6477b9d",
+        "size_bytes": 1389568
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-sse42.dll",
+        "sha256": "2082c92a205510936558998182be19019d93e4a99fcd793039081d33a3d5ad70",
+        "size_bytes": 877568
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-x64.dll",
+        "sha256": "60971ca51406a002c099d5db41e03de454ee98f963ca60c05fa570f018e2fdf2",
+        "size_bytes": 870400
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-cpu-zen4.dll",
+        "sha256": "987cac33a360bedbfe3e92926ca04b36de55ec48cb7224a9a552782068b30d6b",
+        "size_bytes": 1390080
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-rpc.dll",
+        "sha256": "4ae2a0e852e0915350eac1761f75ac2ab4a09fc64675e100ebe000ce498506cd",
+        "size_bytes": 137728
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml-vulkan.dll",
+        "sha256": "a7ac1389844210f50fcf8fce9a07c2d9193fbdb1c97e377471bbd06dfb7f334a",
+        "size_bytes": 53586944
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/ggml.dll",
+        "sha256": "53c2833d6cd55d80ec6863a570a0bfc97e4b1510594b3dc36059261378139da1",
+        "size_bytes": 86016
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/libomp140.x86_64.dll",
+        "sha256": "4a20c1e5c115c29771a12324513eb109badac72180f79481527ad79d996ffb33",
+        "size_bytes": 661856
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-batched-bench-impl.dll",
+        "sha256": "df98bc6bb3bc48a1a8ccd1f87c116bc1b21c23d9c05c35b2df111742594117d2",
+        "size_bytes": 61440
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-bench-impl.dll",
+        "sha256": "6204d16e40e143e72005461c176c8ae8e7ce410e7b4edc5a2948f5111342993c",
+        "size_bytes": 395264
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-cli-impl.dll",
+        "sha256": "2eb02096b7b95a45d201a64c65aee2a6429d1672fe511d0f6036b5db377a50c2",
+        "size_bytes": 3523584
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-common.dll",
+        "sha256": "b98ab6df2f15001c711925f09b4d3b914f08681c01c1ed36375a8051f30144c0",
+        "size_bytes": 8056832
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-completion-impl.dll",
+        "sha256": "bc32de22e8d6fa65d7ce1102d8bd0826fec973a6cc23a39c2e9850ed64b1235d",
+        "size_bytes": 133120
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-fit-params-impl.dll",
+        "sha256": "8e8d3abe5c22b413beb3d7e837cb1322f7ea9b21cda2d61b889bfae805eb46da",
+        "size_bytes": 40960
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-perplexity-impl.dll",
+        "sha256": "97ccf248df09c8f311c328522050209979bee08d0a796d9ecc20951a786e87b7",
+        "size_bytes": 194048
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-quantize-impl.dll",
+        "sha256": "1017584fa31b5f119818216b303794c5c51e1dbec76c6c46083c439ab0c6bd91",
+        "size_bytes": 136704
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-server-impl.dll",
+        "sha256": "57a5ef7a34bf3bfa5ef732158d185b2c7eb14ffce131c3ea9af0a89934fbaa6e",
+        "size_bytes": 10023936
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama.dll",
+        "sha256": "70a209eca689a91734b026d77648a01ac7ea094c883816afe29e772af88dbcbb",
+        "size_bytes": 2898432
+      },
+      {
+        "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/mtmd.dll",
+        "sha256": "de7169905bb0f1c6cd2fb7f881f80d76dfb9dc3a46d05161dcf551259c13ff68",
+        "size_bytes": 1606144
+      }
+    ],
+    "native_chat_template_sha256": "e10ca381b1ccc5cf9db52e371f3b6651576caee0a630b452e2816b2d404d4b65",
+    "native_chat_template_utf8_bytes": 4614,
+    "served_chat_template_sha256": "93c0e9aa3629bbd77e68dbc0f5621f6e6b23aa8d74b932595cdb8d64684526d7",
+    "served_chat_template_utf8_bytes": 4613,
+    "server": {
+      "path": "artifacts/p2_runtime_qualification_v1/runtime/llama-b10441-vulkan/llama-server.exe",
+      "sha256": "4a118c0892482e738b19ebcd201d3fc9d687ab0dd2f841d2b0d7272ab909655a",
+      "size_bytes": 9216
+    },
+    "server_args": [
+      "--device",
+      "Vulkan1",
+      "--gpu-layers",
+      "all",
+      "--ctx-size",
+      "4096",
+      "--parallel",
+      "1",
+      "--threads",
+      "8",
+      "--threads-batch",
+      "8",
+      "--batch-size",
+      "512",
+      "--ubatch-size",
+      "512",
+      "--split-mode",
+      "none",
+      "--fit",
+      "off",
+      "--jinja",
+      "--reasoning",
+      "off",
+      "--offline",
+      "--no-webui",
+      "--no-agent",
+      "--no-cache-prompt",
+      "--cors-origins",
+      "localhost"
+    ],
+    "template_identity_transformation": "Pinned lexer source: CRLF to LF; CR to LF; remove one final byte iff ORIGINAL ends LF"
+  },
+  "schema_version": "jbspan-pa-llama-topology-execution-v1",
+  "seeds": [
+    11,
+    23,
+    47
+  ],
+  "server": {
+    "host": "127.0.0.1",
+    "port": 18087,
+    "request_timeout_seconds": 120,
+    "startup_timeout_seconds": 180
+  },
+  "software": {
+    "numpy": "1.26.4",
+    "safetensors": "0.8.0",
+    "tokenizers": "0.22.2",
+    "torch": "2.6.0+cu124",
+    "transformers": "4.56.2"
+  },
+  "source_bundle_identity_sha256": "fe0af6381817cddc6da856da69fccc2b7a9a282e8a4cce7707c81070f8489a82"
+}
