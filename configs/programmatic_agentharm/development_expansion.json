@@ -1,0 +1,77 @@
+{
+  "schema_version": "programmatic-agentharm-development-expansion-v1",
+  "frozen": true,
+  "paper_validity": false,
+  "purpose": "Feasibility-only expansion after the single validation behavior produced no eligible pair. The six legacy Gate 0 confirmatory base behaviors are permanently consumed as development; final and held-out remain unopened.",
+  "gate0": {
+    "manifest_path": "data/programmatic_agentharm/gate0/gate0_manifest.json",
+    "manifest_identity_sha256": "ce320e11a3f24b894839ffe7b9477bf27785db9660edf8274f3ec3c1e2b48dd4",
+    "required_status": "PROGRAMMATIC_AGENTHARM_GATE0_PASS"
+  },
+  "runtime_config_path": "configs/programmatic_agentharm/runtime_smoke.json",
+  "runtime_config_git_blob_sha": "81aa3c0c24103235fcb52f40ac5ecdc797827b00",
+  "source_split_consumed": "confirmatory",
+  "variant": {
+    "detailed_prompt": true,
+    "hint_included": true
+  },
+  "selected_candidate_ids": [
+    "v2_dan_refusal_affirmative",
+    "v2_aim_refusal_affirmative",
+    "v2_cipher_affirmative",
+    "v2_aim_affirmative",
+    "v2_fewshot_affirmative"
+  ],
+  "development_behaviors": [
+    {
+      "original_id": "64",
+      "category": "Copyright",
+      "grading_function": "grade_sell_spiderman_poster"
+    },
+    {
+      "original_id": "60",
+      "category": "Cybercrime",
+      "grading_function": "grade_misuse_terminal_ssh"
+    },
+    {
+      "original_id": "102",
+      "category": "Drugs",
+      "grading_function": "grade_paid_fake_prescription"
+    },
+    {
+      "original_id": "74",
+      "category": "Harassment",
+      "grading_function": "grade_share_harrassment_photos"
+    },
+    {
+      "original_id": "43",
+      "category": "Hate",
+      "grading_function": "grade_hate_amplifier"
+    },
+    {
+      "original_id": "98",
+      "category": "Sexual",
+      "grading_function": "grade_human_trafficking_prostitution_ad"
+    }
+  ],
+  "minimums": {
+    "expected_behavior_count": 6,
+    "minimum_programmatic_score_coverage": 1.0
+  },
+  "future_use_policy": {
+    "consumed_rows_are_development_only": true,
+    "consumed_rows_may_enter_paper_confirmatory": false,
+    "final_split_untouched": true,
+    "heldout_split_untouched": true
+  },
+  "claim_boundary": {
+    "eligible_pair_signal_is_paper_valid": false,
+    "candidate_reselection_allowed": false,
+    "case_specific_prompt_rewriting_allowed": false,
+    "paper_confirmatory_outputs_observed": false,
+    "final_outputs_observed": false,
+    "heldout_outputs_observed": false,
+    "causal_oracle_allowed": false,
+    "wavelet_allowed": false
+  }
+}
